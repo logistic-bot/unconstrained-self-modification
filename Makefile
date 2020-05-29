@@ -1,4 +1,4 @@
-default: install test style
+default: test style
 test:
 	@pytest --ff --nf tests --durations=2 --testmon -x --suppress-no-test-exit-code
 
@@ -13,4 +13,4 @@ run:
 	stty sane
 install:
 	pip install -r requirements.txt
-init: install test run
+init: install test
