@@ -4,3 +4,5 @@
 .testmondata
 __pycache__/
 .pytest_cache/
+.vscode/
+workspace.code-workspace
