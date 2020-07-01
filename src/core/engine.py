@@ -1,11 +1,9 @@
-from src.core.actors.player.player import Player
 from src.core.render import render as render
 
 
 class Engine:
     def __init__(self):
         self.renderer = render.CursesRenderer()
-        self.player = Player(self)
 
     def start(self):
         try:
