@@ -3,6 +3,7 @@ Game engine
 """
 
 from src.core.render import render
+from src.scenes import startup
 
 
 class Engine:
@@ -17,6 +18,8 @@ class Engine:
         Start the game
         """
         try:
+            startup_scene = startup.StartupScene(self.renderer)
+            startup_scene.start()
             self.main_loop()
         finally:
             self.renderer.tear_down()
@@ -25,8 +28,13 @@ class Engine:
         """
         Main game loop
         """
-        while True:
+        key = ""
+        while key != "q":
             self.step()
+            key = self.get_key()
+
+    def get_key(self):
+        return self.renderer.get_key()
 
     def step(self) -> None:
         """
@@ -45,7 +53,6 @@ class Engine:
         """
         Handle keypresses
         """
-        self.wait_keypress()
 
     def wait_keypress(self) -> None:
         """
