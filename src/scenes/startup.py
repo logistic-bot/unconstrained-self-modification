@@ -1,5 +1,11 @@
-from time import sleep
+"""
+This Scene is responsible for showing the game's title and startup messages.
+"""
+
 from pathlib import Path
+from typing import Optional
+
+from src.core.scene import Scene
 
 STARTUP_MESSAGE_PATH = Path(__file__).parent.absolute() / "STARTUP"
 
@@ -7,69 +13,17 @@ with open(STARTUP_MESSAGE_PATH, "r") as f:
     STARTUP_MESSAGE = f.read()
 
 
-class StartupScene:
-    def __init__(self, renderer):
-        self.renderer = renderer
-
-    def start(self):
+class StartupScene(Scene):
+    """
+    This scene is called at the start of the game, in engine.py
+    """
+    def start(self) -> Optional[Scene]:  # pylint: disable=R1711
+        """
+        Shows a copyright notice and the game's title.
+        """
         self.clear()
-        self.addinto_allcentred(STARTUP_MESSAGE, delay=0.2, pager_delay=0)
-        self.sleep_key(2)
+        self.sleep_key(0.3)
+        self.addinto_all_centred(STARTUP_MESSAGE, delay=0.1, pager_delay=0)
+        self.sleep_key(50)
 
-    def sleep_key(self, delay, inc=0.01):
-        if delay == 0: return False
-        key = self.renderer.wait_keypress_delay(delay)
-        return True if key == -1 else False
-
-    def addinto_allcentred(self, text, delay=0, pager_delay=2):
-        line_count = len(text.splitlines())
-        self.addinto_centred(round(self.renderer.max_y / 2) - line_count, text, delay, pager_delay)
-
-    def addinto_centred(self, y_pos, text, delay=0, pager_delay=2):
-        line_count = len(text.splitlines())
-
-        if y_pos < 1:
-            y_pos = 1
-
-        if line_count > self.renderer.max_y - 2: # -2 for the borders
-            max_lines = self.renderer.max_y - 2
-            all_lines = text.splitlines()
-            next_lines = "\n".join(all_lines[:max_lines])
-            remainder = "\n".join(all_lines[max_lines - 5:])
-            skip = self.addinto_centred(y_pos, next_lines, delay, pager_delay)
-
-            skip_all = not self.sleep_key(pager_delay)
-            self.clear()
-
-            if skip:
-                delay = 0
-
-            if skip_all:
-                return
-
-            self.addinto_centred(y_pos, remainder, delay, pager_delay)
-            return
-
-        for idx, line in enumerate(text.splitlines()):
-            line = line.strip()
-
-            self.renderer.addtext((round(self.renderer.max_x / 2) - round(len(line) / 2)), y_pos + idx, line)
-
-            self.refresh()
-
-            if line == "":
-                continue
-
-            full_delay = self.sleep_key(delay)
-
-            if not full_delay:
-                delay = 0
-
-        self.sleep_key(pager_delay)
-        return True if delay == 0 else False
-
-    def refresh(self):
-        self.renderer.refresh()
-
-    def clear(self):
-        self.renderer.clear_screen()
+        return None
