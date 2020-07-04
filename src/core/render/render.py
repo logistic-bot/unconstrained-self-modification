@@ -3,6 +3,7 @@ This is where the rendering happens.
 """
 
 import curses
+from typing import Any
 
 
 class CursesRenderer:
@@ -11,7 +12,7 @@ class CursesRenderer:
     """
 
     def __init__(self) -> None:
-        self.stdscr: curses._CursesWindow = curses.initscr()  # pylint: disable=E1101
+        self.stdscr: Any = curses.initscr()  # pylint: disable=E1101
 
         curses.noecho()
         curses.cbreak()
@@ -25,6 +26,7 @@ class CursesRenderer:
         """
         return the maximum x size of the screen
         """
+        max_x: int = 0
         _, max_x = self.stdscr.getmaxyx()
         return max_x
 
@@ -33,11 +35,16 @@ class CursesRenderer:
         """
         returns the maximum y size of the screen
         """
+        max_y: int = 0
         max_y, _ = self.stdscr.getmaxyx()
         return max_y
 
-    def get_key(self):
-        return self.stdscr.getkey()
+    def get_key(self) -> str:
+        """
+        Wait for a key to be pressed, and return a string representing it.
+        """
+        key: str = self.stdscr.getkey()
+        return key
 
     # def get_key_non_blocking(self):
     #     self.stdscr.nodelay(True)
@@ -48,12 +55,19 @@ class CursesRenderer:
     #     self.stdscr.nodelay(False)
     #     return key
 
-    def wait_keypress_delay(self, delay):
-        self.stdscr.timeout(round(delay * 1000)) # the delay is given in seconds, but milliseconds are expected.
-        key = self.stdscr.getch()
+    def wait_keypress_delay(self, delay: float) -> int:
+        """
+        Wait for a key press or for the delay to pass, then return the pressed key. If no key was
+        pressed, return -1.
+
+        :param delay: For how long to wait for a key press, in seconds.
+        :return: The key pressed, or -1 if no key was pressed.
+        """
+        self.stdscr.timeout(round(delay * 1000))  # the delay is given in seconds, but
+        # milliseconds are expected.
+        key: int = self.stdscr.getch()
         self.stdscr.timeout(-1)
         return key
-
 
     def tear_down(self) -> None:
         """

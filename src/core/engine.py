@@ -33,7 +33,12 @@ class Engine:
             self.step()
             key = self.get_key()
 
-    def get_key(self):
+    def get_key(self) -> str:
+        """
+        Wait for a key to be pressed, and return a string representing it. For more
+        documentation, see the documentation for CursesRenderer.get_key().
+        :return:
+        """
         return self.renderer.get_key()
 
     def step(self) -> None:
