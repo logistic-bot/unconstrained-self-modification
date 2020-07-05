@@ -15,6 +15,9 @@ class Scene:
     def __init__(self, renderer: CursesRenderer) -> None:
         self.renderer = renderer
 
+    def start(self) -> None:
+        return None
+
     def sleep_key(self, delay: float) -> bool:
         """
         Wait until a key is pressed, or the delay is exceeded.
@@ -123,7 +126,9 @@ class Scene:
                 delay = 0
         return delay
 
-    def addinto_all_centred(self, text: str, delay: float = 0, pager_delay: float = 2) -> bool:
+    def addinto_all_centred(self, text: str, delay: float = 0, pager_delay: float = 2,
+                            color_pair: int = 0) -> \
+            bool:
         """
         Adds a text into the canvas, completely centred.
 
@@ -135,7 +140,8 @@ class Scene:
         """
         line_count = len(text.splitlines())
         return self.addinto_centred(round(self.renderer.max_y / 2) - round(line_count / 2), text,
-                                    delay, pager_delay, )
+                                    delay, pager_delay, color_pair
+                                    )
 
     def refresh(self) -> None:
         """

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from src.core.scene import Scene
+from src.scenes.start_computer import StartComputer
 
 STARTUP_MESSAGE_PATH = Path(__file__).parent.absolute() / "STARTUP"
 FULL_LICENSE_PATH = Path(__file__).parent.parent.parent.absolute() / "LICENCE"
@@ -53,4 +54,4 @@ class StartupScene(Scene):
         if key == "l":
             self.addinto_all_centred(FULL_LICENSE, 0.01, 5)
 
-        return None
+        return StartComputer(self.renderer)
