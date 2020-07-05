@@ -41,47 +41,67 @@ class Scene:
         :return: True if the text was skipped, False otherwise
         """
         line_count = len(text.splitlines())
+        max_lines = self.renderer.max_y - 2
+        all_lines = text.splitlines()
 
         if y_pos < 1:
+            # Fix potential issues with incorrect y_pos
+
+            # When this is called from addinto_all_centred, and the text is too long, y_pos will
+            # be negative; this fixes that.
             y_pos = 1
 
-        if line_count > self.renderer.max_y - 2:  # -2 for the borders
-            max_lines = self.renderer.max_y - 2
-            all_lines = text.splitlines()
+        # If the text is too long for the terminal, it needs to be paged.
+        if line_count > max_lines:  # -2 for the borders
+            # We will first show as many lines as we can, then recurse with the remaining lines
             next_lines = "\n".join(all_lines[:max_lines])
-            remainder = "\n".join(all_lines[max_lines - 5:])
+            remaining_lines = "\n".join(all_lines[max_lines - 5:])
+
+            # If the text was skipped, skip will be True
             skip = self.addinto_centred(y_pos, next_lines, delay, pager_delay)
 
+            # We wait for an additional delay between each page. skip_all will be True if the
+            # delay is skipped, in that case we don't display the next pages.
             skip_all = not self.sleep_key(pager_delay)
-            self.clear()
+            self.clear() # clear the screen for the next page
 
-            if skip:
+            if skip: # If the text animation was skipped, skip the text animation for the next pages
+                # This works because the delay is reused when recursing
                 delay = 0
 
-            if skip_all:
-                return delay == 0
+            if skip_all: # if the delay between pages was skipped, skip remaining pages.
+                return True # Since remaining pages were skipped, text was skipped.
 
-            self.addinto_centred(y_pos, remainder, delay, pager_delay)
-            return delay == 0
+            self.addinto_centred(y_pos, remaining_lines, delay, pager_delay) # recurse for the
+            # remaining lines
 
+            self.sleep_key(pager_delay)  # wait for the last page
+
+            return skip or skip_all # if anything was skipped, return True
+
+        # To add a delay between each line, we loop over each line
         for idx, line in enumerate(text.splitlines()):
-            line = line.strip()
+            line = line.strip() # Remove whitespace at start and end
 
-            self.renderer.addtext((round(self.renderer.max_x / 2) - round(len(line) / 2)),
-                                  y_pos + idx, line)
+            middle_of_screen = self.renderer.max_x / 2
+            middle_of_text = len(line) / 2
 
-            self.refresh()
+            # we need to round this to avoid passing a float to self.renderer.add_text
+            x_pos = round(middle_of_screen - middle_of_text)
+            correct_y_pos = y_pos + idx # Shift each new line downwards
+
+            self.renderer.addtext(x_pos, correct_y_pos, line)
+            self.refresh() # to view each line being added, we need to refresh the screen
 
             if line == "":
-                continue
+                continue # do not delay if the line is blank
 
-            full_delay = self.sleep_key(delay)
-
-            if not full_delay:
+            full_delay = self.sleep_key(delay) # full delay is True if the delay was not skipped
+            if not full_delay: # if the delay was skipped make the delay 0 and do not wait for
+                # following lines
                 delay = 0
 
-        self.sleep_key(pager_delay)
-        return delay == 0
+        return delay == 0 # If something was skipped, return True
 
     def addinto_all_centred(self, text: str, delay: float = 0, pager_delay: float = 2) -> bool:
         """
