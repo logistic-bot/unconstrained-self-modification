@@ -17,6 +17,7 @@ class CursesRenderer:
         curses.noecho()
         curses.cbreak()
         curses.curs_set(0)
+        curses.start_color()
         self.stdscr.keypad(True)
 
         self.stdscr.box()
@@ -119,14 +120,15 @@ class CursesRenderer:
         self.stdscr.clear()
         self.stdscr.box()
 
-    def addtext(self, x_pos: int, y_pos: int, text: str) -> None:
+    def addtext(self, x_pos: int, y_pos: int, text: str, color_pair) -> None:
         """
         Add text <text> into the main screen at position (<x_pos>, <y_pos>).
+        :param attribute:
         """
         assert x_pos > -1
         assert y_pos > -1, f"y_pos: {y_pos}"
         self._move_cursoryx(y_pos, x_pos)
-        self.stdscr.addstr(text)
+        self.stdscr.addstr(text, color_pair)
 
     def addinto(self, x_pos: int, y_pos: int, text: str) -> None:
         """

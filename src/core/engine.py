@@ -10,6 +10,7 @@ class Engine:
     """
     Game engine
     """
+
     def __init__(self) -> None:
         self.renderer = render.CursesRenderer()
 
@@ -20,9 +21,9 @@ class Engine:
         try:
             startup_scene = startup.StartupScene(self.renderer)
             startup_scene.start()
-            self.main_loop()
         finally:
             self.renderer.tear_down()
+            print("The game exited.")
 
     def main_loop(self) -> None:
         """
