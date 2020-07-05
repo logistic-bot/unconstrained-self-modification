@@ -94,7 +94,8 @@ class Scene:
         :param pager_delay: How many seconds to wait between each page.
         """
         line_count = len(text.splitlines())
-        return self.addinto_centred(round(self.renderer.max_y / 2) - line_count, text, delay,
+        return self.addinto_centred(round(self.renderer.max_y / 2) - round(line_count / 2), text,
+                                    delay,
                                     pager_delay)
 
     def refresh(self) -> None:
