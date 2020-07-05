@@ -14,8 +14,8 @@ with open(STARTUP_MESSAGE_PATH, "r") as f:
     STARTUP_MESSAGE = f.read()
 
 with FULL_LICENSE_PATH.open("r") as f:
-    FULL_LICENSE = [line.strip() for line in f]
-    FULL_LICENSE = "\n".join(FULL_LICENSE)
+    licence = [line.strip() for line in f]
+    FULL_LICENSE = "\n".join(licence)
 
 
 class StartupScene(Scene):
@@ -43,8 +43,7 @@ class StartupScene(Scene):
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
         self.addinto_centred(
             y_pos,
-            "  Press any key to start  \n"
-            " Press l for full license ",
+            "  Press any key to start  \n" " Press l for full license ",
             0.1,
             0,
             curses.color_pair(1) | curses.A_BLINK | curses.A_DIM,
