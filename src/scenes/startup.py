@@ -3,7 +3,7 @@ This Scene is responsible for showing the game's title and startup messages.
 """
 import curses
 from pathlib import Path
-from typing import Optional
+from typing import Any
 
 from src.core.scene import Scene
 from src.scenes.start_computer import StartComputer
@@ -24,7 +24,7 @@ class StartupScene(Scene):
     This scene is called at the start of the game, in engine.py
     """
 
-    def start(self) -> Optional[Scene]:  # pylint: disable=R1711
+    def start(self) -> Any:  # pylint: disable=R1711
         """
         Shows a copyright notice and the game's title.
         """

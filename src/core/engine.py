@@ -6,7 +6,7 @@ from src.core.render import render
 from src.scenes import startup
 
 
-class Engine:
+class Engine:  # pylint: disable=R0903
     """
     Game engine
     """

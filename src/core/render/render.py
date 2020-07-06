@@ -27,6 +27,7 @@ class CursesRenderer:
         """
         return the maximum x size of the screen
         """
+        # noinspection PyUnusedLocal
         max_x: int = 0
         _, max_x = self.stdscr.getmaxyx()
         return max_x
@@ -36,6 +37,7 @@ class CursesRenderer:
         """
         returns the maximum y size of the screen
         """
+        # noinspection PyUnusedLocal
         max_y: int = 0
         max_y, _ = self.stdscr.getmaxyx()
         return max_y

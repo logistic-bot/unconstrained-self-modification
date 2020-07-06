@@ -1,3 +1,7 @@
+"""
+This scene is for the start of the game, this computer is the first that the user can use.
+"""
+
 import curses
 from pathlib import Path
 from time import sleep
@@ -18,9 +22,20 @@ with LOGO_DONE_PATH.open("r") as f:
 
 
 class StartComputer(Scene):
-    def start(self):
+    """
+    The first computer the user can use.
+    """
+
+    def start(self) -> None:
+        """
+        Shows the init sequence of the first computer.
+
+        :return:
+        """
         # init colors
-        font_logo = curses.color_pair(0) | curses.A_ITALIC | curses.A_BOLD | curses.A_BLINK
+        font_logo = (
+            curses.color_pair(0) | curses.A_ITALIC | curses.A_BOLD | curses.A_BLINK
+        )
         curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         font_info = curses.color_pair(1)
         curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -28,7 +43,6 @@ class StartComputer(Scene):
         font_working = font_info | curses.A_BLINK | curses.A_REVERSE
         curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
         font_bad = curses.color_pair(3) | curses.A_BOLD
-
 
         self.addinto(1, 1, "EtherBIOS v2.35.16 initialising...", font_info)
         self.addinto(45, 1, "WORKING", font_working)
@@ -49,7 +63,9 @@ class StartComputer(Scene):
         self.addinto(1, 7, "STARTING SELF-TEST", font_info)
         self.addinto(45, 7, "WORKING", font_working)
         sleep(1.5)
-        self.addinto(1, 8, "WARNING No graphics available, starting in text mode", font_bad)
+        self.addinto(
+            1, 8, "WARNING No graphics available, starting in text mode", font_bad
+        )
         sleep(0.7)
         self.addinto(45, 7, "[DONE] ", font_good)
         self.addinto(1, 9, "Booting from disk 0...", font_info)
@@ -61,6 +77,13 @@ class StartComputer(Scene):
 
         self.get_key()
 
-    def addinto(self, x_pos, y_pos, text, color_pair=0):
+    def addinto(self, x_pos: int, y_pos: int, text: str, color_pair: int = 0) -> None:
+        """
+        Add a text into the screen, and refresh it.
+
+        See CursesRenderer.addtext() for details.
+
+        :return: None
+        """
         self.renderer.addtext(x_pos, y_pos, text, color_pair)
         self.refresh()

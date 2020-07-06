@@ -2,7 +2,7 @@
 This file implements the Scene class, which contains convenience methods for all Scenes.
 """
 import curses
-from typing import Optional
+from typing import Optional, Any
 
 from src.core.render.render import CursesRenderer
 
@@ -15,8 +15,15 @@ class Scene:
     def __init__(self, renderer: CursesRenderer) -> None:
         self.renderer = renderer
 
-    def start(self) -> None:
-        return None
+    def start(self) -> Any:
+        """
+        Run the scene. Should be overridden by subclasses. Should return the next scene. If None
+        is returned, exit the game.
+        """
+        raise NotImplementedError(
+            "This class is not to be used directly, please create a "
+            "subclass and override the start method."
+        )
 
     def sleep_key(self, delay: float) -> bool:
         """
@@ -39,14 +46,16 @@ class Scene:
         """
         return self.renderer.get_key()
 
-    def _addinto_centred_paged(self, y_pos: int, text: str, delay: float, pager_delay: float,
-                               color_pair: int) -> bool:
+    def _addinto_centred_paged(
+        self, y_pos: int, text: str, delay: float, pager_delay: float, color_pair: int
+    ) -> bool:
         all_lines = text.splitlines()
         max_lines = self.renderer.max_y - 2
 
         # We will first show as many lines as we can, then recurse with the remaining lines
         next_lines = "\n".join(all_lines[:max_lines])
-        remaining_lines = "\n".join(all_lines[max_lines - 5:])
+        max_lines_with_buffer = max_lines - 5
+        remaining_lines = "\n".join(all_lines[max_lines_with_buffer:])
 
         # If the text was skipped, skip will be True
         skip = self.addinto_centred(y_pos, next_lines, delay, pager_delay, color_pair)
@@ -56,7 +65,9 @@ class Scene:
         self.sleep_key(pager_delay)
         self.clear()  # clear the screen for the next page
 
-        if skip:  # If the text animation was skipped, skip the text animation for the next
+        if (
+            skip
+        ):  # If the text animation was skipped, skip the text animation for the next
             # pages
             # This works because the delay is reused when recursing
             delay = 0
@@ -71,8 +82,13 @@ class Scene:
         return skip  # if anything was skipped, return True
 
     def addinto_centred(  # pylint: disable=R0913
-            self, y_pos: int, text: str, delay: float = 0, pager_delay: float = 2,
-            color_pair: Optional[int] = None, ) -> bool:
+        self,
+        y_pos: int,
+        text: str,
+        delay: float = 0,
+        pager_delay: float = 2,
+        color_pair: Optional[int] = None,
+    ) -> bool:
         """
         Add a text into, centered vertically, with optional delay between lines.
 
@@ -110,8 +126,9 @@ class Scene:
 
         return delay == 0  # If something was skipped, return True
 
-    def _add_line_centred(self, color_pair: int, delay: float, idx: int, line: str,
-                          y_pos: int) -> float:
+    def _add_line_centred(
+        self, color_pair: int, delay: float, idx: int, line: str, y_pos: int
+    ) -> float:
         middle_of_screen = self.renderer.max_x / 2
         middle_of_text = len(line) / 2
         # we need to round this to avoid passing a float to self.renderer.add_text
@@ -120,28 +137,37 @@ class Scene:
         self.renderer.addtext(x_pos, correct_y_pos, line, color_pair)
         self.refresh()  # to view each line being added, we need to refresh the screen
         if line != "":
-            full_delay = self.sleep_key(delay)  # full delay is True if the delay was not skipped
-            if not full_delay:  # if the delay was skipped make the delay 0 and do not wait for
+            full_delay = self.sleep_key(
+                delay
+            )  # full delay is True if the delay was not skipped
+            if (
+                not full_delay
+            ):  # if the delay was skipped make the delay 0 and do not wait for
                 # following lines
                 delay = 0
         return delay
 
-    def addinto_all_centred(self, text: str, delay: float = 0, pager_delay: float = 2,
-                            color_pair: int = 0) -> \
-            bool:
+    def addinto_all_centred(
+        self, text: str, delay: float = 0, pager_delay: float = 2, color_pair: int = 0
+    ) -> bool:
         """
         Adds a text into the canvas, completely centred.
 
         For more documentation, see Scene.addinto_centred()
 
+        :param color_pair: The color pair to use
         :param text: The text to be displayed
         :param delay: How many seconds to wait between each line
         :param pager_delay: How many seconds to wait between each page.
         """
         line_count = len(text.splitlines())
-        return self.addinto_centred(round(self.renderer.max_y / 2) - round(line_count / 2), text,
-                                    delay, pager_delay, color_pair
-                                    )
+        return self.addinto_centred(
+            round(self.renderer.max_y / 2) - round(line_count / 2),
+            text,
+            delay,
+            pager_delay,
+            color_pair,
+        )
 
     def refresh(self) -> None:
         """
