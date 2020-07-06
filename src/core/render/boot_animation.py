@@ -27,7 +27,8 @@ from src.core.render.render import CursesRenderer
 
 class BootAnimation:
     """
-    This is a helper class to display animated boot animations with progress updates.
+    This is a helper class to display animated boot animations with progress updates. It is
+    designed to be used by a Scene.
 
     A new instance needs to be created with each animation.
 
@@ -38,12 +39,51 @@ class BootAnimation:
 
     The finished and progress strings are optional.
     """
+
     def __init__(self, renderer: CursesRenderer) -> None:
         self.renderer = renderer
 
     def start(self) -> None:
         """
         Start the animation.
+
+        :return: None
+        """
+
+
+class BootAnimationStage:
+    """
+    This is a helper class to store boot animation stage information. It should only be used by
+    BootAnimation.
+
+    Read the documentation for BootAnimation for more details.
+    """
+
+    def __init__(self, renderer: CursesRenderer) -> None:
+        self.renderer = renderer
+
+    def start(self) -> None:
+        """
+        Show this boot stage.
+
+        :return: None
+        """
+
+
+class BootAnimationStageStep:
+    """
+    This is a helper class to store boot animation stage step information. It should only be used
+    by BootAnimationStage.
+
+    Read the documentation for BootAnimation for more details.
+    """
+
+    def __init__(self, renderer: CursesRenderer) -> None:
+        self.renderer = renderer
+
+    def start(self) -> None:
+        """
+        Show this boot step.
 
         :return: None
         """
