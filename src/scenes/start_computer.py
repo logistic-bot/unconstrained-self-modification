@@ -22,7 +22,6 @@ This scene is for the start of the game, this computer is the first that the use
 
 import curses
 from pathlib import Path
-from time import sleep
 
 from src.core.render.boot_animation import (BootAnimation, BootAnimationStage, StyledText,
                                             BootAnimationStageStep, )
@@ -46,7 +45,7 @@ class StartComputer(Scene):
     The first computer the user can use.
     """
 
-    def start(self) -> None: # pylint: disable=R0914
+    def start(self) -> None:  # pylint: disable=R0914
         # TODO: Move the animation definiton to own file.
         # TODO: Programming language name: Parcel-3
         """
@@ -105,11 +104,10 @@ class StartComputer(Scene):
         boot_stage = BootAnimationStage(self.renderer, boot)
 
         # BootAnimation works.
-        animation = BootAnimation(self.renderer, [bios_stage, self_test_stage, boot_stage],
-                                  delay=1.5)
+        animation = BootAnimation(
+            self.renderer, [bios_stage, self_test_stage, boot_stage], delay=1.5
+        )
         animation.start()
-
-        sleep(1.5)
 
         self.addinto_all_centred(LOGO_START, 0.05)
         self.addinto_all_centred(LOGO_DONE, color_pair=font_logo)
