@@ -1,6 +1,7 @@
 """
 This file implements the Scene class, which contains convenience methods for all Scenes.
 """
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
