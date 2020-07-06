@@ -2,6 +2,61 @@
 This scene is for the start of the game, this computer is the first that the user can use.
 """
 
+# ------------------------------------------------------------------------------
+#  This file is part of Universal Sandbox.
+#
+#  Copyright (C) © 2020 Khaïs COLIN <khais.colin@gmail.com>
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+#  This file is part of Universal Sandbox.
+#
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+#  This file is part of Universal Sandbox.
+#
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
 import curses
 from pathlib import Path
 from time import sleep
@@ -44,7 +99,7 @@ class StartComputer(Scene):
         curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
         font_bad = curses.color_pair(3) | curses.A_BOLD
 
-        self.addinto(1, 1, "EtherBIOS v2.35.16 initialising...", font_info)
+        self.addinto(1, 1, "EtherBIOS v2.3.1 initialising...", font_info)
         self.addinto(45, 1, "WORKING", font_working)
         sleep(1.5)
         self.addinto(1, 2, "CPU 0: Ether Industries Pulse 32 Cores 128 bit 9MHz")
@@ -76,14 +131,3 @@ class StartComputer(Scene):
         self.addinto_all_centred(LOGO_DONE, color_pair=font_logo)
 
         self.get_key()
-
-    def addinto(self, x_pos: int, y_pos: int, text: str, color_pair: int = 0) -> None:
-        """
-        Add a text into the screen, and refresh it.
-
-        See CursesRenderer.addtext() for details.
-
-        :return: None
-        """
-        self.renderer.addtext(x_pos, y_pos, text, color_pair)
-        self.refresh()

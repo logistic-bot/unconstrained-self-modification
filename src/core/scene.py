@@ -1,6 +1,61 @@
 """
 This file implements the Scene class, which contains convenience methods for all Scenes.
 """
+# ------------------------------------------------------------------------------
+#  This file is part of Universal Sandbox.
+#
+#  Copyright (C) © 2020 Khaïs COLIN <khais.colin@gmail.com>
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+#  This file is part of Universal Sandbox.
+#
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+#  This file is part of Universal Sandbox.
+#
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
 import curses
 from typing import Optional, Any
 
@@ -181,3 +236,14 @@ class Scene:
         Clear the screen, and redraw the borders.
         """
         self.renderer.clear_screen()
+
+    def addinto(self, x_pos: int, y_pos: int, text: str, color_pair: int = 0) -> None:
+        """
+        Add a text into the screen, and refresh it.
+
+        See CursesRenderer.addtext() for details.
+
+        :return: None
+        """
+        self.renderer.addtext(x_pos, y_pos, text, color_pair)
+        self.refresh()
