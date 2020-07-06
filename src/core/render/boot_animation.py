@@ -23,6 +23,8 @@ animations with progress updates.
 # ------------------------------------------------------------------------------
 
 import curses
+from time import sleep
+from typing import List, Optional, Sized
 
 from src.core.render.render import CursesRenderer
 
@@ -44,8 +46,8 @@ class StyledText:
 
     def __init__(
         self,
-        renderer: CursesRenderer,
-        text: str = " ",
+        renderer: Optional[CursesRenderer],
+        text: Optional[str] = None,
         color: int = 0,
         inverted: bool = False,
         blinking: bool = False,
@@ -66,12 +68,140 @@ class StyledText:
         self.text = text
         self.renderer = renderer
 
+    @property
+    def draw(self) -> bool:
+        """
+        Returns true if there is something to draw
+        """
+        if self.text is None:
+            return False
+        return True
+
     def show(self, x_pos: int, y_pos: int) -> None:
         """
         Show the styled text at the given position
         :return: None
         """
-        self.renderer.addtext(x_pos, y_pos, self.text, self.font)
+        assert self.renderer is not None
+        if self.draw:
+            assert isinstance(self.text, str)
+            self.renderer.addtext(x_pos, y_pos, self.text, self.font)
+        self.renderer.refresh()
+
+
+class BootAnimationStageStep:
+    """
+    This is a helper class to store boot animation stage step information. It should only be used
+    by BootAnimationStage.
+
+    Read the documentation for BootAnimation for more details.
+    """
+
+    def __init__(
+        self,
+        text: StyledText,
+        progress: Optional[StyledText] = None,
+        finished: Optional[StyledText] = None,
+        delay: float = 0,
+    ) -> None:
+        self.renderer: Optional[CursesRenderer] = None
+        self.text = text
+        self.delay = delay
+        self.progress = progress
+        self.finished = finished
+
+        self.status_x = 45
+
+    def start(self, x_pos: int, y_pos: int) -> None:
+        """
+        Show this boot step.
+
+        :return: None
+        """
+        assert self.renderer is not None
+        self.text.show(x_pos, y_pos)
+
+        if self.progress is not None:
+            self.progress.show(self.status_x, y_pos)
+
+        sleep(self.delay)
+
+        # replace the previous status with whitespace
+        if self.progress is not None:
+            assert isinstance(self.progress.text, Sized)
+            self.renderer.addtext(self.status_x, y_pos, len(self.progress.text) * " ")
+
+        if self.finished is not None:
+            self.finished.show(self.status_x, y_pos)
+
+    def set_renderer(self, renderer: CursesRenderer) -> None:
+        """
+        Set the renderer for this step. Should only be used by BootAnimationStage.
+
+        :param renderer: The renderer to be used
+        :return: None
+        """
+        self.renderer = renderer
+
+
+class BootAnimationStage:
+    """
+    This is a helper class to store boot animation stage information. It should only be used by
+    BootAnimation.
+
+    Read the documentation for BootAnimation for more details.
+    """
+
+    def __init__(
+        self,
+        renderer: CursesRenderer,
+        text: StyledText,
+        progress: Optional[StyledText] = None,
+        finished: Optional[StyledText] = None,
+        steps: Optional[List[BootAnimationStageStep]] = None,
+        delay: float = 0,
+    ) -> None:
+        if steps is None:
+            steps = []
+        self.renderer = renderer
+        self.steps = steps
+        self.delay = delay
+
+        self.text = text
+        self.progress = progress
+        self.finished = finished
+
+        self.status_x = 45
+
+    def start(self, start_y: int = 1) -> int:
+        """
+        Show this boot stage.
+
+        :return: The maximum y position where text was drawn.
+        """
+        x_pos = 1
+        y_pos = start_y
+        self.text.show(x_pos, y_pos)
+
+        if self.progress is not None:
+            self.progress.show(self.status_x, y_pos)
+
+        sleep(self.delay)
+        if not self.steps:
+            y_pos += 1
+        else:
+            for step in self.steps:
+                y_pos += 1
+                step.set_renderer(self.renderer)
+                step.start(x_pos, y_pos)
+
+        if self.progress is not None:
+            assert isinstance(self.progress.text, Sized)
+            self.renderer.addtext(self.status_x, start_y, len(self.progress.text) * " ")
+        if self.finished is not None:
+            self.finished.show(self.status_x, start_y)
+
+        return y_pos
 
 
 class BootAnimation:
@@ -89,7 +219,16 @@ class BootAnimation:
     The finished and progress strings are optional.
     """
 
-    def __init__(self, renderer: CursesRenderer) -> None:
+    def __init__(
+        self,
+        renderer: CursesRenderer,
+        stages: Optional[List[BootAnimationStage]] = None,
+        delay: float = 0,
+    ) -> None:
+        self.delay = delay
+        if stages is None:
+            stages = []
+        self.stages = stages
         self.renderer = renderer
 
     def start(self) -> None:
@@ -98,41 +237,8 @@ class BootAnimation:
 
         :return: None
         """
-
-
-class BootAnimationStage:
-    """
-    This is a helper class to store boot animation stage information. It should only be used by
-    BootAnimation.
-
-    Read the documentation for BootAnimation for more details.
-    """
-
-    def __init__(self, renderer: CursesRenderer) -> None:
-        self.renderer = renderer
-
-    def start(self) -> None:
-        """
-        Show this boot stage.
-
-        :return: None
-        """
-
-
-class BootAnimationStageStep:
-    """
-    This is a helper class to store boot animation stage step information. It should only be used
-    by BootAnimationStage.
-
-    Read the documentation for BootAnimation for more details.
-    """
-
-    def __init__(self, renderer: CursesRenderer) -> None:
-        self.renderer = renderer
-
-    def start(self) -> None:
-        """
-        Show this boot step.
-
-        :return: None
-        """
+        y_pos = 1
+        for stage in self.stages:
+            y_pos = stage.start(y_pos)
+            y_pos = y_pos + 1  # we need to increment this to draw on a free line
+        sleep(self.delay)
