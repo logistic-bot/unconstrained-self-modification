@@ -21,7 +21,7 @@ This is where the rendering happens.
 # ------------------------------------------------------------------------------
 
 import curses
-from typing import Any
+from typing import Any, Optional
 
 
 class CursesRenderer:
@@ -140,10 +140,14 @@ class CursesRenderer:
         self.stdscr.clear()
         self.stdscr.box()
 
-    def addtext(self, x_pos: int, y_pos: int, text: str, color_pair: int) -> None:
+    def addtext(
+        self, x_pos: int, y_pos: int, text: str, color_pair: Optional[int] = None
+    ) -> None:
         """
         Add text <text> into the main screen at position (<x_pos>, <y_pos>).
         """
+        if color_pair is None:
+            color_pair = curses.color_pair(0)
         assert x_pos > -1
         assert y_pos > -1, f"y_pos: {y_pos}"
         self._move_cursoryx(y_pos, x_pos)
@@ -161,4 +165,12 @@ class CursesRenderer:
         self.stdscr.addstr(text)
 
     def _move_cursoryx(self, y_pos: int, x_pos: int) -> None:
-        self.stdscr.move(y_pos, x_pos)
+        try:
+            self.stdscr.move(y_pos, x_pos)
+        except curses.error:
+            max_x = self.max_x
+            max_y = self.max_y
+            raise Exception(
+                f"Tried to move cursor: failed: y_pos: {y_pos}, x_pos: {x_pos}, "
+                f"max_x: {max_x}, max_y: {max_y}"
+            )
