@@ -118,21 +118,25 @@ class BootAnimationStageStep:
 
         :return: None
         """
-        assert self.renderer is not None
-        self.text.show(x_pos, y_pos)
-
-        if self.progress is not None:
-            self.progress.show(self.status_x, y_pos)
+        self._start(x_pos, y_pos)
 
         sleep(self.delay)
 
+        self._stop(y_pos)
+
+    def _stop(self, y_pos):
         # replace the previous status with whitespace
         if self.progress is not None:
             assert isinstance(self.progress.text, Sized)
             self.renderer.addtext(self.status_x, y_pos, len(self.progress.text) * " ")
-
         if self.finished is not None:
             self.finished.show(self.status_x, y_pos)
+
+    def _start(self, x_pos, y_pos):
+        assert self.renderer is not None
+        self.text.show(x_pos, y_pos)
+        if self.progress is not None:
+            self.progress.show(self.status_x, y_pos)
 
     def set_renderer(self, renderer: CursesRenderer) -> None:
         """
@@ -181,25 +185,102 @@ class BootAnimationStage:
         """
         x_pos = 1
         y_pos = start_y
-        self.text.show(x_pos, y_pos)
-
-        if self.progress is not None:
-            self.progress.show(self.status_x, y_pos)
+        self._start(x_pos, y_pos)
 
         sleep(self.delay)
-        if not self.steps:
-            y_pos += 1
-        else:
-            for step in self.steps:
-                y_pos += 1
-                step.set_renderer(self.renderer)
-                step.start(x_pos, y_pos)
 
+        for step in self.steps:
+            y_pos += 1
+            step.set_renderer(self.renderer)
+            step.start(x_pos, y_pos)
+
+        self._stop(start_y)
+
+        return y_pos
+
+    def _stop(self, start_y):
         if self.progress is not None:
             assert isinstance(self.progress.text, Sized)
             self.renderer.addtext(self.status_x, start_y, len(self.progress.text) * " ")
         if self.finished is not None:
             self.finished.show(self.status_x, start_y)
+
+    def _start(self, x_pos, y_pos):
+        self.text.show(x_pos, y_pos)
+        if self.progress is not None:
+            self.progress.show(self.status_x, y_pos)
+
+
+class BootAnimationInfoStage:
+    """
+    This is about the same as BootAnimationStage, except it does not have a progress string,
+    a finished string, and a text, only a list of steps. It is designed to display short messages.
+    """
+
+    def __init__(self, renderer, steps, delay, blank_lines=0):
+        self.renderer = renderer
+        self.steps = steps
+        self.delay = delay
+        self.blank_lines = blank_lines
+
+    def start(self, start_y: int = 1) -> int:
+        """
+        Show this boot stage.
+
+        :return: The maximum y position where text was drawn.
+        """
+        x_pos = 1
+        y_pos = start_y
+
+        if not self.steps:
+            y_pos += 1
+        else:
+            for step in self.steps:
+                step.set_renderer(self.renderer)
+                step.start(x_pos, y_pos)
+                y_pos += 1
+
+        sleep(self.delay)
+
+        return y_pos - 1
+
+
+class BootAnimationSimultaneousStage:
+    """
+    This is used to display multiple in-progress steps at once.
+    """
+
+    def __init__(self, renderer, stages, delay=0.1, end_delay=0, delay_between=0.1):
+        self.delay_between = delay_between
+        self.end_delay = end_delay
+        self.renderer = renderer
+        self.stages = stages
+        self.delay = delay
+
+    def start(self, start_y: int = 1) -> int:
+        """
+        Show this boot stage.
+
+        :return: The maximum y position where text was drawn.
+        """
+        x_pos = 1
+        y_pos = start_y
+
+        if not self.stages:
+            y_pos += 1
+        else:
+            for stage in self.stages:
+                y_pos += 1
+                # noinspection PyProtectedMember
+                stage._start(x_pos, y_pos)
+                sleep(self.delay_between)
+            sleep(self.delay)
+            y_pos = start_y
+            for stage in self.stages:
+                y_pos += 1
+                # noinspection PyProtectedMember
+                stage._stop(y_pos)
+                sleep(self.delay_between)
 
         return y_pos
 
@@ -231,14 +312,14 @@ class BootAnimation:
         self.stages = stages
         self.renderer = renderer
 
-    def start(self) -> None:
+    def start(self, y_pos=1) -> int:
         """
         Start the animation.
 
         :return: None
         """
-        y_pos = 1
         for stage in self.stages:
             y_pos = stage.start(y_pos)
             y_pos = y_pos + 1  # we need to increment this to draw on a free line
         sleep(self.delay)
+        return y_pos
