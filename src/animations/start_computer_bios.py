@@ -24,8 +24,7 @@ This is the boot animation from the first computer
 # init colors
 import curses
 
-from src.core.render.boot_animation import StyledText, BootAnimationStageStep, BootAnimationStage, \
-    BootAnimation
+from src.core.render.boot_animation import StyledText, Step, Stage, BootAnimation
 from src.core.render.render import CursesRenderer
 
 
@@ -51,15 +50,15 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
 
     # step list definition
     cpus = [cpu0, cpu1, cpu2, cpu3]
-    cpu_steps = [BootAnimationStageStep(cpu, delay=0.3) for cpu in cpus]
-    gpu_step = BootAnimationStageStep(gpu, delay=0.3)
+    cpu_steps = [Step(cpu, delay=0.3) for cpu in cpus]
+    gpu_step = Step(gpu, delay=0.3)
     bios_steps = cpu_steps + [gpu_step]
-    self_test_steps = [BootAnimationStageStep(gpu_warning, delay=0.7)]
+    self_test_steps = [Step(gpu_warning, delay=0.7)]
 
     # stage definitions
-    bios_stage = BootAnimationStage(renderer, init, progress, finished, bios_steps, 1.5)
-    self_test_stage = BootAnimationStage(renderer, self_test, progress, finished, self_test_steps)
-    boot_stage = BootAnimationStage(renderer, boot)
+    bios_stage = Stage(renderer, init, progress, finished, bios_steps, 1.5)
+    self_test_stage = Stage(renderer, self_test, progress, finished, self_test_steps)
+    boot_stage = Stage(renderer, boot)
 
     # BootAnimation works.
     animation = BootAnimation(renderer, [bios_stage, self_test_stage, boot_stage], delay=1.5)
