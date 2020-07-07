@@ -1,2 +1,3 @@
+pytest
 pytest-testmon
 pytest-custom_exit_code
