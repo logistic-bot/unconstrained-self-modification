@@ -1,3 +1,7 @@
+"""
+This is the boot animation from the first computer
+"""
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
@@ -22,9 +26,11 @@ import curses
 
 from src.core.render.boot_animation import StyledText, BootAnimationStageStep, BootAnimationStage, \
     BootAnimation
+from src.core.render.render import CursesRenderer
 
 
-def create_animation(renderer):
+def create_animation(renderer: CursesRenderer) -> BootAnimation:
+    """create a boot animation and returns it"""
     curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)

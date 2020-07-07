@@ -45,7 +45,6 @@ class StartComputer(Scene):
     """
 
     def start(self) -> None:  # pylint: disable=R0914
-        # TODO: Move the animation definition to own file.
         # TODO: Programming language name: Parcel-3
         """
         Shows the init sequence of the first computer.
