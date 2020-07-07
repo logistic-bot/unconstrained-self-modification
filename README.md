@@ -1,12 +1,10 @@
-# Mind Control RPG
+# Unconstrained self-modification
 
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html) [![Ask Me Anything !](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](https://GitHub.com/Naereen/ama)
 
-> An RPG where you have the ability to control the minds of other creatures
+> An RPG where you play as an Advanced Artificial Intelligence
 
-This is a work in progress RPG and Roguelike where you have the ability to
-control the minds of other creatures. It is still in a very early stage of
-development, but all questions are welcome.
+This is a curses, terminal-only RPG where an AGI tries to figure out it's purpose.
 
 ## Table of Contents
 
@@ -61,7 +59,7 @@ above commands.
 
 With this method, you may need to run `sudo pip install -r requirements.txt`.
 
-## Usage 
+## Usage
 
 In the game directory, run this command:
 
@@ -90,8 +88,7 @@ worked on.
 If you have trouble with anything, even if it seems trivial to you, please
 open an issue.
 
-I recomend installing [entr](https://github.com/clibs/entr) and running `find
-. | entr -c make` in another terminal to run tests and check style as you
+I recomend installing [entr](https://github.com/clibs/entr) and running `find . | entr -c make` in another terminal to run tests and check style as you
 code.
 
 ### Summary of make commands
