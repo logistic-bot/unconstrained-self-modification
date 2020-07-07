@@ -26,6 +26,7 @@ jobs:
     - name: Install
       run: |
         cd $GITHUB_WORKSPACE
+        apt install make pytest
         pip install -r requirements.txt
         make init
 
