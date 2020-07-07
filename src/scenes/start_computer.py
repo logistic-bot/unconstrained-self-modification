@@ -23,7 +23,7 @@ This scene is for the start of the game, this computer is the first that the use
 import curses
 from pathlib import Path
 
-from src.animations import start_computer_boot
+from src.animations import start_computer_bios, start_computer_boot
 from src.core.scene import Scene
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
@@ -51,11 +51,14 @@ class StartComputer(Scene):
 
         :return:
         """
-        animation = start_computer_boot.create_animation(self.renderer)
-        animation.start()
+        animation = start_computer_bios.create_animation(self.renderer)
+        y_pos = animation.start()
 
         font_logo = (curses.color_pair(0) | curses.A_ITALIC | curses.A_BOLD | curses.A_BLINK)
         self.addinto_all_centred(LOGO_START, 0.05)
         self.addinto_all_centred(LOGO_DONE, color_pair=font_logo)
+
+        animation = start_computer_boot.create_animation(self.renderer)
+        animation.start(y_pos + 1) # leave a blank line
 
         self.get_key()

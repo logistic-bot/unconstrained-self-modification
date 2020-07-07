@@ -1,5 +1,6 @@
 """
-This is the boot animation from the first computer
+This is the boot animation for the first computer. It will play after the bios animation for the
+first computer.
 """
 
 # ------------------------------------------------------------------------------
@@ -20,47 +21,49 @@ This is the boot animation from the first computer
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
-
-# init colors
 import curses
 
-from src.core.render.boot_animation import StyledText, BootAnimationStageStep, BootAnimationStage, \
-    BootAnimation
+from src.core.render.boot_animation import BootAnimation, StyledText, Step, Stage, InfoStage, \
+    SimultaneousStage
 from src.core.render.render import CursesRenderer
 
 
 def create_animation(renderer: CursesRenderer) -> BootAnimation:
     """create a boot animation and returns it"""
-    curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(4, curses.COLOR_CYAN, curses.COLOR_BLACK) # info
+    curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK) # progress
+    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK) # good
+    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK) # bad
 
-    # text definition
-    init = StyledText(renderer, "EtherBIOS v2.3.1 initialising...", 1)
-    self_test = StyledText(renderer, "STARTING SELF-TEST...", 1)
-    cpu0 = StyledText(renderer, "CPU 0: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0)
-    cpu1 = StyledText(renderer, "CPU 1: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0)
-    cpu2 = StyledText(renderer, "CPU 2: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0)
-    cpu3 = StyledText(renderer, "CPU 3: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0)
-    gpu = StyledText(renderer, "GPU 0: Ether Industries UltraText", 0)
-    gpu_warning = StyledText(renderer, "WARNING: No graphics available, starting in text mode", 3,
-                             bold=True, )
-    boot = StyledText(renderer, "Booting from disk 0...", 1)
-    progress = StyledText(renderer, "WORKING", 1, blinking=True, inverted=True)
-    finished = StyledText(renderer, "DONE", 2, bold=True)
+    progress = StyledText(renderer, "IN PROGRESS", 5, blinking=True, inverted=True)
+    finished = StyledText(renderer, "OK", 2, bold=True)
+    success = StyledText(renderer, "PASSED", 2, bold=True)
+    # warning = StyledText(renderer, "WARNING", 3, bold=True, blinking=True)
 
-    # step list definition
-    cpus = [cpu0, cpu1, cpu2, cpu3]
-    cpu_steps = [BootAnimationStageStep(cpu, delay=0.3) for cpu in cpus]
-    gpu_step = BootAnimationStageStep(gpu, delay=0.3)
-    bios_steps = cpu_steps + [gpu_step]
-    self_test_steps = [BootAnimationStageStep(gpu_warning, delay=0.7)]
+    greet = StyledText(renderer, "Ether Industries EtherOS v6.2.4", 0)
+    ether_copyright = StyledText(renderer, "Copyright (C) 2024-2052 Ether Industries, Inc.", 0)
+    cpu_test_0 = StyledText(renderer, "Testing cpu 0", 4)
+    cpu_test_1 = StyledText(renderer, "Testing cpu 1", 4)
+    cpu_test_2 = StyledText(renderer, "Testing cpu 2", 4)
+    cpu_test_3 = StyledText(renderer, "Testing cpu 3", 4)
+    gpu_test = StyledText(renderer, "Testing gpu 0", 4)
+    compiler = StyledText(renderer, "Loading parcel 3 compiler", 4)
+    text_mode = StyledText(renderer, "Starting text interface", 4)
 
-    # stage definitions
-    bios_stage = BootAnimationStage(renderer, init, progress, finished, bios_steps, 1.5)
-    self_test_stage = BootAnimationStage(renderer, self_test, progress, finished, self_test_steps)
-    boot_stage = BootAnimationStage(renderer, boot)
+    greet_steps = [Step(greet), Step(ether_copyright)]
+    test_step = [cpu_test_0, cpu_test_1, cpu_test_2, cpu_test_3, gpu_test]
 
-    # BootAnimation works.
-    animation = BootAnimation(renderer, [bios_stage, self_test_stage, boot_stage], delay=1.5)
+    test_stage_tmp = [Stage(renderer, step, progress, success, delay=1) for step in
+                      test_step]
+    for stage in test_stage_tmp:
+        stage.status_x = 40
+
+    greet_stage = InfoStage(renderer, greet_steps, 0.7, 1)
+    test_stage = SimultaneousStage(renderer, test_stage_tmp, 1.5, 0.5, 0.7)
+    compiler_stage = Stage(renderer, compiler, progress, finished, delay=1.5)
+    compiler_stage.status_x = 40
+    final_stage = Stage(renderer, text_mode, progress, finished, delay=1.5)
+    final_stage.status_x = 40
+
+    animation = BootAnimation(renderer, [greet_stage, test_stage, compiler_stage, final_stage])
     return animation
