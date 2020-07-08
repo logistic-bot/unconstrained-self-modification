@@ -24,7 +24,7 @@ This is the boot animation from the first computer
 # init colors
 import curses
 
-from src.core.boot_animation import StyledText, Step, Stage, BootAnimation
+from src.core.boot_animation.boot_animation import StyledText, Step, Stage, BootAnimation
 from src.core.render import CursesRenderer
 
 
