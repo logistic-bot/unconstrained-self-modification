@@ -23,9 +23,10 @@ first computer.
 # ------------------------------------------------------------------------------
 import curses
 
-from src.core.boot_animation.boot_animation import BootAnimation, StyledText, Stage, InfoStage, \
-    SimultaneousStage
+from src.core.boot_animation.boot_animation import BootAnimation, InfoStage, SimultaneousStage
+from src.core.boot_animation.stage import Stage
 from src.core.boot_animation.step import Step
+from src.core.boot_animation.styled_text import StyledText
 from src.core.render import CursesRenderer
 
 
