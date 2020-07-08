@@ -6,7 +6,7 @@ animations with progress updates.
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
-#  Copyright (C) © 2020 Khaïs COLIN <khais.colin@gmail.com>
+#  Copyright (C) © 2020 Khaïs COLIN <logistic-bot@protonmail.com>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
