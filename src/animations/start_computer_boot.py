@@ -30,7 +30,7 @@ from src.core.render.render import CursesRenderer
 
 def create_animation(renderer: CursesRenderer) -> BootAnimation:
     """create a boot animation and returns it"""
-    curses.init_pair(4, curses.COLOR_CYAN, curses.COLOR_BLACK) # info
+    curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK) # info
     curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK) # progress
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK) # good
     curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK) # bad
