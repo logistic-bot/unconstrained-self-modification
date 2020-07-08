@@ -23,9 +23,9 @@ first computer.
 # ------------------------------------------------------------------------------
 import curses
 
-from src.core.render.boot_animation import BootAnimation, StyledText, Step, Stage, InfoStage, \
+from src.core.boot_animation import BootAnimation, StyledText, Step, Stage, InfoStage, \
     SimultaneousStage
-from src.core.render.render import CursesRenderer
+from src.core.render import CursesRenderer
 
 
 def create_animation(renderer: CursesRenderer) -> BootAnimation:

@@ -20,7 +20,7 @@ Game engine
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-from src.core.render import render
+from src.core import render
 from src.scenes import startup
 
 

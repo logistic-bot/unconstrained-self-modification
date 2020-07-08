@@ -23,7 +23,7 @@ This file implements the Scene class, which contains convenience methods for all
 import curses
 from typing import Optional, Any
 
-from src.core.render.render import CursesRenderer
+from src.core.render import CursesRenderer
 
 
 class Scene:
