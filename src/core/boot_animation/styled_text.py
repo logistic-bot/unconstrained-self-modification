@@ -108,6 +108,8 @@ class StyledText:
             for text in self.text:
                 assert isinstance(text, str)
                 self.renderer.addtext(x_pos, y_pos, text, self.font)
+        else:
+            raise NotImplementedError("Please try using one of the supported text types.")
 
         self.renderer.refresh()
 
