@@ -102,6 +102,13 @@ class StyledText:
             assert isinstance(self.text, str)
             self.renderer.addtext(x_pos, y_pos, self.text, self.font)
 
+        elif self.method == "List[str]:":
+            assert isinstance(self.text, list)
+
+            for text in self.text:
+                assert isinstance(text, str)
+                self.renderer.addtext(x_pos, y_pos, text, self.font)
+
         self.renderer.refresh()
 
 
