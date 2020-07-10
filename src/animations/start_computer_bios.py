@@ -48,7 +48,7 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
     gpu_warning = StyledText(renderer, "WARNING: No graphics available, starting in text mode", 3,
                              bold=True, )
     boot = StyledText(renderer, "Booting from disk 0...", 1)
-    progress = StyledText(renderer, "WORKING", 1, blinking=True, inverted=True)
+    progress = StyledText(renderer, "WORKING", 1, blink=True, invert=True)
     finished = StyledText(renderer, "DONE", 2, bold=True)
 
     # step list definition

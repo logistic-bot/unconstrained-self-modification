@@ -17,13 +17,95 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
+# TODO: REFACTORING BOOT_ANIMATION PLAN
+# TODO: Rewrite StyledText so that it can take a list of StyledText as its text argument and is
+#  accepted by CursesRenderer as a text.
+# TODO: Refactor Stage.
+from __future__ import annotations
+
 import curses
-from typing import Optional
+from typing import Optional, Union, List, TypeVar
 
 from src.core.render import CursesRenderer
 
+CursesColorPairNumber = TypeVar("CursesColorPairNumber", bound=int)
+
 
 class StyledText:
+    """
+    This class is used to draw text with colors, and different curses attributes.
+    """
+
+    def __init__(
+        self,
+        renderer: Optional[CursesRenderer],
+        text: Union[str, List[str], List[StyledText]],
+        color: CursesColorPairNumber,
+        invert: bool = False,
+        blink: bool = False,
+        bold: bool = False,
+        italic: bool = False,
+    ) -> None:
+        self.italic = italic
+        self.bold = bold
+        self.blink = blink
+        self.invert = invert
+
+        self.renderer = renderer
+        self.color = color
+
+        self.text = text
+
+    @property
+    def effects(self) -> int:
+        effects = curses.A_NORMAL
+        if self.invert:
+            effects = effects | curses.A_REVERSE
+        if self.blink:
+            effects = effects | curses.A_BLINK
+        if self.bold:
+            effects = effects | curses.A_BOLD
+        if self.italic:
+            effects = effects | curses.A_ITALIC
+        return effects
+
+    @property
+    def font(self) -> int:
+        return curses.color_pair(self.color) | self.effects
+
+    @property
+    def method(self) -> str:
+        # I don't know is we need this.
+        if isinstance(self.text, str):
+            method = "str"
+        elif isinstance(self.text, list):
+            if isinstance(self.text[0], str):
+                method = "List[str]"
+            elif isinstance(self.text[0], StyledText):
+                method = "List[StyledText]"
+            else:
+                raise TypeError(
+                    "Argument text for StyledText needs to be of type Union[str, "
+                    "List[str], List[StyledText]]."
+                )
+        else:
+            raise TypeError(
+                "Argument text for StyledText needs to be of type Union[str, "
+                "List[str], List[StyledText]]."
+            )
+        return method
+
+    def show(self, x_pos: int, y_pos: int) -> None:
+        assert self.renderer is not None
+
+        if self.method == "str":
+            assert isinstance(self.text, str)
+            self.renderer.addtext(x_pos, y_pos, self.text, self.font)
+
+        self.renderer.refresh()
+
+
+class OldStyledText:
     """
     This class is used to draw styled text. It abstracts away curses attributes system.
 

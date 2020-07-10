@@ -37,7 +37,7 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK) # good
     curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK) # bad
 
-    progress = StyledText(renderer, "IN PROGRESS", 5, blinking=True, inverted=True)
+    progress = StyledText(renderer, "IN PROGRESS", 5, blink=True, invert=True)
     finished = StyledText(renderer, "OK", 2, bold=True)
     success = StyledText(renderer, "PASSED", 2, bold=True)
     # warning = StyledText(renderer, "WARNING", 3, bold=True, blinking=True)
