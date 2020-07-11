@@ -23,25 +23,48 @@ first computer.
 # ------------------------------------------------------------------------------
 import curses
 
-from src.core.render.boot_animation import BootAnimation, StyledText, Step, Stage, InfoStage, \
-    SimultaneousStage
-from src.core.render.render import CursesRenderer
+from src.core.boot_animation.boot_animation import (BootAnimation, InfoStage, SimultaneousStage, )
+from src.core.boot_animation.stage import Stage
+from src.core.boot_animation.step import Step
+from src.core.boot_animation.styled_text import StyledText
+from src.core.render import CursesRenderer
 
 
 def create_animation(renderer: CursesRenderer) -> BootAnimation:
     """create a boot animation and returns it"""
-    curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK) # info
-    curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK) # progress
-    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK) # good
-    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK) # bad
+    curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)  # info
+    curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)  # progress
+    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)  # good
+    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)  # bad
 
-    progress = StyledText(renderer, "IN PROGRESS", 5, blinking=True, inverted=True)
-    finished = StyledText(renderer, "OK", 2, bold=True)
-    success = StyledText(renderer, "PASSED", 2, bold=True)
+    progress = StyledText(renderer, "IN PROGRESS", 5, blink=True, invert=True)
+    # finished = StyledText(renderer, ["[", "OK", "]"], 2, bold=True)
+    finished = StyledText(
+        renderer,
+        [
+            StyledText(renderer, ["[", " "], 0, bold=True),
+            StyledText(renderer, ["  ", "OK", "  "], 2, bold=True),
+            StyledText(renderer, [" ", "]"], 0, bold=True),
+        ],
+        2,
+        bold=True,
+    )
+    success = StyledText(
+        renderer,
+        [
+            StyledText(renderer, ["[", " "], 0, bold=True),
+            StyledText(renderer, "PASSED", 2, bold=True),
+            StyledText(renderer, [" ", "]"], 0, bold=True),
+        ],
+        0,
+        bold=True,
+    )
     # warning = StyledText(renderer, "WARNING", 3, bold=True, blinking=True)
 
     greet = StyledText(renderer, "Ether Industries EtherOS v6.2.4", 0)
-    ether_copyright = StyledText(renderer, "Copyright (C) 2024-2052 Ether Industries, Inc.", 0)
+    ether_copyright = StyledText(
+        renderer, "Copyright (C) 2024-2052 Ether Industries, Inc.", 0
+    )
     cpu_test_0 = StyledText(renderer, "Testing cpu 0", 4)
     cpu_test_1 = StyledText(renderer, "Testing cpu 1", 4)
     cpu_test_2 = StyledText(renderer, "Testing cpu 2", 4)
@@ -53,8 +76,9 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
     greet_steps = [Step(greet), Step(ether_copyright)]
     test_step = [cpu_test_0, cpu_test_1, cpu_test_2, cpu_test_3, gpu_test]
 
-    test_stage_tmp = [Stage(renderer, step, progress, success, delay=1) for step in
-                      test_step]
+    test_stage_tmp = [
+        Stage(renderer, step, progress, success, delay=1) for step in test_step
+    ]
     for stage in test_stage_tmp:
         stage.status_x = 40
 
@@ -65,5 +89,7 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
     final_stage = Stage(renderer, text_mode, progress, finished, delay=1.5)
     final_stage.status_x = 40
 
-    animation = BootAnimation(renderer, [greet_stage, test_stage, compiler_stage, final_stage])
+    animation = BootAnimation(
+        renderer, [greet_stage, test_stage, compiler_stage, final_stage]
+    )
     return animation
