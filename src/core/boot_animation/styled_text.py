@@ -95,6 +95,13 @@ class StyledText:
             )
         return method
 
+    def __len__(self) -> int:
+        if self.method.startswith("List"):
+            lens = [len(text) for text in self.text]
+            return sum(lens)
+        else:
+            return len(self.text)
+
     def show(self, x_pos: int, y_pos: int) -> None:
         assert self.renderer is not None
 
@@ -102,14 +109,25 @@ class StyledText:
             assert isinstance(self.text, str)
             self.renderer.addtext(x_pos, y_pos, self.text, self.font)
 
-        elif self.method == "List[str]:":
+        elif self.method == "List[str]":
             assert isinstance(self.text, list)
 
             for text in self.text:
                 assert isinstance(text, str)
                 self.renderer.addtext(x_pos, y_pos, text, self.font)
+                x_pos += len(text)
+
+        elif self.method == "List[StyledText]":
+            assert isinstance(self.text, list)
+
+            for text in self.text:
+                assert isinstance(text, StyledText)
+                text.show(x_pos, y_pos)
+                x_pos += len(text)
         else:
-            raise NotImplementedError("Please try using one of the supported text types.")
+            raise NotImplementedError(
+                "Please try using one of the supported text types."
+            )
 
         self.renderer.refresh()
 
