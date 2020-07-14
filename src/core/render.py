@@ -176,10 +176,10 @@ class CursesRenderer:
                 f"max_x: {max_x}, max_y: {max_y}"
             )
 
-    def move_cursorxy(self, x_pos, y_pos):
+    def move_cursorxy(self, x_pos: int, y_pos: int) -> None:
         self._move_cursoryx(y_pos, x_pos)
 
-    def text_input(self, prompt, x_pos, y_pos, length):
+    def text_input(self, prompt: str, x_pos: int, y_pos: int, length: int) -> str:
         curses.curs_set(2)
 
         self.addtext(x_pos, y_pos, prompt)
@@ -194,4 +194,4 @@ class CursesRenderer:
         text = pad.edit()
 
         curses.curs_set(0)
-        return text.encode("utf-8")
+        return text

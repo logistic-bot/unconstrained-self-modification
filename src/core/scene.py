@@ -212,5 +212,5 @@ class Scene:
         self.renderer.addtext(x_pos, y_pos, text, color_pair)
         self.refresh()
 
-    def prompt(self, y_pos, x_pos, prompt="", length=30):
+    def prompt(self, y_pos: int, x_pos: int, prompt: str = "", length: int = 30) -> str:
         return self.renderer.text_input(prompt, x_pos, y_pos, length)

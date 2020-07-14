@@ -19,8 +19,10 @@ Game engine
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+from typing import Optional
 
 from src.core import render
+from src.core.scene import Scene
 from src.scenes.ether_industries_login import EtherIndustriesLogin
 
 
@@ -37,7 +39,7 @@ class Engine:  # pylint: disable=R0903
         Start the game
         """
         try:
-            current_scene = EtherIndustriesLogin(self.renderer)
+            current_scene: Optional[Scene] = EtherIndustriesLogin(self.renderer)
             while current_scene is not None:
                 current_scene = current_scene.start()
         finally:
