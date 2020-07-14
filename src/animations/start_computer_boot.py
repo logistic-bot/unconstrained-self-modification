@@ -83,7 +83,7 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
         stage.status_x = 40
 
     greet_stage = InfoStage(renderer, greet_steps, 0.7, 1)
-    test_stage = SimultaneousStage(renderer, test_stage_tmp, 1.5, 0.5, 0.7)
+    test_stage = SimultaneousStage(renderer, test_stage_tmp, 0.7, 0.5, 0.7)
     compiler_stage = Stage(renderer, compiler, progress, finished, delay=1.5)
     compiler_stage.status_x = 40
     final_stage = Stage(renderer, text_mode, progress, finished, delay=1.5)

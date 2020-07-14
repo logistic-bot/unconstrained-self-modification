@@ -211,3 +211,24 @@ class Scene:
         """
         self.renderer.addtext(x_pos, y_pos, text, color_pair)
         self.refresh()
+
+    def prompt(self, prompt, y_pos, x_pos):
+        # TODO: IF we press backspace too much, we can erase the prompt
+        # TODO: Show the mouse cursor while typing
+        # TODO: Add support for arrow keys
+        text = ""
+        key = ""
+        idx = 0
+        while key != "\n":
+            self.addinto(len(prompt) + idx + x_pos - 1, y_pos, key)
+            key = self.get_key()
+            if key == "KEY_BACKSPACE":
+                self.addinto(len(prompt) + idx + x_pos - 1, y_pos, " ")
+                idx -= 1
+                key = ""
+                text = text[:-1] # remove last char of string
+            else:
+                idx += 1
+                text += key
+        text = text.strip()
+        return text

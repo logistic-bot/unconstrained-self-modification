@@ -25,6 +25,7 @@ from pathlib import Path
 
 from src.animations import start_computer_bios, start_computer_boot
 from src.core.scene import Scene
+from src.scenes.ether_industries_login import EtherIndustriesLogin
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
 LOGO_START_PATH = PROJECT_ROOT / "assets" / "ether_industries" / "1"
@@ -44,8 +45,7 @@ class StartComputer(Scene):
     The first computer the user can use.
     """
 
-    def start(self) -> None:  # pylint: disable=R0914
-        # TODO: Programming language name: Parcel-3
+    def start(self) -> EtherIndustriesLogin:  # pylint: disable=R0914
         """
         Shows the init sequence of the first computer.
 
@@ -61,4 +61,4 @@ class StartComputer(Scene):
         animation = start_computer_boot.create_animation(self.renderer)
         animation.start(y_pos + 1) # leave a blank line
 
-        self.get_key()
+        return EtherIndustriesLogin(self.renderer)
