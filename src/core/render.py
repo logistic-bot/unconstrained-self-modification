@@ -21,6 +21,7 @@ This is where the rendering happens.
 # ------------------------------------------------------------------------------
 
 import curses
+from curses import textpad
 from typing import Any, Optional
 
 
@@ -177,3 +178,20 @@ class CursesRenderer:
 
     def move_cursorxy(self, x_pos, y_pos):
         self._move_cursoryx(y_pos, x_pos)
+
+    def text_input(self, prompt, x_pos, y_pos, length):
+        curses.curs_set(2)
+
+        self.addtext(x_pos, y_pos, prompt)
+        self.refresh()
+
+        correct_x_pos = x_pos + len(prompt)
+
+        win = curses.newwin(1, length, y_pos, correct_x_pos)
+        win.bkgd(" ", curses.A_UNDERLINE | curses.A_ITALIC)
+
+        pad = textpad.Textbox(win, insert_mode=True)
+        text = pad.edit()
+
+        curses.curs_set(0)
+        return text.encode("utf-8")
