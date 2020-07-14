@@ -28,7 +28,7 @@ class EtherIndustriesLogin(Scene):
         self.clear()
         self.addinto(1, 1, "Ether Industry EtherOS v6.2.4")
 
-        text = self.prompt(LOGIN_PROMPT, login_y, 1)
+        text = self.prompt(login_y, 1, LOGIN_PROMPT)
 
         self.addinto(1, 5, text)
         self.get_key()
