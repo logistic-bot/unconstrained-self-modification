@@ -174,3 +174,6 @@ class CursesRenderer:
                 f"Tried to move cursor: failed: y_pos: {y_pos}, x_pos: {x_pos}, "
                 f"max_x: {max_x}, max_y: {max_y}"
             )
+
+    def move_cursorxy(self, x_pos, y_pos):
+        self._move_cursoryx(y_pos, x_pos)

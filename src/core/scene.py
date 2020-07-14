@@ -213,13 +213,19 @@ class Scene:
         self.refresh()
 
     def prompt(self, prompt, y_pos, x_pos):
-        # TODO: Show the mouse cursor while typing
         # TODO: Add support for arrow keys
+
+        self.addinto(x_pos, y_pos, prompt)
+
+        # show the cursor
+        curses.curs_set(2)
+
         text = ""
         key = ""
         idx = 0
         while key != "\n":
             self.addinto(len(prompt) + idx + x_pos - 1, y_pos, key)
+            self.renderer.move_cursorxy(len(prompt) + idx + x_pos, y_pos)
 
             key = self.get_key()
             if key == "KEY_BACKSPACE":
@@ -233,4 +239,8 @@ class Scene:
                 idx += 1
                 text += key
         text = text.strip()
+
+        # hide the cursor
+        curses.curs_set(0)
+
         return text

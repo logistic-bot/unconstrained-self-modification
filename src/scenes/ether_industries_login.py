@@ -1,10 +1,7 @@
-"""
-Game engine
-"""
-
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
+#  Copyright (C) © 2020 Khaïs COLIN <logistic-bot@protonmail.com>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,26 +17,18 @@ Game engine
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-from src.core import render
-from src.scenes.ether_industries_login import EtherIndustriesLogin
+from src.core.scene import Scene
 
 
-class Engine:  # pylint: disable=R0903
-    """
-    Game engine
-    """
-
-    def __init__(self) -> None:
-        self.renderer = render.CursesRenderer()
-
+class EtherIndustriesLogin(Scene):
     def start(self) -> None:
-        """
-        Start the game
-        """
-        try:
-            current_scene = EtherIndustriesLogin(self.renderer)
-            while current_scene is not None:
-                current_scene = current_scene.start()
-        finally:
-            self.renderer.tear_down()
-            print("The game exited.")
+        LOGIN_PROMPT = "Login: "
+        login_y = 3
+
+        self.clear()
+        self.addinto(1, 1, "Ether Industry EtherOS v6.2.4")
+
+        text = self.prompt(LOGIN_PROMPT, login_y, 1)
+
+        self.addinto(1, 5, text)
+        self.get_key()
