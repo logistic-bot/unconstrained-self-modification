@@ -212,5 +212,8 @@ class Scene:
         self.renderer.addtext(x_pos, y_pos, text, color_pair)
         self.refresh()
 
-    def prompt(self, y_pos: int, x_pos: int, prompt: str = "", length: int = 30) -> str:
+    def prompt(self, x_pos: int, y_pos: int, prompt: str = "", length: int = 30) -> str:
+        """
+        Get some input from the user. for more information, see CursesRenderer.text_input()
+        """
         return self.renderer.text_input(prompt, x_pos, y_pos, length)

@@ -177,9 +177,25 @@ class CursesRenderer:
             )
 
     def move_cursorxy(self, x_pos: int, y_pos: int) -> None:
+        """
+        Move the cursor to the given position
+
+        :param x_pos: x position where the cursor should be moved
+        :param y_pos: y position where the cursor should be moved
+        """
         self._move_cursoryx(y_pos, x_pos)
 
     def text_input(self, prompt: str, x_pos: int, y_pos: int, length: int) -> str:
+        """
+        Get some input from the user, and return it. Similar to built-in input(), but for curses
+
+        :param prompt: A short text inviting the user to input something.
+        :param x_pos: The x position where the prompt should be displayed
+        :param y_pos: The y position where the prompt should be displayed
+        :param length: The length of prompt. This will also limit the length of returned text.
+        length - 1 characters can be returned.
+        :return: The text imputed by the user, terminated by a carriage return.
+        """
         curses.curs_set(2)
 
         self.addtext(x_pos, y_pos, prompt)

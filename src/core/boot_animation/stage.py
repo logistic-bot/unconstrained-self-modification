@@ -1,3 +1,7 @@
+"""
+This file contains the Stage class, which is used to hold information about a boot animation stage.
+"""
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #

@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+This Scene will show login for an Ether Industries computer.
+"""
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
@@ -21,14 +26,20 @@ from src.core.scene import Scene
 
 
 class EtherIndustriesLogin(Scene):
+    """
+    Ask an user to login to an Ether Industries computer
+    """
     def start(self) -> None:
-        LOGIN_PROMPT = "Login: "
+        """
+        Show this scene
+        """
+        login_prompt = "Login: "
         login_y = 3
 
         self.clear()
         self.addinto(1, 1, "Ether Industry EtherOS v6.2.4")
 
-        text = self.prompt(login_y, 1, LOGIN_PROMPT)
+        text = self.prompt(1, login_y, login_prompt)
 
         self.addinto(1, 5, text)
         self.get_key()

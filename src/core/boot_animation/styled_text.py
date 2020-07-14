@@ -1,3 +1,8 @@
+"""
+This file contains the StyledText class, which stores style information for a string,
+abstracting away the curses problems.
+"""
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
@@ -54,6 +59,9 @@ class StyledText:
 
     @property
     def effects(self) -> int:
+        """
+        Get the int representing the effects applied to the text.
+        """
         effects = curses.A_NORMAL
         if self.invert:
             effects = effects | curses.A_REVERSE
@@ -67,10 +75,16 @@ class StyledText:
 
     @property
     def font(self) -> int:
+        """
+        Get the int representing the curses font associated with this text.
+        """
         return curses.color_pair(self.color) | self.effects
 
     @property
     def method(self) -> str:
+        """
+        Get the way in which this text should be displayed. Used internally.
+        """
         # I don't know is we need this.
         if isinstance(self.text, str):
             method = "str"
@@ -95,10 +109,12 @@ class StyledText:
         if self.method.startswith("List"):
             lens = [len(text) for text in self.text]
             return sum(lens)
-        else:
-            return len(self.text)
+        return len(self.text)
 
     def show(self, x_pos: int, y_pos: int) -> None:
+        """
+        Show the text at the given position.
+        """
         assert self.renderer is not None
 
         if self.method == "str":

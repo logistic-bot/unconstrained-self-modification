@@ -1,3 +1,7 @@
+"""
+This file contains the Step class, a class that holds information about a boot step.
+"""
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
