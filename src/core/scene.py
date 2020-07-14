@@ -213,8 +213,6 @@ class Scene:
         self.refresh()
 
     def prompt(self, prompt, y_pos, x_pos):
-        # TODO: Add support for arrow keys
-
         self.addinto(x_pos, y_pos, prompt)
 
         # show the cursor
@@ -224,23 +222,43 @@ class Scene:
         key = ""
         idx = 0
         while key != "\n":
-            self.addinto(len(prompt) + idx + x_pos - 1, y_pos, key)
-            self.renderer.move_cursorxy(len(prompt) + idx + x_pos, y_pos)
+            self._redraw_prompt_and_text(idx, prompt, text, x_pos, y_pos)
 
             key = self.get_key()
             if key == "KEY_BACKSPACE":
                 key = ""
 
-                if idx > 0: # stop from erasing the prompt
+                if idx > 0:  # stop from erasing the prompt
                     self.addinto(len(prompt) + idx + x_pos - 1, y_pos, " ")
                     idx -= 1
-                    text = text[:-1] # remove last char of string
+                    text = text[:idx] + text[idx + 1 :]
+
+                    self._redraw_prompt_and_text(idx, prompt, text, x_pos, y_pos)
+            elif key == "KEY_LEFT":
+                key = ""
+                if idx > 0:  # stop from erasing the prompt
+                    idx -= 1
+            elif key == "KEY_RIGHT":
+                key = ""
+                if idx < len(text):
+                    idx += 1
+
             else:
-                idx += 1
-                text += key
+                if len(key) == 1:  # do not show special keys
+                    text = text[:idx] + key + text[idx:]
+                    text = "".join(text.splitlines())
+                    idx += 1
         text = text.strip()
 
         # hide the cursor
         curses.curs_set(0)
 
         return text
+
+    def _redraw_prompt_and_text(self, idx, prompt, text, x_pos, y_pos):
+        # redraw the whole text with the prompt
+        self.addinto(x_pos, y_pos, prompt)
+        self.addinto(len(prompt) + x_pos, y_pos, (len(text) + 1) * " ")  # plus one
+        # because the string is now shorter
+        self.addinto(len(prompt) + x_pos, y_pos, text)
+        self.renderer.move_cursorxy(len(prompt) + idx + x_pos, y_pos)
