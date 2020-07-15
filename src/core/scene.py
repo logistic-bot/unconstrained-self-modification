@@ -24,6 +24,7 @@ import curses
 from typing import Optional, Any
 
 from src.core.render import CursesRenderer
+from src.core.state.game_state import GameState
 
 
 class Scene:
@@ -31,7 +32,8 @@ class Scene:
     The base class for all Scenes, contains convenience methods.
     """
 
-    def __init__(self, renderer: CursesRenderer) -> None:
+    def __init__(self, renderer: CursesRenderer, state: GameState) -> None:
+        self.state = state
         self.renderer = renderer
 
     def start(self) -> Any:

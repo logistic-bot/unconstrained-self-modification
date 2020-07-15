@@ -61,4 +61,4 @@ class StartComputer(Scene):
         animation = start_computer_boot.create_animation(self.renderer)
         animation.start(y_pos + 1) # leave a blank line
 
-        return EtherIndustriesLogin(self.renderer)
+        return EtherIndustriesLogin(self.renderer, self.state)

@@ -73,4 +73,4 @@ class StartupScene(Scene):
         if key == "l":
             self.addinto_all_centred(FULL_LICENSE, 0.01, 5)
 
-        return StartComputer(self.renderer)
+        return StartComputer(self.renderer, self.state)
