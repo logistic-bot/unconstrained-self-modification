@@ -204,10 +204,19 @@ class CursesRenderer:
         correct_x_pos = x_pos + len(prompt)
 
         win = curses.newwin(1, length, y_pos, correct_x_pos)
-        win.bkgd(" ", curses.A_UNDERLINE | curses.A_ITALIC)
+        win.bkgd(" ", curses.A_UNDERLINE | curses.A_BOLD)
 
         pad = textpad.Textbox(win, insert_mode=True)
         text = pad.edit()
+        text = text.strip()
+
+        win.bkgd(" ", curses.A_NORMAL)
+        win.refresh()
+        win = curses.newwin(1, len(text) + 1, y_pos, correct_x_pos)
+        win.addstr(0, 0, text, curses.A_BOLD)
+        win.refresh()
+
+        # self.refresh()
 
         curses.curs_set(0)
         return text
