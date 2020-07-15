@@ -34,12 +34,13 @@ class EtherIndustriesLogin(Scene):
         Show this scene
         """
         login_prompt = "Login: "
-        login_y = 3
+        password_prompt = "Password: "
 
         self.clear()
         self.addinto(1, 1, "Ether Industry EtherOS v6.2.4")
 
-        text = self.prompt(1, login_y, login_prompt)
+        name = self.prompt(1, 3, login_prompt)
+        password = self.prompt(1, 4, password_prompt)
 
-        self.addinto(1, 5, text)
+        self.addinto(1, 5, f"'{name}'+'{password}'")
         self.get_key()
