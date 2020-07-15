@@ -1,3 +1,6 @@
 pytest
 pytest-testmon
 pytest-custom_exit_code
+typing
+pathlib
+Pathlib
