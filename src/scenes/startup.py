@@ -46,6 +46,9 @@ class StartupScene(Scene):
     def start(self) -> Any:  # pylint: disable=R1711
         """
         Shows a copyright notice and the game's title.
+
+        If there is at least one save, show the save select Scene, in other cases, show the
+        StartComputer scene.
         """
         self.clear()
         self.sleep_key(0.3)

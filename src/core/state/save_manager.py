@@ -1,10 +1,11 @@
 """
-Define Game-wide Constants
+This file contains the SaveManager class, which manages a group of Saves
 """
 
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
+#  Copyright (C) © 2020 Khaïs COLIN <logistic-bot@protonmail.com>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,6 +21,15 @@ Define Game-wide Constants
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-from pathlib import Path
+from src import GAME_ROOT_DIR
 
-GAME_ROOT_DIR = Path(__file__).parent.absolute().resolve()
+SAVE_DIRECTORY = GAME_ROOT_DIR / "saves"
+SAVE_DIRECTORY.mkdir()
+
+
+class SaveManager:
+    """
+    This class manages a group of Saves.
+    """
+    def __init__(self) -> None:
+        pass
