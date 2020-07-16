@@ -22,4 +22,4 @@ Define Game-wide Constants
 
 from pathlib import Path
 
-GAME_ROOT_DIR = Path(__file__).parent.absolute().resolve()
+GAME_ROOT_DIR = Path(__file__).parent.parent.absolute().resolve()

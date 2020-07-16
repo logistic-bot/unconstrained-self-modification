@@ -20,16 +20,36 @@ This file contains the SaveManager class, which manages a group of Saves
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+from typing import List
 
 from src import GAME_ROOT_DIR
+from src.core.state.save import Save
+
+SAVEFILE_EXTENSION = ".json"
 
 SAVE_DIRECTORY = GAME_ROOT_DIR / "saves"
-SAVE_DIRECTORY.mkdir()
+SAVE_DIRECTORY.mkdir(exist_ok=True)
 
 
 class SaveManager:
     """
     This class manages a group of Saves.
     """
+
     def __init__(self) -> None:
-        pass
+        self.save_dir = SAVE_DIRECTORY
+
+    @property
+    def saves(self) -> List[Save]:
+        """
+        Return an unordered (as in: in no particular order) list of all saves in self.save_dir
+        """
+        saves = []
+        for savefile_path in self.save_dir.iterdir():
+            if savefile_path.suffix == SAVEFILE_EXTENSION:
+                save = Save(savefile_path)
+                saves.append(save)
+            else:
+                pass  # TODO: When logging is added, log a warning
+
+        return saves
