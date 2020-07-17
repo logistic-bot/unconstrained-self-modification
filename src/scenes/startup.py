@@ -1,5 +1,5 @@
 """
-This Scene is responsible for showing the game's title and startup messages.
+This FullScreenScene is responsible for showing the game's title and startup messages.
 """
 
 # ------------------------------------------------------------------------------
@@ -24,8 +24,10 @@ import curses
 from pathlib import Path
 from typing import Any
 
-from src.core.scene import Scene
-from src.scenes.start_computer import StartComputer
+from src.core.scene import FullScreenScene
+from src.core.state.save_manager import SaveManager
+from src.scenes.corrupted_login_new_save import CorruptedLoginNewSave
+from src.scenes.select_save import SelectSave
 
 STARTUP_MESSAGE_PATH = Path(__file__).parent.absolute() / "STARTUP"
 FULL_LICENSE_PATH = Path(__file__).parent.parent.parent.absolute() / "LICENCE"
@@ -38,7 +40,7 @@ with FULL_LICENSE_PATH.open("r") as f:
     FULL_LICENSE = "\n".join(licence)
 
 
-class StartupScene(Scene):
+class StartupScene(FullScreenScene):
     """
     This scene is called at the start of the game, in engine.py
     """
@@ -51,8 +53,8 @@ class StartupScene(Scene):
         StartComputer scene.
         """
         self.clear()
-        self.sleep_key(0.3)
-        self.addinto_all_centred(STARTUP_MESSAGE, delay=0.1, pager_delay=0)
+        self.sleep_key(0.1)
+        self.addinto_all_centred(STARTUP_MESSAGE, delay=0.05, pager_delay=0)
 
         y_pos = (
             round(

@@ -42,6 +42,7 @@ class Engine:  # pylint: disable=R0903
         """
         try:
             current_scene: Optional[Scene] = StartupScene(self.renderer, self.game_state)
+
             while current_scene is not None:
                 current_scene = current_scene.start()
         finally:

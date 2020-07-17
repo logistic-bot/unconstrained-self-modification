@@ -22,10 +22,10 @@ This Scene will show login for an Ether Industries computer.
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-from src.core.scene import Scene
+from src.core.scene import FullScreenScene
 
 
-class EtherIndustriesLogin(Scene):
+class EtherIndustriesLogin(FullScreenScene):
     """
     Ask an user to login to an Ether Industries computer
     """

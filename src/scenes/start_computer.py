@@ -24,7 +24,7 @@ import curses
 from pathlib import Path
 
 from src.animations import start_computer_bios, start_computer_boot
-from src.core.scene import Scene
+from src.core.scene import FullScreenScene
 from src.scenes.ether_industries_login import EtherIndustriesLogin
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
@@ -40,7 +40,7 @@ with LOGO_DONE_PATH.open("r") as f:
     LOGO_DONE = "\n".join(logo)
 
 
-class StartComputer(Scene):
+class StartComputer(FullScreenScene):
     """
     The first computer the user can use.
     """

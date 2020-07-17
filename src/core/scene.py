@@ -1,5 +1,5 @@
 """
-This file implements the Scene class, which contains convenience methods for all Scenes.
+This file implements the FullScreenScene class, which contains convenience methods for all Scenes.
 """
 
 # ------------------------------------------------------------------------------
@@ -21,6 +21,7 @@ This file implements the Scene class, which contains convenience methods for all
 # ------------------------------------------------------------------------------
 
 import curses
+from abc import ABC
 from typing import Optional, Any
 
 from src.core.render import CursesRenderer
@@ -66,6 +67,42 @@ class Scene:
         :return: The pressed key
         """
         return self.renderer.get_key()
+
+    def refresh(self) -> None:
+        """
+        Refresh the screen, making sure that all modified characters are displayed correctly.
+        :return:
+        """
+        self.renderer.refresh()
+
+    def clear(self) -> None:
+        """
+        Clear the screen, and redraw the borders.
+        """
+        self.renderer.clear_screen()
+
+    def addinto(self, x_pos: int, y_pos: int, text: str, color_pair: int = 0) -> None:
+        """
+        Add a text into the screen, and refresh it.
+
+        See CursesRenderer.addtext() for details.
+
+        :return: None
+        """
+        self.renderer.addtext(x_pos, y_pos, text, color_pair)
+        self.refresh()
+
+    def prompt(self, x_pos: int, y_pos: int, prompt: str = "", length: int = 30) -> str:
+        """
+        Get some input from the user. for more information, see CursesRenderer.text_input()
+        """
+        return self.renderer.text_input(prompt, x_pos, y_pos, length)
+
+
+class FullScreenScene(Scene, ABC):
+    """
+    The base class for all full-screen Scenes, contains convenience methods.
+    """
 
     def _addinto_centred_paged(
         self, y_pos: int, text: str, delay: float, pager_delay: float, color_pair: int
@@ -174,7 +211,7 @@ class Scene:
         """
         Adds a text into the canvas, completely centred.
 
-        For more documentation, see Scene.addinto_centred()
+        For more documentation, see FullScreenScene.addinto_centred()
 
         :param color_pair: The color pair to use
         :param text: The text to be displayed
@@ -190,32 +227,8 @@ class Scene:
             color_pair,
         )
 
-    def refresh(self) -> None:
-        """
-        Refresh the screen, making sure that all modified characters are displayed correctly.
-        :return:
-        """
-        self.renderer.refresh()
 
-    def clear(self) -> None:
-        """
-        Clear the screen, and redraw the borders.
-        """
-        self.renderer.clear_screen()
-
-    def addinto(self, x_pos: int, y_pos: int, text: str, color_pair: int = 0) -> None:
-        """
-        Add a text into the screen, and refresh it.
-
-        See CursesRenderer.addtext() for details.
-
-        :return: None
-        """
-        self.renderer.addtext(x_pos, y_pos, text, color_pair)
-        self.refresh()
-
-    def prompt(self, x_pos: int, y_pos: int, prompt: str = "", length: int = 30) -> str:
-        """
-        Get some input from the user. for more information, see CursesRenderer.text_input()
-        """
-        return self.renderer.text_input(prompt, x_pos, y_pos, length)
+class PartialScreenScene(FullScreenScene, ABC):
+    """
+    This is the base class for all Scenes that do not use the full screen.
+    """
