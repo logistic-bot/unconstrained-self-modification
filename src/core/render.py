@@ -33,6 +33,8 @@ class CursesRenderer:
     def __init__(self) -> None:
         self.stdscr: Any = curses.initscr()  # pylint: disable=E1101
 
+        self.last_key = ""
+
         curses.noecho()
         curses.cbreak()
         curses.curs_set(0)
@@ -66,7 +68,24 @@ class CursesRenderer:
         Wait for a key to be pressed, and return a string representing it.
         """
         key: str = self.stdscr.getkey()
+
+        key_repr = self.get_key_repr(key)
+        self.last_key = key_repr
+
         return key
+
+    @staticmethod
+    def get_key_repr(key: str) -> str:
+        """
+        Return a string representation of the given key
+        """
+        if key == "\n":
+            key_repr = "KEY_ENTER"
+        elif key == " ":
+            key_repr = "KEY_SPACE"
+        else:
+            key_repr = key
+        return key_repr
 
     # def get_key_non_blocking(self):
     #     self.stdscr.nodelay(True)
@@ -88,6 +107,8 @@ class CursesRenderer:
         self.stdscr.timeout(round(delay * 1000))  # the delay is given in seconds, but
         # milliseconds are expected.
         key: int = self.stdscr.getch()
+        if key != -1:
+            self.last_key = "SKIP"
         self.stdscr.timeout(-1)
         return key
 
@@ -126,6 +147,8 @@ class CursesRenderer:
         """
         Refresh the screen
         """
+        # self.last_key = "KEY_TEST"
+        self.addinto(self.max_x - 2 - len(self.last_key), self.max_y - 2, self.last_key)
         self.stdscr.refresh()
 
     def wait_keypress(self) -> None:
