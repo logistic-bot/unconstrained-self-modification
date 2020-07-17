@@ -21,6 +21,7 @@ This Scene will show login for an Ether Industries computer.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+from time import sleep
 
 from src.core.scene import FullScreenScene
 
@@ -29,6 +30,7 @@ class EtherIndustriesLogin(FullScreenScene):
     """
     Ask an user to login to an Ether Industries computer
     """
+
     def start(self) -> None:
         """
         Show this scene
@@ -36,11 +38,22 @@ class EtherIndustriesLogin(FullScreenScene):
         login_prompt = "Login: "
         password_prompt = "Password: "
 
-        self.clear()
-        self.addinto(1, 1, "Ether Industry EtherOS v6.2.4")
+        expected_password = self.state.data["user"]["password"]
+        expected_username = self.state.data["user"]["username"]
 
-        name = self.prompt(1, 3, login_prompt)
-        password = self.prompt(1, 4, password_prompt)
+        logged_in = False
+        while not logged_in:
+            self.clear()
+            self.addinto(1, 1, "Ether Industry EtherOS v6.2.4 (black-hole-01) (tty1)")
 
-        self.addinto(1, 5, f"'{name}'+'{password}'")
+            username = self.prompt(1, 3, login_prompt)
+            password = self.prompt(1, 4, password_prompt)
+
+            if username == expected_username and password == expected_password:
+                self.addinto(1, 5, f"Last login: {self.state.lastsave}")
+                logged_in = True
+            else:
+                self.addinto(1, 5, "Login incorrect.")
+                sleep(self.state.data["login"]["delay_incorrect_password"])
+
         self.get_key()

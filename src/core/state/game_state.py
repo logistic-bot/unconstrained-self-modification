@@ -40,3 +40,13 @@ class GameState:
         self.data = save.data
         self.save = save
 
+    @property
+    def lastsave(self) -> str:
+        """
+        Return a string describing the last time this state was saved. If it was not saved,
+        return "Never".
+        """
+        if self.save is None:
+            return "Never"
+        else:
+            return self.data["metadata"]["save_date"]
