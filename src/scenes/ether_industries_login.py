@@ -59,6 +59,6 @@ class EtherIndustriesLogin(FullScreenScene):
                 logged_in = True
             else:
                 self.addinto(1, 5, "Login incorrect.")
-                sleep(self.state.data["login"]["delay_incorrect_password"])
+                sleep(1)
 
         self.get_key()
