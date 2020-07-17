@@ -7,3 +7,4 @@ __pycache__/
 .vscode/
 mind_control.code-workspace
 /.dmypy.json
+saves/
