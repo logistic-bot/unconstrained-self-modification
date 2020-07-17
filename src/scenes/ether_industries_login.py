@@ -49,6 +49,8 @@ class EtherIndustriesLogin(FullScreenScene):
             username = self.prompt(1, 3, login_prompt)
             password = self.prompt(1, 4, password_prompt)
 
+            sleep(0.2)
+
             if username == expected_username and password == expected_password:
                 self.addinto(1, 5, f"Last login: {self.state.lastsave}")
                 logged_in = True

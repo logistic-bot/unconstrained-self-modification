@@ -48,8 +48,15 @@ class SaveManager:
         for savefile_path in self.save_dir.iterdir():
             if savefile_path.suffix == SAVEFILE_EXTENSION:
                 save = Save(savefile_path)
+                save.load()
                 saves.append(save)
             else:
                 pass  # TODO: When logging is added, log a warning
 
         return saves
+
+    def newsave(self, state):
+        path = SAVE_DIRECTORY / f"{state.data['name']}.json"
+        save = Save(path)
+        save.load_from_state(state)
+        save.save()

@@ -37,20 +37,15 @@ class StyledText:
     This class is used to draw text with colors, and different curses attributes.
     """
 
-    def __init__(
-        self,
-        renderer: Optional[CursesRenderer],
-        text: Union[str, List[str], List[StyledText]],
-        color: int,
-        invert: bool = False,
-        blink: bool = False,
-        bold: bool = False,
-        italic: bool = False,
-    ) -> None:
+    def __init__(self, renderer: Optional[CursesRenderer],
+                 text: Union[str, List[str], List[StyledText]], color: int = 0,
+                 invert: bool = False, blink: bool = False, bold: bool = False,
+                 italic: bool = False, dim=False) -> None:
         self.italic = italic
         self.bold = bold
         self.blink = blink
         self.invert = invert
+        self.dim = dim
 
         self.renderer = renderer
         self.color = color
@@ -71,6 +66,8 @@ class StyledText:
             effects = effects | curses.A_BOLD
         if self.italic:
             effects = effects | curses.A_ITALIC
+        if self.dim:
+            effects = effects | curses.A_DIM
         return effects
 
     @property

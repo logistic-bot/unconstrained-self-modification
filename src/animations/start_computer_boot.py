@@ -37,34 +37,18 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)  # good
     curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)  # bad
 
-    progress = StyledText(renderer, "IN PROGRESS", 5, blink=True, invert=True)
+    progress = StyledText(renderer, "IN PROGRESS", 5, invert=True, blink=True)
     # finished = StyledText(renderer, ["[", "OK", "]"], 2, bold=True)
-    finished = StyledText(
-        renderer,
-        [
-            StyledText(renderer, ["[", " "], 0, bold=True),
-            StyledText(renderer, ["  ", "OK", "  "], 2, bold=True),
-            StyledText(renderer, [" ", "]"], 0, bold=True),
-        ],
-        2,
-        bold=True,
-    )
-    success = StyledText(
-        renderer,
-        [
-            StyledText(renderer, ["[", " "], 0, bold=True),
-            StyledText(renderer, "PASSED", 2, bold=True),
-            StyledText(renderer, [" ", "]"], 0, bold=True),
-        ],
-        0,
-        bold=True,
-    )
+    finished = StyledText(renderer, [StyledText(renderer, ["[", " "], 0, bold=True),
+        StyledText(renderer, ["  ", "OK", "  "], 2, bold=True),
+        StyledText(renderer, [" ", "]"], 0, bold=True), ], 2, bold=True)
+    success = StyledText(renderer, [StyledText(renderer, ["[", " "], 0, bold=True),
+        StyledText(renderer, "PASSED", 2, bold=True),
+        StyledText(renderer, [" ", "]"], 0, bold=True), ], 0, bold=True)
     # warning = StyledText(renderer, "WARNING", 3, bold=True, blinking=True)
 
     greet = StyledText(renderer, "Ether Industries EtherOS v6.2.4", 0)
-    ether_copyright = StyledText(
-        renderer, "Copyright (C) 2024-2052 Ether Industries, Inc.", 0
-    )
+    ether_copyright = StyledText(renderer, "Copyright (C) 2024-2052 Ether Industries, Inc.", 0)
     cpu_test_0 = StyledText(renderer, "Testing cpu 0", 4)
     cpu_test_1 = StyledText(renderer, "Testing cpu 1", 4)
     cpu_test_2 = StyledText(renderer, "Testing cpu 2", 4)

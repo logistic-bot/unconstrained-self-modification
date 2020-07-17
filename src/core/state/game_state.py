@@ -2,6 +2,8 @@
 This file contains the GameState class, which is responsible for saving the current game state.
 """
 
+from collections import defaultdict
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
@@ -29,7 +31,7 @@ class GameState:
     """
 
     def __init__(self) -> None:
-        self.data = {}
+        self.data = defaultdict(dict)
         self.save = None
 
     def load_from_save(self, save: Save) -> None:
@@ -37,7 +39,7 @@ class GameState:
         Load a saved game state into this object
         :param save: The Save object which has the saved game state
         """
-        self.data = save.data
+        self.data = defaultdict(dict, save.data)
         self.save = save
 
     @property
