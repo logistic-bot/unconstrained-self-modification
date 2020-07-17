@@ -51,6 +51,7 @@ class StartComputer(FullScreenScene):
 
         :return:
         """
+        self.clear()
         animation = start_computer_bios.create_animation(self.renderer)
         y_pos = animation.start()
 

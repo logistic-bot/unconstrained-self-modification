@@ -1,5 +1,6 @@
 """
-This file contains the GameState class, which is responsible for saving the current game state.
+This file contains the CorruptedLoginNewSave FullScreenScene. It is called if no save is found, and a new
+save should be created.
 """
 
 # ------------------------------------------------------------------------------
@@ -20,23 +21,17 @@ This file contains the GameState class, which is responsible for saving the curr
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
-from src.core.state.save import Save
+
+from src.core.scene import FullScreenScene
 
 
-class GameState:
+class CorruptedLoginNewSave(FullScreenScene):
     """
-    This class is responsible for saving the current game state.
+    This FullScreenScene will tell the user that the login file is corrupt, and walk it through the new
+    superuser creation process. It will then create a new save.
     """
-
-    def __init__(self) -> None:
-        self.data = {}
-        self.save = None
-
-    def load_from_save(self, save: Save) -> None:
+    def start(self):
         """
-        Load a saved game state into this object
-        :param save: The Save object which has the saved game state
+        See above
         """
-        self.data = save.data
-        self.save = save
-
+        pass

@@ -78,4 +78,9 @@ class StartupScene(FullScreenScene):
         if key == "l":
             self.addinto_all_centred(FULL_LICENSE, 0.01, 5)
 
-        return StartComputer(self.renderer, self.state)
+        save_manager = SaveManager()
+        saves = save_manager.saves
+        if len(saves) == 0:
+            return CorruptedLoginNewSave(self.renderer, self.state)
+        else:
+            return SelectSave(self.renderer, self.state)
