@@ -19,6 +19,7 @@ found, and a new save should be created. """
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+import curses
 import datetime
 from time import sleep
 from typing import Optional
@@ -43,6 +44,7 @@ class CorruptedLoginNewSave(FullScreenScene):
         c.start()
 
         self.clear()
+        curses.flushinp()
 
         a = ether_industries_password_corrupt.create_animation(self.renderer)
         a.start()
@@ -81,6 +83,7 @@ class CorruptedLoginNewSave(FullScreenScene):
         self.state.data["name"] = username
         self.state.data["user"]["password"] = password
         self.state.data["user"]["username"] = username
+        self.state.data["login"]["delay_incorrect_password"] = 1
 
         self.addinto(1, 9, "[ether-login c198762] Creating new user database...")
 

@@ -21,6 +21,7 @@ This Scene will show login for an Ether Industries computer.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+import curses
 from time import sleep
 
 from src.core.scene import FullScreenScene
@@ -35,6 +36,8 @@ class EtherIndustriesLogin(FullScreenScene):
         """
         Show this scene
         """
+        curses.flushinp()
+
         login_prompt = "Login: "
         password_prompt = "Password: "
 
