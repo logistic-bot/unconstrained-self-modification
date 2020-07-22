@@ -40,7 +40,7 @@ class StyledText:
     def __init__(self, renderer: Optional[CursesRenderer],
                  text: Union[str, List[str], List[StyledText]], color: int = 0,
                  invert: bool = False, blink: bool = False, bold: bool = False,
-                 italic: bool = False, dim=False) -> None:
+                 italic: bool = False, dim: bool = False) -> None:
         self.italic = italic
         self.bold = bold
         self.blink = blink

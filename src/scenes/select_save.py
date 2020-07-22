@@ -102,7 +102,7 @@ class SelectSave(FullScreenScene):
 
         self.addinto_centred(20, "Loading '{}'...".format(current.data["name"]))
 
-        self.state.load_from_save(current)
+        self.state = current
 
         self.clear()
         self.addinto_all_centred("Done.")

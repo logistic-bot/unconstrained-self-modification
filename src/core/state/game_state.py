@@ -2,8 +2,6 @@
 This file contains the GameState class, which is responsible for saving the current game state.
 """
 
-from collections import defaultdict
-
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
@@ -22,7 +20,13 @@ from collections import defaultdict
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
-from src.core.state.save import Save
+
+import json
+from collections import defaultdict
+from pathlib import Path
+from typing import Any
+
+JSON = Any
 
 
 class GameState:
@@ -31,16 +35,28 @@ class GameState:
     """
 
     def __init__(self) -> None:
-        self.data = defaultdict(dict)
-        self.save = None
+        def nested_dict() -> JSON:
+            """
+            returns a nested_dict with nested_dicts of type dict
+            """
+            return defaultdict(nested_dict)
 
-    def load_from_save(self, save: Save) -> None:
+        self.data: JSON = nested_dict()
+
+    # def load_from_save(self, path: Path) -> None:
+    #     """
+    #     Load a saved game state into this object
+    #     :param save: The Save object which has the saved game state
+    #     """
+    #     self.data = defaultdict(dict, save.data)
+    #     self.save = save
+
+    def load(self, path: Path = None) -> None:
         """
-        Load a saved game state into this object
-        :param save: The Save object which has the saved game state
+        Load a save file at a specified path into this save object.
         """
-        self.data = defaultdict(dict, save.data)
-        self.save = save
+        with path.open("r") as f:
+            self.data = json.load(f)
 
     @property
     def lastsave(self) -> str:
@@ -48,7 +64,12 @@ class GameState:
         Return a string describing the last time this state was saved. If it was not saved,
         return "Never".
         """
-        if self.save is None:
-            return "Never"
-        else:
-            return self.data["metadata"]["save_date"]
+        last_save = self.data["metadata"]["save_date"]
+        assert isinstance(last_save, str)
+        return last_save
+
+    def save(self, path: Path) -> None:
+        path.touch(exist_ok=True)
+
+        with path.open("w") as f:
+            json.dump(self.data, f, indent=2, sort_keys=True)

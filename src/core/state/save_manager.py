@@ -23,7 +23,7 @@ This file contains the SaveManager class, which manages a group of Saves
 from typing import List
 
 from src import GAME_ROOT_DIR
-from src.core.state.save import Save
+from src.core.state.game_state import GameState
 
 SAVEFILE_EXTENSION = ".json"
 
@@ -40,23 +40,23 @@ class SaveManager:
         self.save_dir = SAVE_DIRECTORY
 
     @property
-    def saves(self) -> List[Save]:
+    def saves(self) -> List[GameState]:
         """
         Return an unordered (as in: in no particular order) list of all saves in self.save_dir
         """
         saves = []
         for savefile_path in self.save_dir.iterdir():
             if savefile_path.suffix == SAVEFILE_EXTENSION:
-                save = Save(savefile_path)
-                save.load()
+                save = GameState()
+                save.load(savefile_path)
                 saves.append(save)
             else:
                 pass  # TODO: When logging is added, log a warning
 
         return saves
 
-    def newsave(self, state):
+    def save_state(self, state: GameState) -> None:
         path = SAVE_DIRECTORY / f"{state.data['name']}.json"
-        save = Save(path)
-        save.load_from_state(state)
-        save.save()
+        state_duplicate = GameState()
+        state_duplicate.data = state.data
+        state_duplicate.save(path)

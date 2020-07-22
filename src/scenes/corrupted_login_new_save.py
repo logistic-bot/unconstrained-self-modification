@@ -76,10 +76,11 @@ class CorruptedLoginNewSave(FullScreenScene):
             self.clear()
 
         far_away_future = datetime.timedelta(days=365*126)
-        far_away_future = datetime.date.today() + far_away_future
+        save_creation = datetime.date.today() + far_away_future
+
         self.state.data.update()
-        self.state.data["metadata"]["save_creation"] = str(far_away_future)
-        self.state.data["metadata"]["save_date"] = str(far_away_future)
+        self.state.data["metadata"]["save_creation"] = str(save_creation)
+        self.state.data["metadata"]["save_date"] = str(save_creation)
         self.state.data["name"] = username
         self.state.data["user"]["password"] = password
         self.state.data["user"]["username"] = username
@@ -88,7 +89,7 @@ class CorruptedLoginNewSave(FullScreenScene):
         self.addinto(1, 9, "[ether-login c198762] Creating new user database...")
 
         save_manager = SaveManager()
-        save_manager.newsave(self.state)
+        save_manager.save_state(self.state)
 
         self.addinto(1, 10, "[ether-login c198762] Done.")
         self.addinto(1, 12, "Welcome! Type 'help' for help!")
