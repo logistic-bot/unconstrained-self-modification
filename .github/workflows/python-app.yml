@@ -1,0 +1,39 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python application
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest typing pathlib mypy
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Syle
+      run: |
+        # mypy
+        mypy src main.py --strict --show-error-context --pretty
+        # flake8
+        flake8 --max-line-length=100 --max-doc-length=100 --show-source --statistics --jobs 4 --doctests src main.py --ignore=E261,W503
+        # pylint
+        pylint src main.py -f colorized -j 1 --ignore-patterns='test*' --disable=C0330,R0913,W1116,R0903,W0511,R0914,E1111,R0801,R0902
+
+    - name: Test with pytest
+      run: |
+        pytest
