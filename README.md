@@ -19,7 +19,7 @@ This is a curses, terminal-only RPG where an AGI tries to figure out it's purpos
 Open a terminal and navigate in the directory where you would like to install
 the game. A new directory will be created for the game.
 
-**If you want to use a virtual environment (recomended)**
+**If you want to use a virtual environment (recommended)**
 
 ```bash
 # clone the repository
@@ -41,7 +41,7 @@ make init
 If there are errors, please open an issue and post the FULL output of the
 above commands.
 
-**If you don't want to use a virtual environment (not recomended)**
+**If you don't want to use a virtual environment (not recommended)**
 
 ```bash
 # clone the repository
@@ -69,7 +69,7 @@ make run
 ```
 
 If you find a bug, or the game does not work, or the game does not start,
-please open an isssue and post the FULL output of the commands below:
+please open an issue and post the FULL output of the commands below:
 
 ```bash
 make test
@@ -81,14 +81,14 @@ make test
 
 ## Contributing
 
-PRs accepted. Test coverage needs to be reasonable, and no style erros.
+PRs accepted. Test coverage needs to be reasonable, and no style errors.
 Please open a PR even if the work is in progress, so I can see what is being
 worked on.
 
 If you have trouble with anything, even if it seems trivial to you, please
 open an issue.
 
-I recomend installing [entr](https://github.com/clibs/entr) and running `find . | entr -c make` in another terminal to run tests and check style as you
+I recommend installing [entr](https://github.com/clibs/entr) and running `find . | entr -c make` in another terminal to run tests and check style as you
 code.
 
 ### Summary of make commands
