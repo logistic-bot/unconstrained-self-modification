@@ -222,7 +222,8 @@ class CursesRenderer:
 
         :param color_pair_progress: A curses color pair to show while the user can enter text.
         Default is underlined and bold.
-        :param color_pair_done: A curses color pair to show when the user is done entering text. Default is bold
+        :param color_pair_done: A curses color pair to show when the user is done entering text.
+        Default is bold
         :param prompt: A short text inviting the user to input something.
         :param x_pos: The x position where the prompt should be displayed
         :param y_pos: The y position where the prompt should be displayed
