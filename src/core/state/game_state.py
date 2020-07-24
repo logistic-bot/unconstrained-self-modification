@@ -51,12 +51,12 @@ class GameState:
     #     self.data = defaultdict(dict, save.data)
     #     self.save = save
 
-    def load(self, path: Path = None) -> None:
+    def load(self, path: Path) -> None:
         """
         Load a save file at a specified path into this save object.
         """
-        with path.open("r") as f:
-            self.data = json.load(f)
+        with path.open("r") as file:
+            self.data = json.load(file)
 
     @property
     def lastsave(self) -> str:
@@ -69,7 +69,12 @@ class GameState:
         return last_save
 
     def save(self, path: Path) -> None:
-        path.touch(exist_ok=True)
+        """
+        Save this game state to a given file, in JSON format.
 
-        with path.open("w") as f:
-            json.dump(self.data, f, indent=2, sort_keys=True)
+        :param path: the path to the file.
+        """
+        path.touch(exist_ok=True)  # ensure that the file exists
+
+        with path.open("w") as file:
+            json.dump(self.data, file, indent=2, sort_keys=True)

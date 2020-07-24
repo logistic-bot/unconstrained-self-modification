@@ -56,7 +56,14 @@ class SaveManager:
         return saves
 
     def save_state(self, state: GameState) -> None:
-        path = SAVE_DIRECTORY / f"{state.data['name']}.json"
+        """
+        Save a given state into a file. The filename is determined by the 'name' attribute of the
+        state data.
+
+        :param state: The state to save
+        :return: None
+        """
+        path = self.save_dir / f"{state.data['name']}.json"
         state_duplicate = GameState()
         state_duplicate.data = state.data
         state_duplicate.save(path)

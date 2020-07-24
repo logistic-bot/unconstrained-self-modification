@@ -36,18 +36,20 @@ class CorruptedLoginNewSave(FullScreenScene):
     the new superuser creation process. It will then create a new save.
     """
 
-    def start(self) -> Optional[Scene]:
+    def start(self) -> Optional[Scene]:  # pylint: disable=R1711
         """
         See above
         """
-        c = StartComputer(self.renderer, self.state)
-        c.start()
+        start_computer_scene = StartComputer(self.renderer, self.state)
+        start_computer_scene.start()
 
         self.clear()
         curses.flushinp()
 
-        a = ether_industries_password_corrupt.create_animation(self.renderer)
-        a.start()
+        password_corrupt_animation = ether_industries_password_corrupt.create_animation(
+            self.renderer
+        )
+        password_corrupt_animation.start()
 
         username_prompt = "New superuser name: "
         password_prompt = "New superuser password: "
@@ -65,17 +67,17 @@ class CorruptedLoginNewSave(FullScreenScene):
             if password == confirmed_password:
                 # noinspection PyUnusedLocal
                 logged_in = True
-                break
             elif password == "":
                 self.addinto(1, 9, "Password is empty.")
             elif username == " ":
                 self.addinto(1, 9, "Username is empty.")
             else:
                 self.addinto(1, 9, "Passwords do not match.")
+
             sleep(1)
             self.clear()
 
-        far_away_future = datetime.timedelta(days=365*126)
+        far_away_future = datetime.timedelta(days=365 * 126)
         save_creation = datetime.date.today() + far_away_future
 
         self.state.data.update()
@@ -95,5 +97,6 @@ class CorruptedLoginNewSave(FullScreenScene):
         self.addinto(1, 12, "Welcome! Type 'help' for help!")
 
         self.get_key()
-        return None
 
+        # TODO: This should return the scene with the command line
+        return None
