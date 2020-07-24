@@ -208,7 +208,15 @@ class CursesRenderer:
         """
         self._move_cursoryx(y_pos, x_pos)
 
-    def text_input(self, prompt: str, x_pos: int, y_pos: int, length: int, color_pair_progress : int = curses.A_UNDERLINE | curses.A_BOLD, color_pair_done : int = curses.A_BOLD) -> str:
+    def text_input(
+        self,
+        prompt: str,
+        x_pos: int,
+        y_pos: int,
+        length: int,
+        color_pair_progress: int = curses.A_UNDERLINE | curses.A_BOLD,
+        color_pair_done: int = curses.A_BOLD,
+    ) -> str:
         """
         Get some input from the user, and return it. Similar to built-in input(), but for curses
 
