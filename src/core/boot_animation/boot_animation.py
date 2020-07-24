@@ -104,14 +104,14 @@ class SimultaneousStage:
             for stage in self.stages:
                 y_pos += 1
                 # noinspection PyProtectedMember
-                stage._start(x_pos, y_pos) # pylint: disable=W0212
+                stage._start(x_pos, y_pos)  # pylint: disable=W0212
                 sleep(self.delay_between)
             sleep(self.delay)
             y_pos = start_y
             for stage in self.stages:
                 y_pos += 1
                 # noinspection PyProtectedMember
-                stage._stop(y_pos) # pylint: disable=W0212
+                stage._stop(y_pos)  # pylint: disable=W0212
                 sleep(self.delay_between)
 
         return y_pos

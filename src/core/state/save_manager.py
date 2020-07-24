@@ -57,7 +57,7 @@ class SaveManager:
 
     def save_state(self, state: GameState) -> None:
         """
-        Save a given state into a file. The filename is determined by the 'name' atribute of the
+        Save a given state into a file. The filename is determined by the 'name' attribute of the
         state data.
 
         :param state: The state to save
