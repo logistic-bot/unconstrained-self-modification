@@ -82,5 +82,4 @@ class StartupScene(FullScreenScene):
         saves = save_manager.saves
         if len(saves) == 0:
             return CorruptedLoginNewSave(self.renderer, self.state)
-        else:
-            return SelectSave(self.renderer, self.state)
+        return SelectSave(self.renderer, self.state)
