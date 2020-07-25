@@ -22,7 +22,11 @@ Run this file to start the game
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
+import logging
+
 from src.core.engine import Engine
+
+logger = logging.getLogger(__name__)
 
 
 def main() -> None:
@@ -31,21 +35,9 @@ def main() -> None:
     """
     engine = Engine()
     engine.start()
-
-    #     # input
-    #     char = stdscr.getkey()
-    #
-    #     if char == "KEY_UP":
-    #         player_y -= 1
-    #     elif char == "KEY_DOWN":
-    #         player_y += 1
-    #     elif char == "KEY_RIGHT":
-    #         player_x += 1
-    #     elif char == "KEY_LEFT":
-    #         player_x -= 1
-    #     else:
-    #         stdscr.addstr(char)
+    logger.info("This should be the last log line. If it is not, please contact the developers")
 
 
 if __name__ == "__main__":
+    logger.info("Starting game")
     main()

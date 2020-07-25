@@ -33,7 +33,7 @@ log_file.touch(exist_ok=True)
 
 logging.basicConfig(
     filename=log_file,
-    filemode="a",
+    filemode="w",
     level=logging.DEBUG,
     format="%(asctime)s:%(levelname)s:%(pathname)s:%(name)s:%(funcName)s:%(lineno)d:%(message)s",
 )
