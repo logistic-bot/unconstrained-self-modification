@@ -22,6 +22,7 @@ Run this file to start the game
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
+
 import logging
 
 from src.core.engine import Engine
@@ -35,6 +36,7 @@ def main() -> None:
     """
     engine = Engine()
     engine.start()
+
     logger.info("This should be the last log line. If it is not, please contact the developers")
 
 
