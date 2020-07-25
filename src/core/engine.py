@@ -60,11 +60,12 @@ class Engine:  # pylint: disable=R0903
                 logger.info("Current scene: %s", current_scene)
 
                 current_scene = current_scene.start()
+
         except KeyboardInterrupt:
             logger.critical("KeyboardInterrupt", exc_info=True)
-
-        except:
+        except:  # noqa: E722
             logger.critical("An exception occurred.", exc_info=True)
+
         finally:
             logger.info("Tearing down curses, and exiting game")
 

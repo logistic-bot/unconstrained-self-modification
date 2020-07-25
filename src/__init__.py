@@ -43,4 +43,3 @@ logger = logging.getLogger(__name__)
 logger.info("Logger configured")
 logger.debug("game root: %s", GAME_ROOT_DIR)
 logger.debug("log file: %s", log_file)
-
