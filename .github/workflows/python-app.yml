@@ -38,10 +38,10 @@ jobs:
         # pylint
         python -m pylint src main.py -f colorized -j 1 --ignore-patterns='test*' --disable=C0330,R0913,W1116,R0903,W0511,R0914,E1111,R0801,R0902
 
-#    - name: Test with pytest
-#      run: |
-#        pytest --ff --nf tests --durations=2 --testmon -x --suppress-no-test-exit-code
-    - name: Coverage with pytest
-      run:
-        pytest --cov=src --ff --nf tests --durations=2 --cov-report term-missing:skip-covered -x
+    - name: Test with pytest
+      run: |
+        pytest --ff --nf tests --durations=2 --testmon -x --suppress-no-test-exit-code
+#    - name: Coverage with pytest
+#      run:
+#        pytest --cov=src --ff --nf tests --durations=2 --cov-report term-missing:skip-covered -x
 
