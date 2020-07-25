@@ -208,10 +208,22 @@ class CursesRenderer:
         """
         self._move_cursoryx(y_pos, x_pos)
 
-    def text_input(self, prompt: str, x_pos: int, y_pos: int, length: int) -> str:
+    def text_input(
+        self,
+        prompt: str,
+        x_pos: int,
+        y_pos: int,
+        length: int,
+        color_pair_progress: int = curses.A_UNDERLINE | curses.A_BOLD,
+        color_pair_done: int = curses.A_BOLD,
+    ) -> str:
         """
         Get some input from the user, and return it. Similar to built-in input(), but for curses
 
+        :param color_pair_progress: A curses color pair to show while the user can enter text.
+        Default is underlined and bold.
+        :param color_pair_done: A curses color pair to show when the user is done entering text.
+        Default is bold
         :param prompt: A short text inviting the user to input something.
         :param x_pos: The x position where the prompt should be displayed
         :param y_pos: The y position where the prompt should be displayed
@@ -227,7 +239,7 @@ class CursesRenderer:
         correct_x_pos = x_pos + len(prompt)
 
         win = curses.newwin(1, length, y_pos, correct_x_pos)
-        win.bkgd(" ", curses.A_UNDERLINE | curses.A_BOLD)
+        win.bkgd(" ", color_pair_progress)
 
         pad = textpad.Textbox(win, insert_mode=True)
         text = pad.edit()
@@ -236,7 +248,7 @@ class CursesRenderer:
         win.bkgd(" ", curses.A_NORMAL)
         win.refresh()
         win = curses.newwin(1, len(text) + 1, y_pos, correct_x_pos)
-        win.addstr(0, 0, text, curses.A_BOLD)
+        win.addstr(0, 0, text, color_pair_done)
         win.refresh()
 
         # self.refresh()
