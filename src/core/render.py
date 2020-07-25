@@ -21,8 +21,11 @@ This is where the rendering happens.
 # ------------------------------------------------------------------------------
 
 import curses
+import logging
 from curses import textpad
 from typing import Any, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class CursesRenderer:
@@ -31,6 +34,7 @@ class CursesRenderer:
     """
 
     def __init__(self) -> None:
+        logger.debug("Crate CursesRenderer and init curses")
         self.stdscr: Any = curses.initscr()  # pylint: disable=E1101
 
         self.last_key = ""
@@ -51,6 +55,9 @@ class CursesRenderer:
         # noinspection PyUnusedLocal
         max_x: int = 0
         _, max_x = self.stdscr.getmaxyx()
+
+        logger.debug("Max x: %s", max_x)
+
         return max_x
 
     @property
@@ -61,6 +68,9 @@ class CursesRenderer:
         # noinspection PyUnusedLocal
         max_y: int = 0
         max_y, _ = self.stdscr.getmaxyx()
+
+        logger.debug("Max y: %s", max_y)
+
         return max_y
 
     def get_key(self) -> str:
@@ -71,6 +81,8 @@ class CursesRenderer:
 
         key_repr = self.get_key_repr(key)
         self.last_key = key_repr
+
+        logger.debug("Got key: %s", key)
 
         return key
 
@@ -85,16 +97,10 @@ class CursesRenderer:
             key_repr = "KEY_SPACE"
         else:
             key_repr = key
-        return key_repr
 
-    # def get_key_non_blocking(self):
-    #     self.stdscr.nodelay(True)
-    #     try:
-    #         key = self.stdscr.get_wch()
-    #     except:
-    #         key = ""
-    #     self.stdscr.nodelay(False)
-    #     return key
+        logger.debug("Got key representation: %s", key_repr)
+
+        return key_repr
 
     def wait_keypress_delay(self, delay: float) -> int:
         """
@@ -109,13 +115,22 @@ class CursesRenderer:
         key: int = self.stdscr.getch()
         if key != -1:
             self.last_key = "SKIP"
+
+            logger.debug("skipped delay")
+        else:
+            logger.debug("did not skip delay")
+
         self.stdscr.timeout(-1)
+
         return key
 
     def tear_down(self) -> None:
         """
         Resume normal terminal state
         """
+
+        logger.info("Reverting to normal terminal state")
+
         assert (
             self.stdscr is not None
         ), "You need to call setup before calling tear_down"
@@ -131,6 +146,9 @@ class CursesRenderer:
         """
         Render the screen
         """
+
+        logger.info("Rendering game")
+
         # render
         self.clear_screen()
 
@@ -147,7 +165,8 @@ class CursesRenderer:
         """
         Refresh the screen
         """
-        # self.last_key = "KEY_TEST"
+        logger.debug("Refreshing screen")
+
         self.addinto(self.max_x - 2 - len(self.last_key), self.max_y - 2, self.last_key)
         self.stdscr.refresh()
 
@@ -155,12 +174,16 @@ class CursesRenderer:
         """
         Wait for a key to be pressed, then return None.
         """
+        logger.debug("Waiting for key")
+
         self.stdscr.getkey()
 
     def clear_screen(self) -> None:
         """
         Clear the screen.
         """
+        logger.debug("Clearing screen")
+
         self.stdscr.clear()
         self.stdscr.box()
 
@@ -170,6 +193,10 @@ class CursesRenderer:
         """
         Add text <text> into the main screen at position (<x_pos>, <y_pos>).
         """
+        logger.debug(
+            "Adding text %s at (%s, %s) with color %s", text, x_pos, y_pos, color_pair
+        )
+
         if color_pair is None:
             color_pair = curses.color_pair(0)
         assert x_pos > -1
@@ -183,6 +210,8 @@ class CursesRenderer:
         The position will be modified so that the text is not drawn on
         top of the window borders.
         """
+        logger.debug("Adding text into screen %s at (%s, %s)", text, x_pos, y_pos)
+
         assert x_pos < self.max_x
         assert y_pos < self.max_y, f"y_pos: {y_pos}, max: {self.max_y}"
         self._move_cursoryx(y_pos + 1, x_pos + 1)
@@ -191,6 +220,7 @@ class CursesRenderer:
     def _move_cursoryx(self, y_pos: int, x_pos: int) -> None:
         try:
             self.stdscr.move(y_pos, x_pos)
+            logger.debug("Moved cursor to (%s, %s)", x_pos, y_pos)
         except curses.error:
             max_x = self.max_x
             max_y = self.max_y
@@ -219,6 +249,7 @@ class CursesRenderer:
         length - 1 characters can be returned.
         :return: The text imputed by the user, terminated by a carriage return.
         """
+        logger.info("Getting text input at (%s, %s) of max length %s", x_pos, y_pos, length)
         curses.curs_set(2)
 
         self.addtext(x_pos, y_pos, prompt)
@@ -239,7 +270,7 @@ class CursesRenderer:
         win.addstr(0, 0, text, curses.A_BOLD)
         win.refresh()
 
-        # self.refresh()
-
         curses.curs_set(0)
+
+        logger.info("The user entered: %s", text)
         return text

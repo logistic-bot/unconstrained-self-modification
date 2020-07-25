@@ -63,7 +63,7 @@ class Engine:  # pylint: disable=R0903
 
         except KeyboardInterrupt:
             logger.critical("KeyboardInterrupt", exc_info=True)
-        except:  # noqa: E722
+        except:  # noqa: E722 pylint: disable=W0702
             logger.critical("An exception occurred.", exc_info=True)
 
         finally:
