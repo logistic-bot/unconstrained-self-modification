@@ -35,7 +35,7 @@ logging.basicConfig(
     filename=log_file,
     filemode="w",
     level=logging.DEBUG,
-    format="%(asctime)s:%(levelname)s:%(pathname)s:%(name)s:%(funcName)s:%(lineno)d:%(message)s",
+    format="%(asctime)s:%(levelname)s:%(name)s:%(funcName)s:%(lineno)d:%(message)s",
 )
 
 logger = logging.getLogger(__name__)

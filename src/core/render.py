@@ -26,7 +26,7 @@ from curses import textpad
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
-logger.level = logging.INFO  # comment out this line if you are trying to debug this
+# logger.level = logging.INFO  # comment out this line if you are trying to debug this
 
 
 class CursesRenderer:
@@ -195,7 +195,7 @@ class CursesRenderer:
         Add text <text> into the main screen at position (<x_pos>, <y_pos>).
         """
         logger.debug(
-            "Adding text %s at (%s, %s) with color %s", text, x_pos, y_pos, color_pair
+            "Adding text '%s' at (%s, %s) with color %s", text, x_pos, y_pos, color_pair
         )
 
         if color_pair is None:
