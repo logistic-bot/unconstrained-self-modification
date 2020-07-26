@@ -26,6 +26,7 @@ from curses import textpad
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
+logger.level = logging.INFO  # comment out this line if you are trying to debug this
 
 
 class CursesRenderer:
@@ -249,7 +250,9 @@ class CursesRenderer:
         length - 1 characters can be returned.
         :return: The text imputed by the user, terminated by a carriage return.
         """
-        logger.info("Getting text input at (%s, %s) of max length %s", x_pos, y_pos, length)
+        logger.info(
+            "Getting text input at (%s, %s) of max length %s", x_pos, y_pos, length
+        )
         curses.curs_set(2)
 
         self.addtext(x_pos, y_pos, prompt)
@@ -271,6 +274,5 @@ class CursesRenderer:
         win.refresh()
 
         curses.curs_set(0)
-
         logger.info("The user entered: %s", text)
         return text
