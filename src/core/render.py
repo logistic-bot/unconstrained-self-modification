@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This is where the rendering happens.
 """
@@ -256,14 +257,21 @@ class CursesRenderer:
         curses.curs_set(0)
         return text
 
-    def add_down_bar_text(self, text : str, mode : int = 0, color_pair: Optional[int] = None, x_pos : Optional[int] = None):
+    def add_down_bar_text(
+        self,
+        text: str,
+        mode: int = 0,
+        color_pair: Optional[int] = None,
+        x_pos: Optional[int] = None,
+    ) -> None:
         """
         Add a down_bar text at the bottom of the screen
 
-        :param color_pair: Curses color pair and formating to use
+        :param color_pair: Curses color pair and formatting to use
         :param x_pos: The x position of the text
         :param text: The text to be writen on screen
-        :param mode: The text mode define where is write the text {0 = Left, 1 = Middle, 2 = Right, 3 = Custom}
+        :param mode: The text mode define where is write the text {0 = Left, 1 = Middle, 2 = Right,
+        3 = Custom}
         :return:
         """
         color = curses.A_NORMAL
@@ -273,9 +281,11 @@ class CursesRenderer:
         if mode == 0:  # Left
             self.addtext(1, self.max_y - 1, text, color)
         elif mode == 1:  # Middle
-            self.addtext(int((self.max_x / 2) - (len(text) / 2)), self.max_y - 1, text, color)
+            x_pos = int((self.max_x / 2) - (len(text) / 2))
+            self.addtext(x_pos, self.max_y - 1, text, color)
         elif mode == 2:  # Right
             self.addtext(self.max_x - 1 - len(text), self.max_y - 1, text, color)
         elif mode == 3:  # Custom
+            assert x_pos is not None
             self.addtext(x_pos, self.max_y - 1, text, color)
         self.refresh()
