@@ -255,17 +255,19 @@ class CursesRenderer:
 
         curses.curs_set(0)
         return text
-
-        def add_down_bar_text(self, text : str, mode : int = 0, color_pair: Optional[int] = None, x_pos : Optional[int] = None):
+    
+    def add_down_bar_text(self, text : str, mode : int = 0, color_pair: Optional[int] = None, x_pos : Optional[int] = None):
         """
+        Add a down_bar text at the bottom of the screen
+
         :param color_pair: Curses color pair and formating to use
         :param x_pos: The x position of the text
         :param text: The text to be writen on screen
         :param mode: The text mode define where is write the text {0 = Left, 1 = Middle, 2 = Right, 3 = Custom}
-        :return:
+        :return: Nothing
         """
         color = curses.A_NORMAL
-        if color_pair != None:
+        if color_pair is not None:
             color = color_pair
         self.refresh()
         if mode == 0:  # Left
