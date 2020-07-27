@@ -256,24 +256,24 @@ class CursesRenderer:
         curses.curs_set(0)
         return text
 
-    def add_down_bar_text(self, x_pos : int, text : str, mode : int = 0, color_pair: Optional[int] = None):
+        def add_down_bar_text(self, text : str, mode : int = 0, color_pair: Optional[int] = None, x_pos : Optional[int] = None):
         """
-        :param color_pair:
-        :param x_pos: the x_position of the text
-        :param text: the text writen on screen
+        :param color_pair: Curses color pair and formating to use
+        :param x_pos: The x position of the text
+        :param text: The text to be writen on screen
         :param mode: The text mode define where is write the text {0 = Left, 1 = Middle, 2 = Right, 3 = Custom}
         :return:
         """
-        color = 0
+        color = curses.A_NORMAL
         if color_pair != None:
             color = color_pair
         self.refresh()
-        if mode == 0:
-            self.addtext(1, self.max_y-1, text, color)
-        elif mode == 1:
-            self.addtext(int((self.max_x/2)-(len(text)/2)), self.max_y-1, text, color)
-        elif mode == 2:
-            self.addtext(self.max_x-1-len(text), self.max_y-1, text, color)
-        elif mode == 3:
-            self.addtext(x_pos, self.max_y-1, text, color)
+        if mode == 0:  # Left
+            self.addtext(1, self.max_y - 1, text, color)
+        elif mode == 1:  # Middle
+            self.addtext(int((self.max_x / 2) - (len(text) / 2)), self.max_y - 1, text, color)
+        elif mode == 2:  # Right
+            self.addtext(self.max_x - 1 - len(text), self.max_y - 1, text, color)
+        elif mode == 3:  # Custom
+            self.addtext(x_pos, self.max_y - 1, text, color)
         self.refresh()
