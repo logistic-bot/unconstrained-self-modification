@@ -264,7 +264,7 @@ class CursesRenderer:
         :param x_pos: The x position of the text
         :param text: The text to be writen on screen
         :param mode: The text mode define where is write the text {0 = Left, 1 = Middle, 2 = Right, 3 = Custom}
-        :return: Nothing
+        :return:
         """
         color = curses.A_NORMAL
         if color_pair is not None:
@@ -277,5 +277,5 @@ class CursesRenderer:
         elif mode == 2:  # Right
             self.addtext(self.max_x - 1 - len(text), self.max_y - 1, text, color)
         elif mode == 3:  # Custom
-            self.addtext(int(x_pos), self.max_y - 1, text, color)
+            self.addtext(x_pos, self.max_y - 1, text, color)
         self.refresh()
