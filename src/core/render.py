@@ -255,7 +255,7 @@ class CursesRenderer:
 
         curses.curs_set(0)
         return text
-    
+
     def add_down_bar_text(self, text : str, mode : int = 0, color_pair: Optional[int] = None, x_pos : Optional[int] = None):
         """
         Add a down_bar text at the bottom of the screen
@@ -277,5 +277,5 @@ class CursesRenderer:
         elif mode == 2:  # Right
             self.addtext(self.max_x - 1 - len(text), self.max_y - 1, text, color)
         elif mode == 3:  # Custom
-            self.addtext(x_pos, self.max_y - 1, text, color)
+            self.addtext(int(x_pos), self.max_y - 1, text, color)
         self.refresh()
