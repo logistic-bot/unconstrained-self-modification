@@ -21,6 +21,7 @@ found, and a new save should be created. """
 # ------------------------------------------------------------------------------
 import curses
 import datetime
+import logging
 from time import sleep
 from typing import Optional
 
