@@ -45,9 +45,9 @@ class EtherIndustriesLogin(FullScreenScene):
         password_prompt = "Password: "
 
         expected_password = self.state.data["user"]["password"]
-        logger.debug("Excepted password : "+excepted_password)
+        logger.debug("Excepted password : "+expected_password)
         expected_username = self.state.data["user"]["username"]
-        logger.debug("Excepted username : "+excepted_username)
+        logger.debug("Excepted username : "+expected_username)
         logged_in = False
         logger.debug("Logged in : "+str(logged_in))
         while not logged_in:
