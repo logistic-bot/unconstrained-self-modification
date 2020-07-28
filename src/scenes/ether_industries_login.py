@@ -65,7 +65,7 @@ class EtherIndustriesLogin(FullScreenScene):
                 logger.debug("Logged in : "+str(logged_in))
             else:
                 self.addinto(1, 5, "Login incorrect.")
-                logger.info("Login incorrect")
+                logger.info(f"Login incorrect Username : {username}, Expected Username : {expected_username}, Password : {password}, Expected Password : {expected_password}")
                 sleep(1)
 
         self.get_key()
