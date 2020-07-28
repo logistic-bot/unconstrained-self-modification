@@ -59,7 +59,7 @@ class CorruptedLoginNewSave(FullScreenScene):
         password_confirm = "Confirm new superuser password: "
 
         logged_in = False
-        logger.debug("Logged in : "+logged_in)
+        logger.debug("Logged in : "+str(logged_in))
         username = ""
         password = ""
         while not logged_in:
@@ -71,7 +71,7 @@ class CorruptedLoginNewSave(FullScreenScene):
             if password == confirmed_password:
                 # noinspection PyUnusedLocal
                 logged_in = True
-                logger.debug("Logged in : "+logged_in)
+                logger.debug("Logged in : "+str(logged_in))
             elif password == "":
                 self.addinto(1, 9, "Password is empty.")
                 logger.info("Password is empty.")
