@@ -225,6 +225,7 @@ class CursesRenderer:
         except curses.error:
             max_x = self.max_x
             max_y = self.max_y
+            logger.error(f"Tried to move cursor: failed: y_pos: {y_pos}, x_pos: {x_pos}, max_x: {max_x}, max_y: {max_y}")
             raise Exception(
                 f"Tried to move cursor: failed: y_pos: {y_pos}, x_pos: {x_pos}, "
                 f"max_x: {max_x}, max_y: {max_y}"
@@ -238,6 +239,7 @@ class CursesRenderer:
         :param y_pos: y position where the cursor should be moved
         """
         self._move_cursoryx(y_pos, x_pos)
+        logger.debug(f"Cursor moved to {x_pos}, {y_pos}")
 
     def text_input(self, prompt: str, x_pos: int, y_pos: int, length: int) -> str:
         """
