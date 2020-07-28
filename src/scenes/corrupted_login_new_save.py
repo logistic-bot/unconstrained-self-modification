@@ -73,10 +73,13 @@ class CorruptedLoginNewSave(FullScreenScene):
                 logger.debug("Logged in : "+logged_in)
             elif password == "":
                 self.addinto(1, 9, "Password is empty.")
+                logger.info("Password is empty.")
             elif username == " ":
                 self.addinto(1, 9, "Username is empty.")
+                logger.info("Username is empty.")
             else:
                 self.addinto(1, 9, "Passwords do not match.")
+                logger.info("Passwords do not match.")
 
             sleep(1)
             self.clear()
