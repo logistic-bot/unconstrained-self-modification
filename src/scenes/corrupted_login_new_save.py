@@ -102,7 +102,7 @@ class CorruptedLoginNewSave(FullScreenScene):
         self.state.data["user"]["username"] = username
         logger.debug("state.data['user']['username'] : "+self.state.data["user"]["username"])
         self.state.data["login"]["delay_incorrect_password"] = 1
-        logger.debug("state.data['login']['delay_incorrect_password'] : "+self.state.data["login"]["delay_incorrect_password"])
+        logger.debug("state.data['login']['delay_incorrect_password'] : "+str(self.state.data["login"]["delay_incorrect_password"]))
 
         self.addinto(1, 9, "[ether-login c198762] Creating new user database...")
 
