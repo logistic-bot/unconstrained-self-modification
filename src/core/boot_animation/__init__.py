@@ -16,3 +16,5 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
+
+# TODO: When the boot_animation refactoring is done, add logging to this module
