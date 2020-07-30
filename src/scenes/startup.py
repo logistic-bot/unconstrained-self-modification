@@ -21,6 +21,7 @@ This FullScreenScene is responsible for showing the game's title and startup mes
 # ------------------------------------------------------------------------------
 
 import curses
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -29,15 +30,19 @@ from src.core.state.save_manager import SaveManager
 from src.scenes.corrupted_login_new_save import CorruptedLoginNewSave
 from src.scenes.select_save import SelectSave
 
+logger = logging.getLogger(__name__)
+
 STARTUP_MESSAGE_PATH = Path(__file__).parent.absolute() / "STARTUP"
 FULL_LICENSE_PATH = Path(__file__).parent.parent.parent.absolute() / "LICENCE"
 
 with open(STARTUP_MESSAGE_PATH, "r") as f:
     STARTUP_MESSAGE = f.read()
+    logger.debug("Startup message: '%'", STARTUP_MESSAGE)
 
 with FULL_LICENSE_PATH.open("r") as f:
     licence = [line.strip() for line in f]
     FULL_LICENSE = "\n".join(licence)
+    logger.debug("License: '%'", FULL_LICENSE)
 
 
 class StartupScene(FullScreenScene):
@@ -52,6 +57,8 @@ class StartupScene(FullScreenScene):
         If there is at least one save, show the save select Scene, in other cases, show the
         StartComputer scene.
         """
+        logger.info("Starting Scene: StartupScene")
+
         self.clear()
         self.sleep_key(0.1)
         self.addinto_all_centred(STARTUP_MESSAGE, delay=0.05, pager_delay=0)
@@ -76,8 +83,13 @@ class StartupScene(FullScreenScene):
         key = self.get_key()
         self.clear()
         if key == "l":
+            logger.info("Showing license")
             self.addinto_all_centred(FULL_LICENSE, 0.01, 5)
+            # XXX: For some reason, the game crashes at this point. FIX
 
+        # TODO: Add option to manage saves: Create new scene that allows to select and manage saves.
+        # TODO: Show the save manager directly after this, and the CorruptedLoginNewSave Scene is
+        #  shown each time a new save is created (Do not forget to rename the scene)
         save_manager = SaveManager()
         saves = save_manager.saves
         if len(saves) == 0:
