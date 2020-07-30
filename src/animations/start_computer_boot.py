@@ -23,8 +23,8 @@ first computer.
 # ------------------------------------------------------------------------------
 import curses
 
-from src.core.boot_animation.boot_animation import (BootAnimation, InfoStage, SimultaneousStage, )
-from src.core.boot_animation.stage import Stage
+from tests.boot_animationV2 import BootAnimation
+from tests.stagesV2 import Stage
 from src.core.boot_animation.step import Step
 from src.core.boot_animation.styled_text import StyledText
 from src.core.render import CursesRenderer
@@ -72,24 +72,14 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
     gpu_test = StyledText(renderer, "Testing gpu 0", 4)
     compiler = StyledText(renderer, "Loading parcel 3 compiler", 4)
     text_mode = StyledText(renderer, "Starting text interface", 4)
-
-    greet_steps = [Step(greet), Step(ether_copyright)]
     test_step = [cpu_test_0, cpu_test_1, cpu_test_2, cpu_test_3, gpu_test]
 
-    test_stage_tmp = [
-        Stage(renderer, step, progress, success, delay=1) for step in test_step
-    ]
-    for stage in test_stage_tmp:
-        stage.status_x = 40
-
-    greet_stage = InfoStage(renderer, greet_steps, 0.7, 1)
-    test_stage = SimultaneousStage(renderer, test_stage_tmp, 0.7, 0.5, 0.1)
-    compiler_stage = Stage(renderer, compiler, progress, finished, delay=1.5)
-    compiler_stage.status_x = 40
-    final_stage = Stage(renderer, text_mode, progress, finished, delay=1.5)
-    final_stage.status_x = 40
+    greet_stage = Stage(renderer, [compiler], delay=[0.7, 0.7, 0.7, 2], progress=[progress,finished,success])
+    text_stage = Stage(renderer, [text_mode], delay=[0.7, 2, 1.5], progress=[progress, finished, success])
+    test_stage = Stage(renderer, test_step, delay=[0.7, 1, 0.7], progress=[progress, finished, success])
 
     animation = BootAnimation(
-        renderer, [greet_stage, test_stage, compiler_stage, final_stage]
+        #renderer, [greet_stage, test_stage, compiler_stage, final_stage]
+        renderer, [greet_stage, text_stage, test_stage]
     )
     return animation
