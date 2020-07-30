@@ -22,9 +22,12 @@ This file contains the GameState class, which is responsible for saving the curr
 # ------------------------------------------------------------------------------
 
 import json
+import logging
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 JSON = Any
 
@@ -43,20 +46,18 @@ class GameState:
 
         self.data: JSON = nested_dict()
 
-    # def load_from_save(self, path: Path) -> None:
-    #     """
-    #     Load a saved game state into this object
-    #     :param save: The Save object which has the saved game state
-    #     """
-    #     self.data = defaultdict(dict, save.data)
-    #     self.save = save
+        logger.debug("Creating new empty GameState")
 
     def load(self, path: Path) -> None:
         """
         Load a save file at a specified path into this save object.
         """
+        logger.info("Loading save file: '%s'", path)
+
         with path.open("r") as file:
             self.data = json.load(file)
+
+        logger.info("New data: '%s'", self.data)
 
     @property
     def lastsave(self) -> str:
@@ -66,6 +67,8 @@ class GameState:
         """
         last_save = self.data["metadata"]["save_date"]
         assert isinstance(last_save, str)
+
+        logger.debug("Lastsave: '%s'", last_save)
         return last_save
 
     def save(self, path: Path) -> None:
@@ -74,7 +77,12 @@ class GameState:
 
         :param path: the path to the file.
         """
+        logger.info("Saving state to file '%s'", path)
+        logger.info("Current data: '%s'", self.data)
+
         path.touch(exist_ok=True)  # ensure that the file exists
 
         with path.open("w") as file:
             json.dump(self.data, file, indent=2, sort_keys=True)
+
+        logger.info("Done saving state")
