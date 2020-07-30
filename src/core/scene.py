@@ -128,6 +128,7 @@ class FullScreenScene(Scene, ABC):
     """
     The base class for all full-screen Scenes, contains convenience methods.
     """
+    # TODO: Add logging for this class
 
     def _addinto_centred_paged(
         self, y_pos: int, text: str, delay: float, pager_delay: float, color_pair: int
@@ -257,3 +258,5 @@ class PartialScreenScene(FullScreenScene, ABC):
     """
     This is the base class for all Scenes that do not use the full screen.
     """
+    # TODO: Add logging for this class
+    # TODO: Make this class inherit from Scene, not FullScreenScene
