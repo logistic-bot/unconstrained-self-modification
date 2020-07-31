@@ -178,9 +178,10 @@ class FullScreenScene(Scene, ABC):
         if line_count > max_lines:  # -2 for the borders
             self._addinto_centred_paged(y_pos, text, delay, pager_delay, color_pair)
 
-        # To add a delay between each line, we loop over each line
-        for idx, line in enumerate(text.splitlines()):
-            delay = self._add_line_centred(color_pair, delay, idx, line, y_pos)
+        else:
+            # To add a delay between each line, we loop over each line
+            for idx, line in enumerate(text.splitlines()):
+                delay = self._add_line_centred(color_pair, delay, idx, line, y_pos)
 
         return delay == 0  # If something was skipped, return True
 
