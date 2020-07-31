@@ -22,10 +22,13 @@ be loaded.
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 import curses
+import logging
 
 from src.core.scene import FullScreenScene, Scene
 from src.core.state.save_manager import SaveManager
 from src.scenes.start_computer import StartComputer
+
+logger = logging.getLogger(__name__)
 
 
 class SelectSave(FullScreenScene):
@@ -37,6 +40,9 @@ class SelectSave(FullScreenScene):
         """
         See above
         """
+
+        logger.info("Starting Scene: SelectSave")
+
         title = " Select a save to load... "
 
         save_manager = SaveManager()
@@ -99,6 +105,8 @@ class SelectSave(FullScreenScene):
             if key == "KEY_UP":
                 if selected_index > 0:
                     selected_index -= 1
+
+            logger.info("Selected save: '%s'", name)
 
         self.addinto_centred(20, "Loading '{}'...".format(current.data["name"]))
 
