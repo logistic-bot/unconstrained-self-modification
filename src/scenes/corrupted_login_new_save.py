@@ -31,6 +31,9 @@ from src.core.state.save_manager import SaveManager
 from src.scenes.start_computer import StartComputer
 
 
+# XXX: Waiting for github discussion to be resolved
+
+
 class CorruptedLoginNewSave(FullScreenScene):
     """
     This FullScreenScene will tell the user that the login file is corrupt, and walk it through
@@ -84,7 +87,7 @@ class CorruptedLoginNewSave(FullScreenScene):
 
             sleep(1)
             self.clear()
-        
+
         far_away_future = datetime.timedelta(days=365 * 126)
         save_creation = datetime.date.today() + far_away_future
         logger.debug("Create new date_time : " + str(save_creation))
