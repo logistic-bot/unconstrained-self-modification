@@ -21,6 +21,7 @@ This scene is for the start of the game, this computer is the first that the use
 # ------------------------------------------------------------------------------
 
 import curses
+import logging
 from pathlib import Path
 
 from src.animations import start_computer_bios, start_computer_boot
@@ -30,6 +31,8 @@ from src.scenes.ether_industries_login import EtherIndustriesLogin
 PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
 LOGO_START_PATH = PROJECT_ROOT / "assets" / "ether_industries" / "1"
 LOGO_DONE_PATH = PROJECT_ROOT / "assets" / "ether_industries" / "2"
+
+logger = logging.getLogger(__name__)
 
 with LOGO_START_PATH.open("r") as f:
     logo = [line.strip() for line in f]
@@ -51,6 +54,8 @@ class StartComputer(FullScreenScene):
 
         :return:
         """
+        logger.info("Starting Scene: StartComputer")
+
         self.clear()
         animation = start_computer_bios.create_animation(self.renderer)
         y_pos = animation.start()
