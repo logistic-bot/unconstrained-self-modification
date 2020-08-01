@@ -22,9 +22,12 @@ This Scene will show login for an Ether Industries computer.
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 import curses
+import logging
 from time import sleep
 
 from src.core.scene import FullScreenScene
+
+logger = logging.getLogger(__name__)
 
 
 class EtherIndustriesLogin(FullScreenScene):
@@ -37,12 +40,16 @@ class EtherIndustriesLogin(FullScreenScene):
         Show this scene
         """
         curses.flushinp()
+        logger.debug("Start Logging in")
 
         login_prompt = "Login: "
         password_prompt = "Password: "
 
         expected_password = self.state.data["user"]["password"]
         expected_username = self.state.data["user"]["username"]
+
+        logger.debug("Excepted password: '%s'", expected_password)
+        logger.debug("Excepted username: '%s'", expected_username)
 
         logged_in = False
         while not logged_in:
@@ -57,8 +64,17 @@ class EtherIndustriesLogin(FullScreenScene):
             if username == expected_username and password == expected_password:
                 self.addinto(1, 5, f"Last login: {self.state.lastsave}")
                 logged_in = True
+                logger.debug("Logged in!")
             else:
                 self.addinto(1, 5, "Login incorrect.")
+                logger.info(
+                    "Login incorrect Username : '%s', Expected Username : "
+                    "'%s', Password : '%s', Expected Password : '%s'",
+                    username,
+                    expected_username,
+                    password,
+                    expected_password,
+                )
                 sleep(1)
 
         self.get_key()

@@ -21,11 +21,14 @@ This file implements the FullScreenScene class, which contains convenience metho
 # ------------------------------------------------------------------------------
 
 import curses
+import logging
 from abc import ABC
 from typing import Optional, Any
 
 from src.core.render import CursesRenderer
 from src.core.state.game_state import GameState
+
+logger = logging.getLogger(__name__)
 
 
 class Scene:
@@ -37,11 +40,16 @@ class Scene:
         self.state = state
         self.renderer = renderer
 
+        logger.debug("Created new Scene")
+
     def start(self) -> Any:
         """
         Run the scene. Should be overridden by subclasses. Should return the next scene. If None
         is returned, exit the game.
         """
+
+        logger.error("Tried to call start() on a Scene class and not a subclass!")
+
         raise NotImplementedError(
             "This class is not to be used directly, please create a "
             "subclass and override the start method."
@@ -55,17 +63,25 @@ class Scene:
 
         :param delay: How many seconds to wait for a key press
         """
+
+        logger.debug("sleeping for %s seconds", delay)
+
         if delay == 0:
             return False
 
         key = self.renderer.wait_keypress_delay(delay)
-        return key == -1
+
+        if key != -1:
+            logger.debug("Sleep interrupted!")
+            return False
+        return True
 
     def get_key(self) -> str:
         """
         Wait for a key to be pressed, and return a string representing it.
         :return: The pressed key
         """
+        logger.debug("Getting key...")
         return self.renderer.get_key()
 
     def refresh(self) -> None:
@@ -73,12 +89,14 @@ class Scene:
         Refresh the screen, making sure that all modified characters are displayed correctly.
         :return:
         """
+        logger.debug("Refreshing screen")
         self.renderer.refresh()
 
     def clear(self) -> None:
         """
         Clear the screen, and redraw the borders.
         """
+        logger.debug("Clearing screen")
         self.renderer.clear_screen()
 
     def addinto(self, x_pos: int, y_pos: int, text: str, color_pair: int = 0) -> None:
@@ -89,6 +107,13 @@ class Scene:
 
         :return: None
         """
+        logger.debug(
+            "Adding text %s to (%s, %s) with color pair %s",
+            text,
+            x_pos,
+            y_pos,
+            color_pair,
+        )
         self.renderer.addtext(x_pos, y_pos, text, color_pair)
         self.refresh()
 
@@ -96,13 +121,26 @@ class Scene:
         """
         Get some input from the user. for more information, see CursesRenderer.text_input()
         """
-        return self.renderer.text_input(prompt, x_pos, y_pos, length)
+        logger.debug(
+            "Getting input from user at (%s, %s), with prompt %s and max length %s",
+            x_pos,
+            y_pos,
+            prompt,
+            length,
+        )
+
+        text = self.renderer.text_input(prompt, x_pos, y_pos, length)
+
+        logger.debug("Got text: %s", text)
+        return text
 
 
 class FullScreenScene(Scene, ABC):
     """
     The base class for all full-screen Scenes, contains convenience methods.
     """
+
+    # TODO: Add logging for this class
 
     def _addinto_centred_paged(
         self, y_pos: int, text: str, delay: float, pager_delay: float, color_pair: int
@@ -233,3 +271,6 @@ class PartialScreenScene(FullScreenScene, ABC):
     """
     This is the base class for all Scenes that do not use the full screen.
     """
+
+    # TODO: Add logging for this class
+    # TODO: Make this class inherit from Scene, not FullScreenScene

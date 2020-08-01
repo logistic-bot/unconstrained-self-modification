@@ -20,11 +20,14 @@ Say that the login file is corrupted and a new superuser will be created
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 import curses
+import logging
 
 from src.core.boot_animation.boot_animation import BootAnimation, InfoStage
 from src.core.boot_animation.step import Step
 from src.core.boot_animation.styled_text import StyledText
 from src.core.render import CursesRenderer
+
+logger = logging.getLogger(__name__)
 
 
 def create_animation(renderer: CursesRenderer) -> BootAnimation:
@@ -55,4 +58,9 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
     steps = [Step(text, delay=0.2) for text in [greet, error, info]]
     stage = InfoStage(renderer, steps, delay=0.7)
     animation = BootAnimation(renderer, [stage])
+
+    logger.info(
+        "Created boot_animation: EtherIndustriesPasswordCorrupt: '%s'", animation
+    )
+
     return animation

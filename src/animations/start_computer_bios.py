@@ -23,12 +23,15 @@ This is the boot animation from the first computer
 
 # init colors
 import curses
+import logging
 
 from src.core.boot_animation.boot_animation import BootAnimation
 from src.core.boot_animation.stage import Stage
 from src.core.boot_animation.step import Step
 from src.core.boot_animation.styled_text import StyledText
 from src.core.render import CursesRenderer
+
+logger = logging.getLogger(__name__)
 
 
 def create_animation(renderer: CursesRenderer) -> BootAnimation:
@@ -67,4 +70,7 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
     animation = BootAnimation(
         renderer, [bios_stage, self_test_stage, boot_stage], delay=1.5
     )
+
+    logger.info("Created boot_animation: StartComputerBios: '%s'", animation)
+
     return animation
