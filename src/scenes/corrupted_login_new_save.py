@@ -25,16 +25,12 @@ import logging
 from time import sleep
 from typing import Optional
 
-logger = logging.getLogger(__name__)
-
-
 from src.animations import ether_industries_password_corrupt
 from src.core.scene import FullScreenScene, Scene
 from src.core.state.save_manager import SaveManager
 from src.scenes.start_computer import StartComputer
 
-
-# XXX: Waiting for github discussion to be resolved
+logger = logging.getLogger(__name__)
 
 
 class CorruptedLoginNewSave(FullScreenScene):
@@ -76,7 +72,9 @@ class CorruptedLoginNewSave(FullScreenScene):
             if password == confirmed_password:
                 # noinspection PyUnusedLocal
                 logged_in = True
-                logger.debug("Logged in! User: '%s', Password: '%s'", username, password)
+                logger.debug(
+                    "Logged in! User: '%s', Password: '%s'", username, password
+                )
             elif password == "":
                 self.addinto(1, 9, "Password is empty.")
                 logger.info("Password is empty.")
@@ -92,7 +90,6 @@ class CorruptedLoginNewSave(FullScreenScene):
 
         far_away_future = datetime.timedelta(days=365 * 126)
         save_creation = datetime.date.today() + far_away_future
-        logger.debug("Create new date_time : " + str(save_creation))
 
         self.state.data.update()
         self.state.data["metadata"]["save_creation"] = str(save_creation)
@@ -101,7 +98,7 @@ class CorruptedLoginNewSave(FullScreenScene):
         self.state.data["user"]["password"] = password
         self.state.data["user"]["username"] = username
         self.state.data["login"]["delay_incorrect_password"] = 1
-        
+
         logger.debug("State data: '%s'", self.state.data)
 
         self.addinto(1, 9, "[ether-login c198762] Creating new user database...")

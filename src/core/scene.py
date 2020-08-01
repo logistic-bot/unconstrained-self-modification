@@ -107,7 +107,13 @@ class Scene:
 
         :return: None
         """
-        logger.debug("Adding text %s to (%s, %s) with color pair %s", text,x_pos, y_pos, color_pair)
+        logger.debug(
+            "Adding text %s to (%s, %s) with color pair %s",
+            text,
+            x_pos,
+            y_pos,
+            color_pair,
+        )
         self.renderer.addtext(x_pos, y_pos, text, color_pair)
         self.refresh()
 
@@ -115,8 +121,13 @@ class Scene:
         """
         Get some input from the user. for more information, see CursesRenderer.text_input()
         """
-        logger.debug("Getting input from user at (%s, %s), with prompt %s and max length %s",
-                     x_pos, y_pos, prompt, length)
+        logger.debug(
+            "Getting input from user at (%s, %s), with prompt %s and max length %s",
+            x_pos,
+            y_pos,
+            prompt,
+            length,
+        )
 
         text = self.renderer.text_input(prompt, x_pos, y_pos, length)
 
@@ -128,6 +139,7 @@ class FullScreenScene(Scene, ABC):
     """
     The base class for all full-screen Scenes, contains convenience methods.
     """
+
     # TODO: Add logging for this class
 
     def _addinto_centred_paged(
@@ -258,5 +270,6 @@ class PartialScreenScene(FullScreenScene, ABC):
     """
     This is the base class for all Scenes that do not use the full screen.
     """
+
     # TODO: Add logging for this class
     # TODO: Make this class inherit from Scene, not FullScreenScene

@@ -27,8 +27,7 @@ from time import sleep
 
 from src.core.scene import FullScreenScene
 
-
-# XXX: Waiting for github discussion to be resolved
+logger = logging.getLogger(__name__)
 
 
 class EtherIndustriesLogin(FullScreenScene):
@@ -37,7 +36,6 @@ class EtherIndustriesLogin(FullScreenScene):
     """
 
     def start(self) -> None:
-        logger = logging.getLogger(__name__)
         """
         Show this scene
         """
@@ -48,11 +46,12 @@ class EtherIndustriesLogin(FullScreenScene):
         password_prompt = "Password: "
 
         expected_password = self.state.data["user"]["password"]
-        logger.debug("Excepted password : " + expected_password)
         expected_username = self.state.data["user"]["username"]
-        logger.debug("Excepted username : " + expected_username)
+
+        logger.debug("Excepted password: '%s'", expected_password)
+        logger.debug("Excepted username: '%s'", expected_username)
+
         logged_in = False
-        logger.debug("Logged in : " + str(logged_in))
         while not logged_in:
             self.clear()
             self.addinto(1, 1, "Ether Industry EtherOS v6.2.4 (black-hole-01) (tty1)")
@@ -65,11 +64,16 @@ class EtherIndustriesLogin(FullScreenScene):
             if username == expected_username and password == expected_password:
                 self.addinto(1, 5, f"Last login: {self.state.lastsave}")
                 logged_in = True
-                logger.debug("Logged in : " + str(logged_in))
+                logger.debug("Logged in!")
             else:
                 self.addinto(1, 5, "Login incorrect.")
                 logger.info(
-                    f"Login incorrect Username : {username}, Expected Username : {expected_username}, Password : {password}, Expected Password : {expected_password}"
+                    "Login incorrect Username : '%s', Expected Username : "
+                    "'%s', Password : '%s', Expected Password : '%s'",
+                    username,
+                    expected_username,
+                    password,
+                    expected_password,
                 )
                 sleep(1)
 

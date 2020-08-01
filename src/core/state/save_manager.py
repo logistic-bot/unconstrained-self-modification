@@ -73,7 +73,6 @@ class SaveManager:
         :return: None
         """
 
-
         path = self.save_dir / f"{state.data['name']}.json"
 
         logger.info("saving state of GameState '%s' at file '%s'", state, path)

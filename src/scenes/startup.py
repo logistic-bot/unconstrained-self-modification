@@ -37,12 +37,11 @@ FULL_LICENSE_PATH = Path(__file__).parent.parent.parent.absolute() / "LICENCE"
 
 with open(STARTUP_MESSAGE_PATH, "r") as f:
     STARTUP_MESSAGE = f.read()
-    logger.debug("Startup message: '%'", STARTUP_MESSAGE)
+    logger.debug("Startup message: '%s'", STARTUP_MESSAGE)
 
 with FULL_LICENSE_PATH.open("r") as f:
     licence = [line.strip() for line in f]
     FULL_LICENSE = "\n".join(licence)
-    logger.debug("License: '%'", FULL_LICENSE)
 
 
 class StartupScene(FullScreenScene):
