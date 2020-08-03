@@ -51,7 +51,7 @@ class SelectSave(FullScreenScene):
         super().__init__(renderer, state)
         self.selected_option = selected_option
         self.selected_index = selected_index
-        self.save_list_selected = save_list_selected
+        self.save_list_selected_index = save_list_selected
 
     def start(self) -> Optional[Scene]:
         """
@@ -59,93 +59,85 @@ class SelectSave(FullScreenScene):
         """
 
         logger.info("Starting Scene: SelectSave")
-        key = ""
-        selected_index = self.selected_index
-        selected_option = self.selected_option
-        save_manager = SaveManager()
-        saves = save_manager.saves
-        current = saves[0]
-        save_list_selected = self.save_list_selected
-        while key != "\n":
-            # setup
-            title = " Save files "
 
-            # get the save with the longest name
-            # TODO: truncate names too long
-            longest_name = len(title)
-            for save in saves:
-                name = save.data["name"]
-                if len(name) > longest_name:
-                    longest_name = len(name)
+        save_list_title = " Save files "
+
+        saves = self.get_saves()
+        save_manager = SaveManager()
+
+        selected_state = saves[0]
+
+        acting_on_save_list = self.save_list_selected_index
+        save_list_selected_index = self.selected_index
+        selected_option = self.selected_option
+
+        minimum_width = 30
+        len_longest_name = self.get_len_longest_save(minimum_width)
+
+        actions = {
+            1: "Load selected",
+            2: "Rename selected",
+            3: "Delete selected",
+            4: "Create new",
+        }
+        actions_positions_offsets = {1: 0, 2: 1, 3: 2, 4: 4}
+        actions_start_y_pos = 3
+
+        helps = {
+            1: "ENTER: Load save '{}'",
+            2: "ENTER: Rename save '{}'",
+            3: "ENTER: Delete save '{}'",
+            4: "ENTER: Create new save",
+        }
+
+        key = ""
+        while key != "\n":
+            self.clear()
 
             save_start_y_pos = 3
             save_x_pos = 2
 
-            self.clear()
-
-            save_name_x_pos = longest_name + 3
+            save_name_x_pos = len_longest_name + 3
             option_x_pos = save_name_x_pos + 2
 
             # show separator
-            self.renderer.stdscr.vline(
-                1, save_name_x_pos, curses.ACS_VLINE, self.renderer.max_y - 2  # type: ignore
-            )
+            self.show_separator(save_name_x_pos)
 
             # show title
-            title_start_x = round(save_name_x_pos / 2) - round(len(title) / 2)
-            self.addinto(title_start_x, 1, title, curses.A_DIM | curses.A_REVERSE)
+            self.show_save_list_title(save_list_title, save_name_x_pos)
 
-            # show the list
-            for save_index, save in enumerate(saves):
-                name = save.data["name"]
-                self.addinto(save_x_pos, save_start_y_pos + save_index, name)
+            # show the save list
+            save_names = [save.data["name"] for save in saves]
+            self.draw_list(save_start_y_pos, save_x_pos, save_names)
 
-            # highlight current
-            current = saves[selected_index]
-            name = current.data["name"]
-            y_pos_selected = save_start_y_pos + selected_index
-            selected_name = " " + name.ljust(longest_name + 1, " ")
-            if save_list_selected:
-                self.addinto(
-                    save_x_pos - 1,
-                    y_pos_selected,
-                    selected_name,
-                    curses.A_BOLD | curses.A_REVERSE,
-                )
-            else:
-                self.addinto(
-                    save_x_pos - 1,
-                    y_pos_selected,
-                    selected_name,
-                    curses.A_DIM | curses.A_REVERSE,
-                )
+            # highlight selected_state
+            self.highlight_selected_save(
+                acting_on_save_list,
+                len_longest_name,
+                save_list_selected_index,
+                save_start_y_pos,
+                save_x_pos,
+                saves,
+                selected_state,
+            )
 
-            # show options
-            options = {
-                1: "Load selected",
-                2: "Rename selected",
-                3: "Delete selected",
-                4: "Create new",
-            }
-            options_positions_offsets = {1: 0, 2: 1, 3: 2, 4: 4}
-            option_start_y_pos = 3
+            # show actions
+            self.show_action_title(option_x_pos)
 
-            self.addinto(option_x_pos, 1, " Actions ", curses.A_DIM | curses.A_REVERSE)
-
-            for number, name in options.items():
+            for number, name in actions.items():
                 self.addinto(
                     option_x_pos,
-                    option_start_y_pos + options_positions_offsets[number],
+                    actions_start_y_pos + actions_positions_offsets[number],
                     name,
                 )
 
-            # highlight current option
-            highlighted_option = options[selected_option]
-            highlighted_option = " " + highlighted_option.ljust(longest_name, " ")
+            # highlight selected_state option
+            highlighted_option = actions[selected_option]
+            highlighted_option = " " + highlighted_option.ljust(len_longest_name, " ")
             y_pos_selected_option = (
-                option_start_y_pos + options_positions_offsets[selected_option]
+                actions_start_y_pos + actions_positions_offsets[selected_option]
             )
-            if save_list_selected:
+            if acting_on_save_list:
                 self.addinto(
                     option_x_pos - 1,
                     y_pos_selected_option,
@@ -161,93 +153,177 @@ class SelectSave(FullScreenScene):
                 )
 
             # show help
-            helps = {
-                1: "ENTER: Load save '{}'",
-                2: "ENTER: Rename save '{}'",
-                3: "ENTER: Delete save '{}'",
-                4: "ENTER: Create new save",
-            }
-            help_text = helps[selected_option]
-            help_text = help_text.format(name)
-            self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
+            self.show_help(helps, selected_option, selected_state)
 
             # handle key
             key = self.get_key()
-            # select pane
-            if key == "KEY_RIGHT":
-                save_list_selected = False
-            elif key == "KEY_LEFT":
-                save_list_selected = True
-            elif key.lower() == "q":
+
+            if key.lower() == "q":
                 return None  # exit the game
 
-            if save_list_selected:
-                if key == "KEY_DOWN":
-                    if selected_index < len(saves) - 1:
-                        selected_index += 1
-                elif key == "KEY_UP":
-                    if selected_index > 0:
-                        selected_index -= 1
-                else:
-                    logger.warning("Unhandled key '%s'", key)
-            else:
-                if key == "KEY_DOWN":
-                    if selected_option < 4:
-                        selected_option += 1
-                elif key == "KEY_UP":
-                    if selected_option > 1:
-                        selected_option -= 1
-                else:
-                    logger.warning("Unhandled key '%s'", key)
+            # select pane
+            acting_on_save_list = self.select_pane(key)
 
+            if acting_on_save_list:
+                save_list_selected_index = self.handle_save_list_key(
+                    key, save_list_selected_index, saves
+                )
+            else:
+                selected_option = self.handle_actions_key(key, selected_option)
+
+            name = selected_state.data["name"]
             logger.info("Selected save: '%s'", name)
             logger.info("Selected option: '%s'", selected_option)
 
-        name = current.data["name"]
-        if selected_option == 1:
-            self.addinto_centred(20, "Loading '{}'...".format(name))
-
-            self.state = current
-
-            self.clear()
-            self.addinto_all_centred("Done.")
-
+        name = selected_state.data["name"]
+        if selected_option == 1:  # Load game
+            self.load_game(selected_state)
             return StartComputer(self.renderer, self.state)
-        if selected_option == 2:
-            prompt_text = "New name for save '{}': ".format(name)
-            new_name = self.prompt(
-                round(self.renderer.max_x / 2) - 15 - round(len(prompt_text) / 2),
-                round(self.renderer.max_y / 2),
-                prompt_text,
-            )
-            save_manager.rename(current, new_name)
-        elif selected_option == 3:
-            confirmation_prompt = " Are you sure you want to delete the save '{}'? ".format(
-                name
-            )
-            key = ""
-            while key not in ("y", "n"):
-                self.renderer.add_down_bar_text(
-                    confirmation_prompt, color_pair=curses.A_REVERSE
-                )
-                self.renderer.add_down_bar_text(
-                    " [y/n] ", 2, color_pair=curses.A_REVERSE
-                )
-                key = self.get_key()
-                key = key.lower()
-            if key == "y":
-                self.addinto_all_centred("Deleting save {}...\n\t\t".format(name))
-                save_manager.delete(current)
 
-        elif selected_option == 4:
+        if selected_option == 2:  # Rename
+            self.rename_game(selected_state)
+        elif selected_option == 3: # Delete
+            self.delete_game(selected_state)
+        elif selected_option == 4: # New
             return CorruptedLoginNewSave(self.renderer, self.state)
         else:
             logger.critical("Unhandled selected option: '%s'", selected_option)
 
+        # restart
         return SelectSave(
             self.renderer,
             self.state,
-            selected_index,
+            save_list_selected_index,
             selected_option,
-            save_list_selected,
+            acting_on_save_list,
         )
+
+    def delete_game(self, selected_state):
+        name = selected_state.data["name"]
+        confirmation_prompt = " Are you sure you want to delete the save '{}'? ".format(name)
+
+        key = ""
+        while key not in ("y", "n"):
+            self.renderer.add_down_bar_text(confirmation_prompt, color_pair=curses.A_REVERSE)
+            self.renderer.add_down_bar_text(" [y/n] ", 2, color_pair=curses.A_REVERSE)
+
+            key = self.get_key().lower()
+
+        if key == "y":
+            self.addinto_all_centred("Deleting save {}...".format(name))
+            SaveManager().delete(selected_state)
+
+    def rename_game(self, selected_state):
+        name = selected_state.data["name"]
+
+        prompt_text = "New name for save '{}': ".format(name)
+
+        new_name = self.prompt(
+            round(self.renderer.max_x / 2) - 15 - round(len(prompt_text) / 2),
+            round(self.renderer.max_y / 2),
+            prompt_text,
+        )
+
+        save_manager = SaveManager()
+        save_manager.rename(selected_state, new_name)
+
+    def load_game(self, selected_state):
+        name = selected_state.data["name"]
+        self.addinto_centred(20, "Loading '{}'...".format(name))
+        self.state = selected_state
+        self.clear()
+        self.addinto_all_centred("Done.")
+
+    def handle_actions_key(self, key, selected_option):
+        if key == "KEY_DOWN":
+            if selected_option < 4:
+                selected_option += 1
+        elif key == "KEY_UP":
+            if selected_option > 1:
+                selected_option -= 1
+        else:
+            logger.warning("Unhandled key '%s'", key)
+        return selected_option
+
+    def handle_save_list_key(self, key, save_list_selected_index, saves):
+        if key == "KEY_DOWN":
+            if save_list_selected_index < len(saves) - 1:
+                save_list_selected_index += 1
+        elif key == "KEY_UP":
+            if save_list_selected_index > 0:
+                save_list_selected_index -= 1
+        else:
+            logger.warning("Unhandled key '%s'", key)
+        return save_list_selected_index
+
+    def select_pane(self, key):
+        if key == "KEY_RIGHT":
+            return False
+        elif key == "KEY_LEFT":
+            return True
+
+    def show_help(self, helps, selected_option, selected_state):
+        name = selected_state.data["name"]
+        help_text = helps[selected_option]
+        help_text = help_text.format(name)
+        self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
+
+    def show_action_title(self, option_x_pos):
+        self.addinto(option_x_pos, 1, " Actions ", curses.A_DIM | curses.A_REVERSE)
+
+    def highlight_selected_save(
+        self,
+        acting_on_save_list,
+        len_longest_name,
+        save_list_selected_index,
+        save_start_y_pos,
+        save_x_pos,
+        saves,
+        selected_state,
+    ):
+        selected_state = saves[save_list_selected_index]
+        name = selected_state.data["name"]
+        y_pos_selected = save_start_y_pos + save_list_selected_index
+        selected_name = " " + name.ljust(len_longest_name + 1, " ")
+        if acting_on_save_list:
+            self.addinto(
+                save_x_pos - 1,
+                y_pos_selected,
+                selected_name,
+                curses.A_BOLD | curses.A_REVERSE,
+            )
+        else:
+            self.addinto(
+                save_x_pos - 1,
+                y_pos_selected,
+                selected_name,
+                curses.A_DIM | curses.A_REVERSE,
+            )
+        return name, selected_state
+
+    def draw_list(self, start_y_pos, x_pos, items):
+        for index, item in enumerate(items):
+            self.addinto(x_pos, start_y_pos + index, item)
+
+    def show_save_list_title(self, save_list_title, save_name_x_pos):
+        title_start_x = round(save_name_x_pos / 2) - round(len(save_list_title) / 2)
+        self.addinto(title_start_x, 1, save_list_title, curses.A_DIM | curses.A_REVERSE)
+
+    def show_separator(self, x_pos):
+        self.renderer.stdscr.vline(
+            1, x_pos, curses.ACS_VLINE, self.renderer.max_y - 2  # type: ignore
+        )
+
+    def get_len_longest_save(self, min_len: int = 0) -> int:
+        """
+        Get the lenght of the name of the save that has the longest name
+        :param min_len: The minimum length of the returned value.
+        """
+        # get the save with the longest name
+        # TODO: truncate names too long
+        longest_name = min_len
+        for save in self.get_saves():
+            name = save.data["name"]
+            if len(name) > longest_name:
+                longest_name = len(name)
+        return longest_name
