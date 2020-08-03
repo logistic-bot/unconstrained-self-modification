@@ -93,7 +93,9 @@ class SaveManager:
         :param state: The save to be renamed
         :param new_name: The new name of the save
         """
-        logger.info("Rename state '%s' from '%s' to '%s'".format(state, state.data["name"], new_name))
+        logger.info(
+            "Rename state '%s' from '%s' to '%s'", state, state.data["name"], new_name
+        )
 
         path = self.get_path(state)
         state.data["name"] = new_name
@@ -104,7 +106,11 @@ class SaveManager:
         logger.warning("Deleting file: '%s'", path)
         path.unlink()
 
-    def delete(self, state: GameState):
+    def delete(self, state: GameState) -> None:
+        """
+        Delete a state.
+        :param state: The state to delete.
+        """
         logger.info("Delete state '%s'", state)
         path = self.get_path(state)
 

@@ -88,7 +88,7 @@ class SelectSave(FullScreenScene):
 
             # show separator
             self.renderer.stdscr.vline(
-                1, save_name_x_pos, curses.ACS_VLINE, self.renderer.max_y - 2
+                1, save_name_x_pos, curses.ACS_VLINE, self.renderer.max_y - 2  # type: ignore
             )
 
             # show title
@@ -213,7 +213,7 @@ class SelectSave(FullScreenScene):
             self.addinto_all_centred("Done.")
 
             return StartComputer(self.renderer, self.state)
-        elif selected_option == 2:
+        if selected_option == 2:
             prompt_text = "New name for save '{}': ".format(name)
             new_name = self.prompt(
                 round(self.renderer.max_x / 2) - 15 - round(len(prompt_text) / 2),
@@ -230,7 +230,9 @@ class SelectSave(FullScreenScene):
                 self.renderer.add_down_bar_text(
                     confirmation_prompt, color_pair=curses.A_REVERSE
                 )
-                self.renderer.add_down_bar_text(" [y/n] ", 2, color_pair=curses.A_REVERSE)
+                self.renderer.add_down_bar_text(
+                    " [y/n] ", 2, color_pair=curses.A_REVERSE
+                )
                 key = self.get_key()
                 key = key.lower()
             if key == "y":
