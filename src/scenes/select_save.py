@@ -42,13 +42,13 @@ class SelectSave(FullScreenScene):
         """
 
         logger.info("Starting Scene: SelectSave")
-
         title = " Select a save to load... "
 
         save_manager = SaveManager()
         saves = save_manager.saves
 
         # get the save with the longest name
+        # TODO: truncate names too long
         longest_name = len(title)
         for save in saves:
             name = save.data["name"]
@@ -56,46 +56,46 @@ class SelectSave(FullScreenScene):
                 longest_name = len(name)
 
         selected_index = 0
-        save_start_y_pos = 5
+        save_start_y_pos = 3
+        save_x_pos = 2
         key = ""
         current = saves[0]
         while key != "\n":
             self.clear()
 
+            max_x_save_name = longest_name + 3
+
+            # show separator
+            self.renderer.stdscr.vline(
+                1, max_x_save_name, curses.ACS_VLINE, self.renderer.max_y - 2
+            )
+
             # show title
-            self.addinto_centred(3, title, 0, 0, curses.A_DIM | curses.A_REVERSE)
+            title_start_x = round(max_x_save_name / 2) - round(len(title) / 2)
+            self.addinto(title_start_x, 1, title, curses.A_DIM | curses.A_REVERSE)
 
             # show the list
             for save_index, save in enumerate(saves):
                 name = save.data["name"]
-                self.addinto_centred(
-                    save_start_y_pos + save_index,
-                    name.ljust(longest_name, " "),
-                    0,
-                    0,
-                    curses.A_BOLD,
-                )
+                self.addinto(save_x_pos, save_start_y_pos + save_index, name)
 
             # highlight current
             current = saves[selected_index]
             name = current.data["name"]
-            self.addinto_centred(
-                save_start_y_pos + selected_index,
-                name.upper().ljust(longest_name, " "),
-                0,
-                0,
-                curses.A_BOLD | curses.A_BLINK,
+            y_pos_selected = save_start_y_pos + selected_index
+            selected_name = " " + name.ljust(longest_name + 1, " ")
+            self.addinto(
+                save_x_pos - 1,
+                y_pos_selected,
+                selected_name,
+                curses.A_BOLD | curses.A_REVERSE,
             )
 
             # show help
-            self.addinto(
-                1,
-                self.renderer.max_y - 1,
-                " ENTER: load save '{}' ({})".format(
+            help_text = "ENTER: load save '{}' ({})".format(
                     name, current.data["user"]["username"]
-                ),
-                curses.A_REVERSE,
             )
+            self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
 
             # handle key
             key = self.get_key()
