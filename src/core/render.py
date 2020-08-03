@@ -39,8 +39,6 @@ class CursesRenderer:
         logger.debug("Crate CursesRenderer and init curses")
         self.stdscr: Any = curses.initscr()  # pylint: disable=E1101
 
-        self.last_key = ""
-
         curses.noecho()
         curses.cbreak()
         curses.curs_set(0)
@@ -81,9 +79,6 @@ class CursesRenderer:
         """
         key: str = self.stdscr.getkey()
 
-        key_repr = self.get_key_repr(key)
-        self.last_key = key_repr
-
         logger.debug("Got key: %s", key)
 
         return key
@@ -116,8 +111,6 @@ class CursesRenderer:
         # milliseconds are expected.
         key: int = self.stdscr.getch()
         if key != -1:
-            self.last_key = "SKIP"
-
             logger.debug("skipped delay")
         else:
             logger.debug("did not skip delay")
@@ -169,7 +162,6 @@ class CursesRenderer:
         """
         logger.debug("Refreshing screen")
 
-        self.addinto(self.max_x - 2 - len(self.last_key), self.max_y - 2, self.last_key)
         self.stdscr.refresh()
 
     def wait_keypress(self) -> None:
