@@ -23,6 +23,7 @@ be loaded.
 # ------------------------------------------------------------------------------
 import curses
 import logging
+from typing import Optional
 
 from src.core.scene import FullScreenScene, Scene
 from src.core.state.save_manager import SaveManager
@@ -36,13 +37,13 @@ class SelectSave(FullScreenScene):
     Ask the user to select a save, then load it.
     """
 
-    def start(self) -> Scene:
+    def start(self) -> Optional[Scene]:
         """
         See above
         """
 
         logger.info("Starting Scene: SelectSave")
-        title = " Select a save to load... "
+        title = " Save files "
 
         save_manager = SaveManager()
         saves = save_manager.saves
@@ -56,22 +57,25 @@ class SelectSave(FullScreenScene):
                 longest_name = len(name)
 
         selected_index = 0
+        selected_option = 1
         save_start_y_pos = 3
         save_x_pos = 2
         key = ""
         current = saves[0]
+        save_list_selected = True
         while key != "\n":
             self.clear()
 
-            max_x_save_name = longest_name + 3
+            save_name_x_pos = longest_name + 3
+            option_x_pos = save_name_x_pos + 2
 
             # show separator
             self.renderer.stdscr.vline(
-                1, max_x_save_name, curses.ACS_VLINE, self.renderer.max_y - 2
+                1, save_name_x_pos, curses.ACS_VLINE, self.renderer.max_y - 2
             )
 
             # show title
-            title_start_x = round(max_x_save_name / 2) - round(len(title) / 2)
+            title_start_x = round(save_name_x_pos / 2) - round(len(title) / 2)
             self.addinto(title_start_x, 1, title, curses.A_DIM | curses.A_REVERSE)
 
             # show the list
@@ -91,20 +95,48 @@ class SelectSave(FullScreenScene):
                 curses.A_BOLD | curses.A_REVERSE,
             )
 
+            # show options
+            self.addinto(option_x_pos, 1, " Actions ", curses.A_DIM | curses.A_REVERSE)
+
+            self.addinto(option_x_pos, 3, "Load selected")
+            self.addinto(option_x_pos, 4, "Rename selected")
+            self.addinto(option_x_pos, 5, "Delete selected")
+
+            self.addinto(option_x_pos, 7, "Create new")
+
             # show help
-            help_text = "ENTER: load save '{}' ({})".format(
+            help_text = ""
+            if save_list_selected:
+                help_text = "ENTER: load save '{}' ({})".format(
                     name, current.data["user"]["username"]
-            )
+                )
             self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
 
             # handle key
             key = self.get_key()
-            if key == "KEY_DOWN":
-                if selected_index < len(saves) - 1:
-                    selected_index += 1
-            if key == "KEY_UP":
-                if selected_index > 0:
-                    selected_index -= 1
+            # select pane
+            if key == "KEY_RIGHT":
+                save_list_selected = False
+            elif key == "KEY_LEFT":
+                save_list_selected = True
+            elif key.lower() == "q":
+                return None  # exit the game
+
+            if save_list_selected:
+                if key == "KEY_DOWN":
+                    if selected_index < len(saves) - 1:
+                        selected_index += 1
+                elif key == "KEY_UP":
+                    if selected_index > 0:
+                        selected_index -= 1
+                else:
+                    logger.warning("Unhandled key '%s'", key)
+            else:
+                # TODO: rename save
+                # TODO: create new save
+                # TODO: Load save
+                # TODO: delete save
+                logger.warning("Unhandled key '%s'", key)
 
             logger.info("Selected save: '%s'", name)
 
