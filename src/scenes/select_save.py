@@ -23,7 +23,7 @@ be loaded.
 # ------------------------------------------------------------------------------
 import curses
 import logging
-from typing import Optional
+from typing import Optional, List
 
 from src.core.render import CursesRenderer
 from src.core.scene import FullScreenScene, Scene
@@ -63,7 +63,6 @@ class SelectSave(FullScreenScene):
         save_list_title = " Save files "
 
         saves = self.get_saves()
-        save_manager = SaveManager()
 
         selected_state = saves[0]
 
@@ -82,13 +81,6 @@ class SelectSave(FullScreenScene):
         }
         actions_positions_offsets = {1: 0, 2: 1, 3: 2, 4: 4}
         actions_start_y_pos = 3
-
-        helps = {
-            1: "ENTER: Load save '{}'",
-            2: "ENTER: Rename save '{}'",
-            3: "ENTER: Delete save '{}'",
-            4: "ENTER: Create new save",
-        }
 
         key = ""
         while key != "\n":
@@ -117,8 +109,6 @@ class SelectSave(FullScreenScene):
                 save_list_selected_index,
                 save_start_y_pos,
                 save_x_pos,
-                saves,
-                selected_state,
             )
 
             # show actions
@@ -153,7 +143,7 @@ class SelectSave(FullScreenScene):
                 )
 
             # show help
-            self.show_help(helps, selected_option, selected_state)
+            self.show_help(selected_option, selected_state)
 
             # handle key
             key = self.get_key()
@@ -162,7 +152,10 @@ class SelectSave(FullScreenScene):
                 return None  # exit the game
 
             # select pane
-            acting_on_save_list = self.select_pane(key)
+            if key == "KEY_RIGHT":
+                acting_on_save_list = False
+            elif key == "KEY_LEFT":
+                acting_on_save_list = True
 
             if acting_on_save_list:
                 save_list_selected_index = self.handle_save_list_key(
@@ -175,16 +168,15 @@ class SelectSave(FullScreenScene):
             logger.info("Selected save: '%s'", name)
             logger.info("Selected option: '%s'", selected_option)
 
-        name = selected_state.data["name"]
         if selected_option == 1:  # Load game
             self.load_game(selected_state)
             return StartComputer(self.renderer, self.state)
 
         if selected_option == 2:  # Rename
             self.rename_game(selected_state)
-        elif selected_option == 3: # Delete
+        elif selected_option == 3:  # Delete
             self.delete_game(selected_state)
-        elif selected_option == 4: # New
+        elif selected_option == 4:  # New
             return CorruptedLoginNewSave(self.renderer, self.state)
         else:
             logger.critical("Unhandled selected option: '%s'", selected_option)
@@ -198,13 +190,21 @@ class SelectSave(FullScreenScene):
             acting_on_save_list,
         )
 
-    def delete_game(self, selected_state):
+    def delete_game(self, selected_state: GameState) -> None:
+        """
+        Delete the currently selected game
+        :param selected_state: The currently selected game
+        """
         name = selected_state.data["name"]
-        confirmation_prompt = " Are you sure you want to delete the save '{}'? ".format(name)
+        confirmation_prompt = " Are you sure you want to delete the save '{}'? ".format(
+            name
+        )
 
         key = ""
         while key not in ("y", "n"):
-            self.renderer.add_down_bar_text(confirmation_prompt, color_pair=curses.A_REVERSE)
+            self.renderer.add_down_bar_text(
+                confirmation_prompt, color_pair=curses.A_REVERSE
+            )
             self.renderer.add_down_bar_text(" [y/n] ", 2, color_pair=curses.A_REVERSE)
 
             key = self.get_key().lower()
@@ -213,7 +213,11 @@ class SelectSave(FullScreenScene):
             self.addinto_all_centred("Deleting save {}...".format(name))
             SaveManager().delete(selected_state)
 
-    def rename_game(self, selected_state):
+    def rename_game(self, selected_state: GameState) -> None:
+        """
+        Rename the currently selected game
+        :param selected_state: the currently selected game
+        """
         name = selected_state.data["name"]
 
         prompt_text = "New name for save '{}': ".format(name)
@@ -227,14 +231,28 @@ class SelectSave(FullScreenScene):
         save_manager = SaveManager()
         save_manager.rename(selected_state, new_name)
 
-    def load_game(self, selected_state):
+    def load_game(self, selected_state: GameState) -> None:
+        """
+        Load the currently selected
+        :param selected_state: The currently selected game
+        """
         name = selected_state.data["name"]
         self.addinto_centred(20, "Loading '{}'...".format(name))
         self.state = selected_state
         self.clear()
         self.addinto_all_centred("Done.")
 
-    def handle_actions_key(self, key, selected_option):
+    @staticmethod
+    def handle_actions_key(key: str, selected_option: int) -> int:
+        """
+        Handle up and down keys in the actions menu.
+
+        read the doc for handle_save_list_key for more information
+
+        :param key: The key to handle
+        :param selected_option: The currently selected option number.
+        :return: The new selected option
+        """
         if key == "KEY_DOWN":
             if selected_option < 4:
                 selected_option += 1
@@ -245,7 +263,20 @@ class SelectSave(FullScreenScene):
             logger.warning("Unhandled key '%s'", key)
         return selected_option
 
-    def handle_save_list_key(self, key, save_list_selected_index, saves):
+    @staticmethod
+    def handle_save_list_key(
+        key: str, save_list_selected_index: int, saves: List[GameState]
+    ) -> int:
+        """
+        Handle keys in the save list. If the up or the down key is pressed, increment or
+        decrement save_list_selected_index if possible. The return value indecates wich save was
+        selected by the user.
+
+        :param key: The key to handle
+        :param save_list_selected_index: The index of the currently selected game in saves
+        :param saves: A list of GameState obejcts displayed on the screen in the same order
+        :return: The new save_list_selected_index.
+        """
         if key == "KEY_DOWN":
             if save_list_selected_index < len(saves) - 1:
                 save_list_selected_index += 1
@@ -256,35 +287,57 @@ class SelectSave(FullScreenScene):
             logger.warning("Unhandled key '%s'", key)
         return save_list_selected_index
 
-    def select_pane(self, key):
-        if key == "KEY_RIGHT":
-            return False
-        elif key == "KEY_LEFT":
-            return True
+    def show_help(self, selected_option: int, selected_state: GameState) -> None:
+        """
+        Show the help message for the currently selected option and state.
 
-    def show_help(self, helps, selected_option, selected_state):
+        :param selected_option: The currently selected option number
+        :param selected_state: The current selected state
+        """
+        helps = {
+            1: "ENTER: Load save '{}'",
+            2: "ENTER: Rename save '{}'",
+            3: "ENTER: Delete save '{}'",
+            4: "ENTER: Create new save",
+        }
         name = selected_state.data["name"]
         help_text = helps[selected_option]
         help_text = help_text.format(name)
         self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
 
-    def show_action_title(self, option_x_pos):
+    def show_action_title(self, option_x_pos: int) -> None:
+        """
+        Draw the title of action pane
+
+        :param option_x_pos: x_pos of the title
+        """
         self.addinto(option_x_pos, 1, " Actions ", curses.A_DIM | curses.A_REVERSE)
 
     def highlight_selected_save(
         self,
-        acting_on_save_list,
-        len_longest_name,
-        save_list_selected_index,
-        save_start_y_pos,
-        save_x_pos,
-        saves,
-        selected_state,
-    ):
+        acting_on_save_list: int,
+        len_longest_name: int,
+        save_list_selected_index: int,
+        save_start_y_pos: int,
+        save_x_pos: int,
+    ) -> None:
+        """
+        Highlight the save that is currently selected.
+
+        :param acting_on_save_list: Whether or not the save pane is currently selected. True if
+        it is selected.
+        :param len_longest_name: How wide the pane is
+        :param save_list_selected_index: index of the currently selected save
+        :param save_start_y_pos: At which y_pos does the save list start
+        :param save_x_pos: At which x_pos does the save list start
+        """
+        saves = self.get_saves()
         selected_state = saves[save_list_selected_index]
         name = selected_state.data["name"]
+
         y_pos_selected = save_start_y_pos + save_list_selected_index
         selected_name = " " + name.ljust(len_longest_name + 1, " ")
+
         if acting_on_save_list:
             self.addinto(
                 save_x_pos - 1,
@@ -299,7 +352,6 @@ class SelectSave(FullScreenScene):
                 selected_name,
                 curses.A_DIM | curses.A_REVERSE,
             )
-        return name, selected_state
 
     def draw_list(self, start_y_pos, x_pos, items):
         for index, item in enumerate(items):
