@@ -86,7 +86,6 @@ class CorruptedLoginNewSave(FullScreenScene):
                 logger.info("Passwords do not match.")
 
             sleep(1)
-            self.clear()
 
         far_away_future = datetime.timedelta(days=365 * 126)
         save_creation = datetime.date.today() + far_away_future
@@ -97,7 +96,6 @@ class CorruptedLoginNewSave(FullScreenScene):
         self.state.data["name"] = username
         self.state.data["user"]["password"] = password
         self.state.data["user"]["username"] = username
-        self.state.data["login"]["delay_incorrect_password"] = 1
 
         logger.debug("State data: '%s'", self.state.data)
 

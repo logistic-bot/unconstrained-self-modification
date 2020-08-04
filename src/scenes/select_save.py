@@ -160,14 +160,17 @@ class SelectSave(FullScreenScene):
         else:
             logger.critical("Unhandled selected option: '%s'", selected_option)
 
-        # restart
-        return SelectSave(
-            self.renderer,
-            self.state,
-            save_list_selected_index,
-            selected_option,
-            acting_on_save_list,
-        )
+        if len(self.get_saves()) >= 1:
+            # restart
+            return SelectSave(
+                self.renderer,
+                self.state,
+                save_list_selected_index,
+                selected_option,
+                acting_on_save_list,
+            )
+        else:
+            return CorruptedLoginNewSave(self.renderer, self.state)
 
     def show_actions(
         self,
@@ -283,14 +286,31 @@ class SelectSave(FullScreenScene):
             name
         )
 
+        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
+
+        self.renderer.add_down_bar_text(
+            confirmation_prompt, color_pair=curses.A_REVERSE | curses.color_pair(1) | curses.A_BOLD
+        )
+        self.renderer.add_down_bar_text(
+            " [y/n] ",
+            2,
+            color_pair=curses.A_REVERSE | curses.color_pair(1),
+        )
+
         key = ""
         while key not in ("y", "n"):
-            self.renderer.add_down_bar_text(
-                confirmation_prompt, color_pair=curses.A_REVERSE
-            )
-            self.renderer.add_down_bar_text(" [y/n] ", 2, color_pair=curses.A_REVERSE)
-
             key = self.get_key().lower()
+            if key not in ("y", "n"):
+                self.renderer.add_down_bar_text(
+                    " Please press 'y' or 'n' ",
+                    2,
+                    color_pair=curses.A_REVERSE
+                    | curses.A_BLINK
+                    | curses.color_pair(1),
+                )
+            self.renderer.add_down_bar_text(
+                    confirmation_prompt, color_pair=curses.A_REVERSE | curses.color_pair(1)
+            )
 
         if key == "y":
             self.addinto_all_centred("Deleting save {}...".format(name))
