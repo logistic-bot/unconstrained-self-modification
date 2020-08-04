@@ -7,6 +7,7 @@ be loaded.
 #  framework?
 # TODO: The todo items in the documentation note the items that should be computed inside the
 #  function, not passed as an argument. This is not a complete list.
+# TODO: This will crash when no saves are present. FIX
 
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
@@ -30,6 +31,7 @@ import curses
 import logging
 from typing import Optional, List, Dict
 
+from src import GAME_ROOT_DIR
 from src.core.render import CursesRenderer
 from src.core.scene import FullScreenScene, Scene
 from src.core.state.game_state import GameState
@@ -38,6 +40,8 @@ from src.scenes.corrupted_login_new_save import CorruptedLoginNewSave
 from src.scenes.start_computer import StartComputer
 
 logger = logging.getLogger(__name__)
+
+MINIMUM_WIDTH = 30
 
 
 class SelectSave(FullScreenScene):
@@ -73,8 +77,7 @@ class SelectSave(FullScreenScene):
         save_list_selected_index = self.selected_index
         selected_option = self.selected_option
 
-        minimum_width = 30
-        len_longest_name = self.get_len_longest_save(minimum_width)
+        len_longest_name = self.get_len_longest_save(MINIMUM_WIDTH)
 
         actions = {
             1: "Load selected",
@@ -85,6 +88,8 @@ class SelectSave(FullScreenScene):
         actions_positions_offsets = {1: 0, 2: 1, 3: 2, 4: 4}
         actions_start_y_pos = 3
 
+        selected_state = saves[save_list_selected_index]
+
         key = ""
         while key != "\n":
             self.clear()
@@ -93,18 +98,26 @@ class SelectSave(FullScreenScene):
             save_start_y_pos = 3
             save_x_pos = 2
 
-            save_name_x_pos = len_longest_name + 3
-            option_x_pos = save_name_x_pos + 2
+            save_list_x_width = max(len_longest_name, MINIMUM_WIDTH)
+            save_name_x_pos = (
+                save_x_pos
+                + round(save_list_x_width / 2)
+                # + 15
+                - round(len(save_list_title) / 2)
+            )
+            logger.error("Save name x pos %s", save_name_x_pos)
+            option_x_pos = save_x_pos + save_list_x_width + 3
 
             # show separator
-            self.show_separator(save_name_x_pos)
+            save_list_separator_x_pos = save_x_pos + save_list_x_width + 1
+            self.show_separator(save_list_separator_x_pos)
 
             self.show_save_list(
                 acting_on_save_list,
                 len_longest_name,
                 save_list_selected_index,
                 save_list_title,
-                save_name_x_pos,
+                save_x_pos,
                 save_start_y_pos,
                 save_x_pos,
                 saves,
@@ -122,6 +135,11 @@ class SelectSave(FullScreenScene):
 
             # show help
             self.show_help(selected_option, selected_state)
+
+            # show extra info for selected save
+            self.draw_extra_info(
+                selected_state, option_x_pos + MINIMUM_WIDTH, option_x_pos
+            )
 
             # handle key
             key = self.get_key()
@@ -193,7 +211,7 @@ class SelectSave(FullScreenScene):
         :param selected_option: A number representing the action number that is currently selected.
         """
         # show actions
-        self.show_action_title(option_x_pos)
+        self.show_action_title(option_x_pos, MINIMUM_WIDTH)
         self.draw_actions(
             actions, actions_positions_offsets, actions_start_y_pos, option_x_pos
         )
@@ -224,7 +242,7 @@ class SelectSave(FullScreenScene):
         len_longest_name: int,
         save_list_selected_index: int,
         save_list_title: str,
-        save_name_x_pos: int,
+        save_list_x_pos: int,
         save_start_y_pos: int,
         save_x_pos: int,
         saves: List[GameState],
@@ -235,13 +253,13 @@ class SelectSave(FullScreenScene):
         :param len_longest_name: The length of the longest save name TODO
         :param save_list_selected_index: The index of the currently selected save.
         :param save_list_title: The title of the save list.
-        :param save_name_x_pos: x_pos of the save list tile TODO
+        :param save_list_x_pos: x_pos of the save list tile TODO
         :param save_start_y_pos: start y_pos of the save names
         :param save_x_pos: The x_pos of the save list
         :param saves: A list of GameStates to show in the list
         """
         # show save list title
-        self.show_save_list_title(save_list_title, save_name_x_pos)
+        self.show_save_list_title(save_list_title, save_list_x_pos, len_longest_name)
         # show the save list
         save_names = [save.data["name"] for save in saves]
         self.draw_list(save_start_y_pos, save_x_pos, save_names)
@@ -288,12 +306,11 @@ class SelectSave(FullScreenScene):
         curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
 
         self.renderer.add_down_bar_text(
-            confirmation_prompt, color_pair=curses.A_REVERSE | curses.color_pair(1) | curses.A_BOLD
+            confirmation_prompt,
+            color_pair=curses.A_REVERSE | curses.color_pair(1) | curses.A_BOLD,
         )
         self.renderer.add_down_bar_text(
-            " [y/n] ",
-            2,
-            color_pair=curses.A_REVERSE | curses.color_pair(1),
+            " [y/n] ", 2, color_pair=curses.A_REVERSE | curses.color_pair(1),
         )
 
         key = ""
@@ -303,12 +320,10 @@ class SelectSave(FullScreenScene):
                 self.renderer.add_down_bar_text(
                     " Please press 'y' or 'n' ",
                     2,
-                    color_pair=curses.A_REVERSE
-                    | curses.A_BLINK
-                    | curses.color_pair(1),
+                    color_pair=curses.A_REVERSE | curses.A_BLINK | curses.color_pair(1),
                 )
             self.renderer.add_down_bar_text(
-                    confirmation_prompt, color_pair=curses.A_REVERSE | curses.color_pair(1)
+                confirmation_prompt, color_pair=curses.A_REVERSE | curses.color_pair(1)
             )
 
         if key == "y":
@@ -407,13 +422,20 @@ class SelectSave(FullScreenScene):
         help_text = help_text.format(name)
         self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
 
-    def show_action_title(self, option_x_pos: int) -> None:
+    def show_action_title(self, option_x_pos: int, option_x_width: int) -> None:
         """
         Draw the title of action pane
-
-        :param option_x_pos: x_pos of the title
         """
-        self.addinto(option_x_pos, 1, " Actions ", curses.A_DIM | curses.A_REVERSE)
+        title = " Actions "
+        # TODO: We should have a fucntion for calculating the x_pos offset from the original
+        #  offset, the length of the text (optional), and the width of the container (optional?).
+        self.addinto(
+            # option_x_pos + round(len(title) / 2) - round(option_x_width / 2) + 2,
+                option_x_pos + round(option_x_width / 2) - round(len(title) / 2),
+            1,
+            title,
+            curses.A_DIM | curses.A_REVERSE,
+        )
 
     def highlight_selected_save(
         self,
@@ -466,13 +488,18 @@ class SelectSave(FullScreenScene):
         for index, item in enumerate(items):
             self.addinto(x_pos, start_y_pos + index, item)
 
-    def show_save_list_title(self, save_list_title: str, save_name_x_pos: int) -> None:
+    def show_save_list_title(
+        self, save_list_title: str, save_list_x_pos: int, x_width
+    ) -> None:
         """
         Show the title of save list
         :param save_list_title: Title to show
-        :param save_name_x_pos: x_pos of the save list title
+        :param save_list_x_pos: x_pos of the save list title
         """
-        title_start_x = round(save_name_x_pos / 2) - round(len(save_list_title) / 2)
+        title_start_x = round(save_list_x_pos / 2) - round(len(save_list_title) / 2)
+        title_start_x = (
+                save_list_x_pos + round(x_width / 2) - round(len(save_list_title) / 2)
+        )
         self.addinto(title_start_x, 1, save_list_title, curses.A_DIM | curses.A_REVERSE)
 
     def show_separator(self, x_pos: int) -> None:
@@ -497,3 +524,56 @@ class SelectSave(FullScreenScene):
             if len(name) > longest_name:
                 longest_name = len(name)
         return longest_name
+
+    def draw_extra_info(self, state, start_x, action_start_x):
+        self.show_separator(start_x)
+        x_pos = start_x + 2  # keep a blank column between the border
+
+        # gather info
+        username = state.data["user"]["username"]
+        password = state.data["user"]["password"]
+        creation_date = state.data["metadata"]["save_creation"]
+        save_date = state.data["metadata"]["save_date"]
+
+        # computer_brand
+        computer_brand = "none"
+        try:
+            logger.debug("Trying to get computer brand info from save file")
+            computer_brand = state.data["progress"]["computer-brand"]
+        except KeyError:
+            logger.warning("Failed to get computer brand info from save file")
+
+        # show info
+        # computer_brand
+        self.show_computer_brand(action_start_x, computer_brand)
+
+        self.addinto(x_pos, 1, f"Username:         {username}")
+        self.addinto(x_pos, 2, f"Password:         {password}")
+        self.addinto(x_pos, 4, f"Creation date:    {creation_date}")
+        self.addinto(x_pos, 5, f"Last time played: {save_date}")
+
+        # logo of the computer, username, password, playtime, creation date,
+        # modified date, playtime.
+
+    def show_computer_brand(self, action_start_x, computer_brand):
+        computer_brand_path = GAME_ROOT_DIR / "assets" / "brand_logo" / computer_brand
+        logger.debug("Trying to find asset at '%s'", computer_brand_path)
+        try:
+            with computer_brand_path.open("r") as file:
+                computer_brand_logo = file.read()
+        except FileNotFoundError:
+            computer_brand_logo = "WARNING: Asset missing. Try updating your game."
+        line_lengths = [len(line) for line in computer_brand_logo.splitlines()]
+        max_line_length = max(line_lengths)
+        assert max_line_length < 30, (
+            "There is an error with the logo file, the lines are too "
+            "long to be displayed."
+        )
+        # computer_brand_x_pos = self.renderer.max_x - max_line_length - 2
+        computer_brand_x_pos = (
+            action_start_x + round(MINIMUM_WIDTH / 2) - round(max_line_length / 2) - 1
+        )  # the minus 1 is because action_start_x has one char of padding.
+        computer_brand_y_pos = self.renderer.max_y - len(line_lengths) - 1
+        self.draw_list(
+            computer_brand_y_pos, computer_brand_x_pos, computer_brand_logo.splitlines()
+        )
