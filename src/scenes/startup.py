@@ -83,12 +83,11 @@ class StartupScene(FullScreenScene):
         self.clear()
         if key == "l":
             logger.info("Showing license")
-            self.addinto_all_centred(FULL_LICENSE, 0.01, 5)
-            # XXX: For some reason, the game crashes at this point. FIX
+            self.addinto_all_centred("Press any key to advance.")
+            self.get_key()
+            self.addinto_all_centred(FULL_LICENSE, 0.01, 10)
+            # TODO refresh line by line, do not clear the entire screen
 
-        # TODO: Add option to manage saves: Create new scene that allows to select and manage saves.
-        # TODO: Show the save manager directly after this, and the CorruptedLoginNewSave Scene is
-        #  shown each time a new save is created (Do not forget to rename the scene)
         save_manager = SaveManager()
         saves = save_manager.saves
         if len(saves) == 0:
