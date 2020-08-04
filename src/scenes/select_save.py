@@ -69,8 +69,6 @@ class SelectSave(FullScreenScene):
 
         saves = self.get_saves()
 
-        selected_state = saves[0]
-
         acting_on_save_list = self.save_list_selected_index
         save_list_selected_index = self.selected_index
         selected_option = self.selected_option
@@ -90,6 +88,7 @@ class SelectSave(FullScreenScene):
         key = ""
         while key != "\n":
             self.clear()
+            selected_state = saves[save_list_selected_index]
 
             save_start_y_pos = 3
             save_x_pos = 2
