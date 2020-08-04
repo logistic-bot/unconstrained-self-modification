@@ -269,12 +269,12 @@ class SelectSave(FullScreenScene):
     ) -> int:
         """
         Handle keys in the save list. If the up or the down key is pressed, increment or
-        decrement save_list_selected_index if possible. The return value indecates wich save was
+        decrement save_list_selected_index if possible. The return value indicates which save was
         selected by the user.
 
         :param key: The key to handle
         :param save_list_selected_index: The index of the currently selected game in saves
-        :param saves: A list of GameState obejcts displayed on the screen in the same order
+        :param saves: A list of GameState objects displayed on the screen in the same order
         :return: The new save_list_selected_index.
         """
         if key == "KEY_DOWN":
@@ -353,22 +353,38 @@ class SelectSave(FullScreenScene):
                 curses.A_DIM | curses.A_REVERSE,
             )
 
-    def draw_list(self, start_y_pos, x_pos, items):
+    def draw_list(self, start_y_pos: int, x_pos: int, items: List[str]) -> None:
+        """
+        Show a list of items on the screen, one item under the other.
+
+        :param start_y_pos: at which y_pos should the list start
+        :param x_pos: at which x_pos should the list be
+        :param items: the list to display
+        """
         for index, item in enumerate(items):
             self.addinto(x_pos, start_y_pos + index, item)
 
-    def show_save_list_title(self, save_list_title, save_name_x_pos):
+    def show_save_list_title(self, save_list_title: str, save_name_x_pos: int) -> None:
+        """
+        Show the title of save list
+        :param save_list_title: Title to show
+        :param save_name_x_pos: x_pos of the save list title
+        """
         title_start_x = round(save_name_x_pos / 2) - round(len(save_list_title) / 2)
         self.addinto(title_start_x, 1, save_list_title, curses.A_DIM | curses.A_REVERSE)
 
-    def show_separator(self, x_pos):
+    def show_separator(self, x_pos: int) -> None:
+        """
+        Show a separator at the given x_pos
+        :param x_pos: the x_pos of the separator
+        """
         self.renderer.stdscr.vline(
             1, x_pos, curses.ACS_VLINE, self.renderer.max_y - 2  # type: ignore
         )
 
     def get_len_longest_save(self, min_len: int = 0) -> int:
         """
-        Get the lenght of the name of the save that has the longest name
+        Get the length of the name of the save that has the longest name
         :param min_len: The minimum length of the returned value.
         """
         # get the save with the longest name
