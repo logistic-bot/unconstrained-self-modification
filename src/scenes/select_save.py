@@ -3,6 +3,11 @@ This files contains the SelectSave scene, which allows the user to select a save
 be loaded.
 """
 
+# TODO: This file is hideous. Refactor as soon as possible. Maybe try using some kind of GUI
+#  framework?
+# TODO: The todo items in the documentation note the items that should be computed inside the
+#  function, not passed as an argument. This is not a complete list.
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
@@ -23,7 +28,7 @@ be loaded.
 # ------------------------------------------------------------------------------
 import curses
 import logging
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from src.core.render import CursesRenderer
 from src.core.scene import FullScreenScene, Scene
@@ -95,52 +100,26 @@ class SelectSave(FullScreenScene):
             # show separator
             self.show_separator(save_name_x_pos)
 
-            # show title
-            self.show_save_list_title(save_list_title, save_name_x_pos)
-
-            # show the save list
-            save_names = [save.data["name"] for save in saves]
-            self.draw_list(save_start_y_pos, save_x_pos, save_names)
-
-            # highlight selected_state
-            self.highlight_selected_save(
+            self.show_save_list(
                 acting_on_save_list,
                 len_longest_name,
                 save_list_selected_index,
+                save_list_title,
+                save_name_x_pos,
                 save_start_y_pos,
                 save_x_pos,
+                saves,
             )
 
-            # show actions
-            self.show_action_title(option_x_pos)
-
-            for number, name in actions.items():
-                self.addinto(
-                    option_x_pos,
-                    actions_start_y_pos + actions_positions_offsets[number],
-                    name,
-                )
-
-            # highlight selected_state option
-            highlighted_option = actions[selected_option]
-            highlighted_option = " " + highlighted_option.ljust(len_longest_name, " ")
-            y_pos_selected_option = (
-                actions_start_y_pos + actions_positions_offsets[selected_option]
+            self.show_actions(
+                acting_on_save_list,
+                actions,
+                actions_positions_offsets,
+                actions_start_y_pos,
+                len_longest_name,
+                option_x_pos,
+                selected_option,
             )
-            if acting_on_save_list:
-                self.addinto(
-                    option_x_pos - 1,
-                    y_pos_selected_option,
-                    highlighted_option,
-                    curses.A_DIM | curses.A_REVERSE,
-                )
-            else:
-                self.addinto(
-                    option_x_pos - 1,
-                    y_pos_selected_option,
-                    highlighted_option,
-                    curses.A_BOLD | curses.A_REVERSE,
-                )
 
             # show help
             self.show_help(selected_option, selected_state)
@@ -189,6 +168,110 @@ class SelectSave(FullScreenScene):
             selected_option,
             acting_on_save_list,
         )
+
+    def show_actions(
+        self,
+        acting_on_save_list: bool,
+        actions: Dict[int, str],
+        actions_positions_offsets: Dict[int, int],
+        actions_start_y_pos: int,
+        len_longest_name: int,
+        option_x_pos: int,
+        selected_option: int,
+    ) -> None:
+        """
+        Show available actions
+        :param acting_on_save_list: False if the action list is selected
+        :param actions: A dict mapping action number to action description
+        :param actions_positions_offsets: A dict mapping action numbers to action position
+        offsets.
+        :param actions_start_y_pos: The start y_pos of the action list
+        :param len_longest_name: The length of the longest save name
+        :param option_x_pos: x_pos of the action list
+        :param selected_option: A number representing the action number that is currently selected.
+        """
+        # show actions
+        self.show_action_title(option_x_pos)
+        self.draw_actions(
+            actions, actions_positions_offsets, actions_start_y_pos, option_x_pos
+        )
+        # highlight selected_state option
+        highlighted_option = actions[selected_option]
+        highlighted_option = " " + highlighted_option.ljust(len_longest_name, " ")
+        y_pos_selected_option = (
+            actions_start_y_pos + actions_positions_offsets[selected_option]
+        )
+        if acting_on_save_list:
+            self.addinto(
+                option_x_pos - 1,
+                y_pos_selected_option,
+                highlighted_option,
+                curses.A_DIM | curses.A_REVERSE,
+            )
+        else:
+            self.addinto(
+                option_x_pos - 1,
+                y_pos_selected_option,
+                highlighted_option,
+                curses.A_BOLD | curses.A_REVERSE,
+            )
+
+    def show_save_list(
+        self,
+        acting_on_save_list: bool,
+        len_longest_name: int,
+        save_list_selected_index: int,
+        save_list_title: str,
+        save_name_x_pos: int,
+        save_start_y_pos: int,
+        save_x_pos: int,
+        saves: List[GameState],
+    ) -> None:
+        """
+        Show the list of saved games.
+        :param acting_on_save_list: True if the list of saved games is selected.
+        :param len_longest_name: The length of the longest save name TODO
+        :param save_list_selected_index: The index of the currently selected save.
+        :param save_list_title: The title of the save list.
+        :param save_name_x_pos: x_pos of the save list tile TODO
+        :param save_start_y_pos: start y_pos of the save names
+        :param save_x_pos: The x_pos of the save list
+        :param saves: A list of GameStates to show in the list
+        """
+        # show save list title
+        self.show_save_list_title(save_list_title, save_name_x_pos)
+        # show the save list
+        save_names = [save.data["name"] for save in saves]
+        self.draw_list(save_start_y_pos, save_x_pos, save_names)
+        # highlight selected_state
+        self.highlight_selected_save(
+            acting_on_save_list,
+            len_longest_name,
+            save_list_selected_index,
+            save_start_y_pos,
+            save_x_pos,
+        )
+
+    def draw_actions(
+        self,
+        actions: Dict[int, str],
+        actions_positions_offsets: Dict[int, int],
+        actions_start_y_pos: int,
+        option_x_pos: int,
+    ) -> None:
+        """
+        Show the actions to the player
+        :param actions: A dict mapping action numbers to actions string
+        :param actions_positions_offsets: A dict mapping action numbers position offsets
+        :param actions_start_y_pos: The start y_pos of the list
+        :param option_x_pos: The x_pos of the list
+        """
+        for number, name in actions.items():
+            self.addinto(
+                option_x_pos,
+                actions_start_y_pos + actions_positions_offsets[number],
+                name,
+            )
 
     def delete_game(self, selected_state: GameState) -> None:
         """
