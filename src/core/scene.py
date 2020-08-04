@@ -23,10 +23,11 @@ This file implements the FullScreenScene class, which contains convenience metho
 import curses
 import logging
 from abc import ABC
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 from src.core.render import CursesRenderer
 from src.core.state.game_state import GameState
+from src.core.state.save_manager import SaveManager
 
 logger = logging.getLogger(__name__)
 
@@ -133,6 +134,16 @@ class Scene:
 
         logger.debug("Got text: %s", text)
         return text
+
+    @staticmethod
+    def get_saves() -> List[GameState]:
+        """
+        Return a name-sorted list of all saved games.
+        """
+        save_manager = SaveManager()
+        saves = save_manager.saves
+        saves.sort(key=lambda x: x.data["name"])
+        return saves
 
 
 class FullScreenScene(Scene, ABC):

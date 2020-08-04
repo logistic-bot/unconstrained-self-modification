@@ -21,6 +21,7 @@ This file contains the SaveManager class, which manages a group of Saves
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 import logging
+from pathlib import Path
 from typing import List
 
 from src import GAME_ROOT_DIR
@@ -73,11 +74,45 @@ class SaveManager:
         :return: None
         """
 
-        path = self.save_dir / f"{state.data['name']}.json"
-
+        path = self.get_path(state)
         logger.info("saving state of GameState '%s' at file '%s'", state, path)
+        state.save(path)
 
-        # TODO: See if this is still needed, maybe replace by state.save(path)
-        state_duplicate = GameState()
-        state_duplicate.data = state.data
-        state_duplicate.save(path)
+    def get_path(self, state: GameState) -> Path:
+        """
+        get the path of a state
+        :param state: the state to get the path
+        :return: the path where the state is saved
+        """
+        path = self.save_dir / f"{state.data['name']}.json"
+        return path
+
+    def rename(self, state: GameState, new_name: str) -> None:
+        """
+        Rename a save
+        :param state: The save to be renamed
+        :param new_name: The new name of the save
+        """
+        logger.info(
+            "Rename state '%s' from '%s' to '%s'", state, state.data["name"], new_name
+        )
+
+        path = self.get_path(state)
+        state.data["name"] = new_name
+
+        new_path = self.get_path(state)
+        state.save(new_path)
+
+        logger.warning("Deleting file: '%s'", path)
+        path.unlink()
+
+    def delete(self, state: GameState) -> None:
+        """
+        Delete a state.
+        :param state: The state to delete.
+        """
+        logger.info("Delete state '%s'", state)
+        path = self.get_path(state)
+
+        logger.warning("Deleting file: '%s'", path)
+        path.unlink()
