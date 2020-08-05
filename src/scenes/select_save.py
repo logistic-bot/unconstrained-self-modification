@@ -186,8 +186,7 @@ class SelectSave(FullScreenScene):
                 selected_option,
                 acting_on_save_list,
             )
-        else:
-            return CorruptedLoginNewSave(self.renderer, self.state)
+        return CorruptedLoginNewSave(self.renderer, self.state)
 
     def show_actions(
         self,
@@ -431,7 +430,7 @@ class SelectSave(FullScreenScene):
         #  offset, the length of the text (optional), and the width of the container (optional?).
         self.addinto(
             # option_x_pos + round(len(title) / 2) - round(option_x_width / 2) + 2,
-                option_x_pos + round(option_x_width / 2) - round(len(title) / 2),
+            option_x_pos + round(option_x_width / 2) - round(len(title) / 2),
             1,
             title,
             curses.A_DIM | curses.A_REVERSE,
@@ -489,16 +488,16 @@ class SelectSave(FullScreenScene):
             self.addinto(x_pos, start_y_pos + index, item)
 
     def show_save_list_title(
-        self, save_list_title: str, save_list_x_pos: int, x_width
+        self, save_list_title: str, save_list_x_pos: int, x_width: int
     ) -> None:
         """
         Show the title of save list
+        :param x_width: width of the save list
         :param save_list_title: Title to show
         :param save_list_x_pos: x_pos of the save list title
         """
-        title_start_x = round(save_list_x_pos / 2) - round(len(save_list_title) / 2)
         title_start_x = (
-                save_list_x_pos + round(x_width / 2) - round(len(save_list_title) / 2)
+            save_list_x_pos + round(x_width / 2) - round(len(save_list_title) / 2)
         )
         self.addinto(title_start_x, 1, save_list_title, curses.A_DIM | curses.A_REVERSE)
 
@@ -525,7 +524,15 @@ class SelectSave(FullScreenScene):
                 longest_name = len(name)
         return longest_name
 
-    def draw_extra_info(self, state, start_x, action_start_x):
+    def draw_extra_info(
+        self, state: GameState, start_x: int, action_start_x: int
+    ) -> None:
+        """
+        Draw the extra information for the save given GameState
+        :param state: The game state that is selected, and that has the info to draw.
+        :param start_x: At which x_pos to start drawing the extra information
+        :param action_start_x: At which x_pos does the action list starts
+        """
         self.show_separator(start_x)
         x_pos = start_x + 2  # keep a blank column between the border
 
@@ -555,7 +562,13 @@ class SelectSave(FullScreenScene):
         # logo of the computer, username, password, playtime, creation date,
         # modified date, playtime.
 
-    def show_computer_brand(self, action_start_x, computer_brand):
+    def show_computer_brand(self, action_start_x: int, computer_brand: str) -> None:
+        """
+        Show the computer brand logo at the bottom of the action list. :param action_start_x: At
+        which position does the action list start :param computer_brand: What brand is the
+        computer? This should be the name of a text file in
+        unconstrained_self_modification/assets/brand_logo
+        """
         computer_brand_path = GAME_ROOT_DIR / "assets" / "brand_logo" / computer_brand
         logger.debug("Trying to find asset at '%s'", computer_brand_path)
         try:
