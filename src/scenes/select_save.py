@@ -426,7 +426,7 @@ class SelectSave(FullScreenScene):
         Draw the title of action pane
         """
         title = " Actions "
-        # TODO: We should have a fucntion for calculating the x_pos offset from the original
+        # TODO: We should have a function for calculating the x_pos offset from the original
         #  offset, the length of the text (optional), and the width of the container (optional?).
         self.addinto(
             # option_x_pos + round(len(title) / 2) - round(option_x_width / 2) + 2,
