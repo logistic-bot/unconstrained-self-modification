@@ -3,6 +3,8 @@ When executed, this file will create a configurable number of valid save files, 
 purposes. The username and password are the same as the save file's name.
 """
 
+# TODO: Update copyright
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #

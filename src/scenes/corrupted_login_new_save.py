@@ -96,6 +96,7 @@ class CorruptedLoginNewSave(FullScreenScene):
         self.state.data["name"] = username
         self.state.data["user"]["password"] = password
         self.state.data["user"]["username"] = username
+        self.state.data["progress"]["computer-brand"] = "ether-industries"
 
         logger.debug("State data: '%s'", self.state.data)
 
