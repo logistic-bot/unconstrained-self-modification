@@ -107,7 +107,7 @@ class CorruptedLoginNewSave(FullScreenScene):
         logger.debug("State Saved!")
 
         self.addinto(1, 10, "[ether-login c198762] Done.")
-        self.addinto(1, 12, "Welcome! Type 'help' for help!")
+        self.sleep_key(0.2)
 
         self.get_key()
 

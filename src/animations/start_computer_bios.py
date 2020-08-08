@@ -43,13 +43,22 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
     # text definition
     init = StyledText(renderer, "EtherBIOS v2.3.1 initialising...", 1)
     self_test = StyledText(renderer, "STARTING SELF-TEST...", 1)
-    cpu0 = StyledText(renderer, "CPU 0: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0)
-    cpu1 = StyledText(renderer, "CPU 1: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0)
-    cpu2 = StyledText(renderer, "CPU 2: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0)
-    cpu3 = StyledText(renderer, "CPU 3: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0)
+    cpu0 = StyledText(
+        renderer, "CPU 0: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0
+    )
+    cpu1 = StyledText(
+        renderer, "CPU 1: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0
+    )
+    cpu2 = StyledText(
+        renderer, "CPU 2: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0
+    )
+    cpu3 = StyledText(
+        renderer, "CPU 3: Ether Industries Pulse 32 Cores 128 bit 9MHz", 0
+    )
     gpu = StyledText(renderer, "GPU 0: Ether Industries UltraText", 0)
-    gpu_warning = StyledText(renderer, "WARNING: No graphics available, starting in text mode", 3,
-                             bold=True)
+    gpu_warning = StyledText(
+        renderer, "WARNING: No graphics available, starting in text mode", 3, bold=True
+    )
     boot = StyledText(renderer, "Booting from disk 0...", 1)
     progress = StyledText(renderer, "WORKING", 1, invert=True, blink=True)
     finished = StyledText(renderer, "DONE", 2, bold=True)

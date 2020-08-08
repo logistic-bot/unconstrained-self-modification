@@ -57,7 +57,7 @@ class GameState:
         with path.open("r") as file:
             self.data = json.load(file)
 
-        logger.info("New data: \"%s\"", self.data)
+        logger.info('New data: "%s"', self.data)
 
     @property
     def lastsave(self) -> str:
@@ -78,7 +78,7 @@ class GameState:
         :param path: the path to the file.
         """
         logger.info("Saving state to file '%s'", path)
-        logger.info("Current data: \"%s\"", self.data)
+        logger.info('Current data: "%s"', self.data)
 
         path.touch(exist_ok=True)  # ensure that the file exists
 

@@ -24,8 +24,10 @@ This Scene will show login for an Ether Industries computer.
 import curses
 import logging
 from time import sleep
+from typing import Optional
 
-from src.core.scene import FullScreenScene
+from src.core.scene import FullScreenScene, Scene
+from src.scenes.story.first_turn_on import FirstTurnOnStory
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +37,7 @@ class EtherIndustriesLogin(FullScreenScene):
     Ask an user to login to an Ether Industries computer
     """
 
-    def start(self) -> None:
+    def start(self) -> Optional[Scene]:
         """
         Show this scene
         """
@@ -76,5 +78,4 @@ class EtherIndustriesLogin(FullScreenScene):
                     expected_password,
                 )
                 sleep(1)
-
-        self.get_key()
+        return FirstTurnOnStory(self.renderer, self.state)

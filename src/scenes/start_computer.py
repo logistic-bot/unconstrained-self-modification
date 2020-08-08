@@ -57,16 +57,26 @@ class StartComputer(FullScreenScene):
         logger.info("Starting Scene: StartComputer")
 
         self.clear()
-        animation = start_computer_bios.create_animation(self.renderer)
-        y_pos = animation.start()
 
-        font_logo = (
-            curses.color_pair(0) | curses.A_ITALIC | curses.A_BOLD | curses.A_BLINK
-        )
-        self.addinto_all_centred(LOGO_START, 0.05)
-        self.addinto_all_centred(LOGO_DONE, color_pair=font_logo)
+        skip_animation = False
+        try:
+            skip_animation = self.state.data["debug"]["skip-boot-animation"]
+        except KeyError:
+            pass
 
-        animation = start_computer_boot.create_animation(self.renderer)
-        animation.start(y_pos + 1)  # leave a blank line
+        if not skip_animation:
+            logger.debug("Used debug option to skip boot animation")
+
+            animation = start_computer_bios.create_animation(self.renderer)
+            y_pos = animation.start()
+
+            font_logo = (
+                curses.color_pair(0) | curses.A_ITALIC | curses.A_BOLD | curses.A_BLINK
+            )
+            self.addinto_all_centred(LOGO_START, 0.05)
+            self.addinto_all_centred(LOGO_DONE, color_pair=font_logo)
+
+            animation = start_computer_boot.create_animation(self.renderer)
+            animation.start(y_pos + 1)  # leave a blank line
 
         return EtherIndustriesLogin(self.renderer, self.state)

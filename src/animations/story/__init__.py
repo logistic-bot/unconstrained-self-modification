@@ -1,12 +1,7 @@
-#!/usr/bin/env python
-
-"""
-Run this file to start the game
-"""
-
 # ------------------------------------------------------------------------------
-#  This file is part of Universal Sandbox.
+#  This file is part of Unconstrained self-modification.
 #
+#  Copyright (C) © 2020 Khaïs COLIN <logistic-bot@protonmail.com>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,27 +16,3 @@ Run this file to start the game
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
-
-
-import logging
-
-from src.core.engine import Engine
-
-logger = logging.getLogger(__name__)
-
-
-def main() -> None:
-    """
-    main
-    """
-    engine = Engine()
-    engine.start()
-
-    logger.info(
-        "This should be the last log line. If it is not, please contact the developers"
-    )
-
-
-if __name__ == "__main__":
-    logger.info("Starting game")
-    main()

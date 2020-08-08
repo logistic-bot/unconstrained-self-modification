@@ -108,13 +108,6 @@ class Scene:
 
         :return: None
         """
-        logger.debug(
-            "Adding text %s to (%s, %s) with color pair %s",
-            text,
-            x_pos,
-            y_pos,
-            color_pair,
-        )
         self.renderer.addtext(x_pos, y_pos, text, color_pair)
         self.refresh()
 
