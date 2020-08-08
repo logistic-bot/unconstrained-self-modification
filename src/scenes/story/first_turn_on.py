@@ -48,12 +48,14 @@ class FirstTurnOnStory(FullScreenScene):
         animation = first_turn_on.create_animation(self.renderer)
         animation.start()
 
-        for x in range(1, self.renderer.max_x, 7):
-            for y in range(1, self.renderer.max_y - 1):
-                if (x + 6) < self.renderer.max_x:
-                    self.renderer.addtext(x, y, "       ")
-                    self.renderer.addtext(x, y, "FASM-4")
+        for x_pos in range(1, self.renderer.max_x, 7):
+            for y_pos in range(1, self.renderer.max_y - 1):
+                if (x_pos + 6) < self.renderer.max_x:
+                    self.renderer.addtext(x_pos, y_pos, "       ")
+                    self.renderer.addtext(x_pos, y_pos, "FASM-4")
                     self.sleep_key(0.001)
+                else:
+                    break
 
         self.sleep_key(1)
         return FirstTurnOnStory(self.renderer, self.state)

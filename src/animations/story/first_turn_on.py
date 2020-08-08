@@ -95,6 +95,7 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
         1,
     )
 
+    # noinspection SpellCheckingInspection
     story = InfoStage(
         renderer,
         [
@@ -126,15 +127,18 @@ def create_animation(renderer: CursesRenderer) -> BootAnimation:
         1,
     )
 
-    Step(StyledText(renderer, "Who.. Who am I?"), delay=1),
-
     stages = [greet, services, story]
     animation = BootAnimation(renderer, stages)
 
     return animation
 
 
-def service(renderer, name):
+def service(renderer: CursesRenderer, name: str) -> Step:
+    """
+    Return a step representing a service starting up.
+    :param renderer: CursesRenderer
+    :param name: services name
+    """
     return Step(
         StyledText(
             renderer,
@@ -152,7 +156,13 @@ def service(renderer, name):
     )
 
 
-def fasm(renderer, text, delay=0.1):
+def fasm(renderer: CursesRenderer, text: str, delay: float = 0.1) -> Step:
+    """
+    Return a step representing a log line from FASM-4
+    :param renderer: CursesRenderer
+    :param text: The text to display
+    :param delay: How long to wait after displaying the text
+    """
     step = (
         Step(
             StyledText(

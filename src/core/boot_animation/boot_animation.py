@@ -23,7 +23,7 @@ animations with progress updates.
 # ------------------------------------------------------------------------------
 
 from time import sleep
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Sequence
 
 from src.core.boot_animation.stage import Stage
 from src.core.boot_animation.step import Step
@@ -135,7 +135,7 @@ class BootAnimation:
     def __init__(
         self,
         renderer: CursesRenderer,
-        stages: Optional[List[Union[Stage, SimultaneousStage, InfoStage]]] = None,
+        stages: Optional[Sequence[Union[Stage, SimultaneousStage, InfoStage]]] = None,
         delay: float = 0,
     ) -> None:
         self.delay = delay
