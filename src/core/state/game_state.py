@@ -23,7 +23,6 @@ This file contains the GameState class, which is responsible for saving the curr
 
 import json
 import logging
-from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -38,13 +37,7 @@ class GameState:
     """
 
     def __init__(self) -> None:
-        def nested_dict() -> JSON:
-            """
-            returns a nested_dict with nested_dicts of type dict
-            """
-            return defaultdict(nested_dict)
-
-        self.data: JSON = nested_dict()
+        self.data: JSON = {}
 
         logger.debug("Creating new empty GameState")
 
@@ -86,3 +79,6 @@ class GameState:
             json.dump(self.data, file, indent=2, sort_keys=True)
 
         logger.info("Done saving state")
+
+    def update(self, data):
+        self.data.update(data)

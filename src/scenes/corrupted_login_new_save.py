@@ -90,13 +90,22 @@ class CorruptedLoginNewSave(FullScreenScene):
         far_away_future = datetime.timedelta(days=365 * 126)
         save_creation = datetime.date.today() + far_away_future
 
-        self.state.data.update()
-        self.state.data["metadata"]["save_creation"] = str(save_creation)
-        self.state.data["metadata"]["save_date"] = str(save_creation)
-        self.state.data["name"] = username
-        self.state.data["user"]["password"] = password
-        self.state.data["user"]["username"] = username
-        self.state.data["progress"]["computer-brand"] = "ether-industries"
+        data = {
+            "metadata": {
+                "save_creation" : str(save_creation),
+                "save_date": str(save_creation)
+            },
+            "name": username,
+            "user": {
+                "password": password,
+                "username": username
+            },
+            "progress": {
+                "computer-brand": "ether-industries"
+            }
+        }
+
+        self.state.update(data)
 
         logger.debug("State data: '%s'", self.state.data)
 
