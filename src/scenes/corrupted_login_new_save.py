@@ -92,17 +92,12 @@ class CorruptedLoginNewSave(FullScreenScene):
 
         data = {
             "metadata": {
-                "save_creation" : str(save_creation),
-                "save_date": str(save_creation)
+                "save_creation": str(save_creation),
+                "save_date": str(save_creation),
             },
             "name": username,
-            "user": {
-                "password": password,
-                "username": username
-            },
-            "progress": {
-                "computer-brand": "ether-industries"
-            }
+            "user": {"password": password, "username": username},
+            "progress": {"computer-brand": "ether-industries"},
         }
 
         self.state.update(data)

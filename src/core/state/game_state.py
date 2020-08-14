@@ -80,5 +80,12 @@ class GameState:
 
         logger.info("Done saving state")
 
-    def update(self, data):
+    def update(self, data: JSON) -> None:
+        """
+        Update the game state data with the provided data.
+        See dict.update() for more details.
+
+        :param data: The data that should be updated
+        :return: None
+        """
         self.data.update(data)
