@@ -32,7 +32,7 @@ class ListRenderer:
         renderer: CursesRenderer,
         x_pos: int,
         y_pos: int,
-        items: Optional[List[str]]=None,
+        items: Optional[List[str]] = None,
         select_max_length: bool = False,
         max_length: Optional[int] = None,
         margin: int = 0,
@@ -176,3 +176,88 @@ class ListRenderer:
                 curses.A_DIM | curses.A_REVERSE,
             )
 
+
+class TreeListRenderer:
+    def __init__(
+        self,
+        renderer,
+        x_pos: int,
+        y_pos: int, items=None,
+    ):
+        if items is None:
+            items = []
+        self.renderer = renderer
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+
+        self.selected_list = 0
+        self.margin = 1
+
+        try:
+            if isinstance(items[0], ListRenderer):
+                logger.debug("Creating TreeListRenderer with List[ListRenderer]")
+                passed_items = items
+            elif isinstance(items[0], str):
+                logger.debug("Creating TreeListRenderer with List[str]")
+                passed_items = self.convert_list_str_to_listrenderer(renderer, items)
+            else:
+                logger.warning("Unexceped type %s. Assuming List[str].", type(items))
+                passed_items = self.convert_list_str_to_listrenderer(renderer, items)
+        except IndexError:
+            logger.warning(
+                "Could not determine type of items. Type: %s. Assuming List[ListRenderer].",
+                type(items),
+            )
+            passed_items = items
+
+        self.items = passed_items
+        self.set_items_position()
+        self.select_list(0)
+
+    def convert_list_str_to_listrenderer(self, renderer, items):
+        passed_items = []
+        for item in items:
+            lr = ListRenderer(renderer, 0, 0, item)
+            passed_items.append(lr)
+
+        return passed_items
+
+    def draw(self):
+        for i in self.items:
+            i.draw()
+        pass
+
+    def check_input(self, key):
+        for item in self.items:
+            item.check_input(key)
+
+        if key == "KEY_RIGHT":
+            self.select_next_list()
+        elif key == "KEY_LEFT":
+            self.select_previous_list()
+
+    def select_next_list(self):
+        self.select_list(self.selected_list + 1)
+
+    def select_previous_list(self):
+        self.select_list(self.selected_list - 1)
+
+    def select_list(self, index):
+        if index < 0 or index >= len(self.items):
+            return
+
+        self.selected_list = index
+        for list_index, item in enumerate(self.items):
+            if list_index == index:
+                item.selected = True
+            else:
+                item.selected = False
+
+    def set_items_position(self):
+        sum_now = self.x_pos
+        for item in self.items:
+            item.x_pos = sum_now
+            item.y_pos = self.y_pos
+            sum_now += item.actual_width + self.margin
+            # self.items[x].x_pos += self.x_pos
+            # self.items[x].y_pos += self.y_pos

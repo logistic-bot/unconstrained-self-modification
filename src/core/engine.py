@@ -27,7 +27,7 @@ from typing import Optional
 from src.core import render
 from src.core.scene import Scene
 from src.core.state import game_state
-from src.scenes.startup import StartupScene
+from src.scenes.Test import TestScene
 
 logger = logging.getLogger(__name__)
 
@@ -52,9 +52,8 @@ class Engine:  # pylint: disable=R0903
         logger.info("Starting game")
 
         try:
-            current_scene: Optional[Scene] = StartupScene(
-                self.renderer, self.game_state
-            )
+            current_scene: Optional[Scene] = TestScene(self.renderer, self.game_state)
+            # current_scene: Optional[Scene] = StartupScene(self.renderer, self.game_state)
 
             while current_scene is not None:
                 logger.info("Current scene: %s", current_scene)

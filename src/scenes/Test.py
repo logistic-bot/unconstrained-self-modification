@@ -20,10 +20,11 @@ This FullScreenScene is responsible for showing the game's title and startup mes
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
+
 from typing import Any
 
 from src.core.scene import FullScreenScene
-from src.core.user_interface import ListRenderer
+from src.core.user_interface import TreeListRenderer
 
 
 class TestScene(FullScreenScene):
@@ -33,40 +34,15 @@ class TestScene(FullScreenScene):
     """
 
     def start(self) -> Any:  # pylint: disable=R1711
-        saves = ListRenderer(
-            self.renderer, 1, 1, ["save 1", "save 245", "save 34861"], True, margin=1
-        )
-        actions = ListRenderer(
-            self.renderer,
-            saves.actual_width,
-            1,
-            ["Load567890", "Rename", "Delete", "New"],
-            True,
-            margin=1,
-        )
-        tmp = ListRenderer(
-            self.renderer,
-            saves.actual_width + actions.actual_width + 10,
-            1,
-            ["tmp567890", "tmpRename", "tmpDelete", "tmpNew"],
-            True,
-            margin=1,
-        )
 
-        tmp.set_selected(False)
+        # treelist = TreeListRenderer(self.renderer, 5, 5 ,[[list,list2,list3,["",""]])
+        treelist = TreeListRenderer(
+            self.renderer, 5, 5, [["Test", "Tryce"], ["Action1", "Action2"]]
+        )
 
         key = ""
         while key != "q":
+            treelist.draw()
             key = self.get_key()
 
-            saves.check_input(key)
-            actions.check_input(key)
-            tmp.check_input(key)
-
-            if key == "s":
-                saves.selected = not saves.selected
-                tmp.selected = not tmp.selected
-
-            saves.draw()
-            actions.draw()
-            tmp.draw()
+            treelist.check_input(key)
