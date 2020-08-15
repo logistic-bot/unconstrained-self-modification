@@ -54,11 +54,8 @@ class ListRenderer:
 
         logger.info("Created new ListRenderer at ({}, {})")
 
-        self.draw()
-
     def set_margin(self, value):
         self._margin = value
-        self.draw()
 
     def get_margin(self):
         return self._margin
@@ -69,11 +66,9 @@ class ListRenderer:
 
     def select_next(self):
         self.select(self.index + 1)
-        self.draw()
 
     def select_previous(self):
         self.select(self.index - 1)
-        self.draw()
 
     def check_input(self, key):
         if self.selected:
@@ -93,7 +88,6 @@ class ListRenderer:
                 index,
                 self.items,
             )
-        self.draw()
 
     @property
     def selected_item(self):
@@ -104,7 +98,6 @@ class ListRenderer:
 
     def set_selected(self, value):
         self._selected = value
-        self.draw()
 
     selected = property(get_selected, set_selected)
 
