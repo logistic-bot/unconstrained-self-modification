@@ -1,12 +1,33 @@
-from typing import List
-import logging
+# ------------------------------------------------------------------------------
+#  This file is part of Unconstrained self-modification.
+#
+#  Copyright (C) © 2020 Khaïs COLIN <logistic-bot@protonmail.com>
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# ------------------------------------------------------------------------------
+
 import curses
+import logging
+
 logger = logging.getLogger(__name__)
 
 class ListRenderer:
-    def __init__(self, renderer, x_pos : int, y_pos : int, items : List[str] = [], max_length : int = None):
+    def __init__(self, renderer, x_pos : int, y_pos : int, items=None, max_length : int = None):
         # TODO: if the user changes self.items, self.max_length is not correct anymore. Use @property and self._max_length
 
+        if items is None:
+            items = []
         if max_length is None:
             max_length = max([len(item) for item in items])
         self.max_length = max_length
@@ -52,14 +73,12 @@ class ListRenderer:
     def selected_item(self):
         return self.items[self.index]
 
-    def selected():
-        def fget(self):
-            return self._selected
-        def fset(self, value):
-            self._selected = value
-            self.draw()
-        return locals()
-    selected = property(**selected())
+    def get_selected(self):
+        return self._selected
+    def set_selected(self, value):
+        self._selected = value
+        self.draw()
+    selected = property(get_selected, set_selected)
 
     def draw(self):
         # draw the list
