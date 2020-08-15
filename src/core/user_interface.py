@@ -19,6 +19,9 @@
 
 import curses
 import logging
+from typing import Optional, List
+
+from src.core.render import CursesRenderer
 
 logger = logging.getLogger(__name__)
 
@@ -26,14 +29,14 @@ logger = logging.getLogger(__name__)
 class ListRenderer:
     def __init__(
         self,
-        renderer,
+        renderer: CursesRenderer,
         x_pos: int,
         y_pos: int,
-        items=None,
+        items: Optional[List[str]]=None,
         select_max_length: bool = False,
-        max_length: int = None,
+        max_length: Optional[int] = None,
         margin: int = 0,
-    ):
+    ) -> None:
         # TODO: if the user changes self.items, self.max_length is not correct anymore. Use @property and self._max_length
 
         if items is None:
@@ -54,30 +57,30 @@ class ListRenderer:
 
         logger.info("Created new ListRenderer at ({}, {})")
 
-    def set_margin(self, value):
+    def set_margin(self, value: int) -> None:
         self._margin = value
 
-    def get_margin(self):
+    def get_margin(self) -> int:
         return self._margin
 
     margin = property(get_margin, set_margin)
 
     # def set_select_max_length():
 
-    def select_next(self):
+    def select_next(self) -> None:
         self.select(self.index + 1)
 
-    def select_previous(self):
+    def select_previous(self) -> None:
         self.select(self.index - 1)
 
-    def check_input(self, key):
+    def check_input(self, key: str) -> None:
         if self.selected:
             if key == "KEY_DOWN":
                 self.select_next()
             elif key == "KEY_UP":
                 self.select_previous()
 
-    def select(self, index: int):
+    def select(self, index: int) -> None:
         try:
             assert index < len(self.items)
             assert index >= 0
@@ -90,18 +93,20 @@ class ListRenderer:
             )
 
     @property
-    def selected_item(self):
-        return self.items[self.index]
+    def selected_item(self) -> str:
+        item = self.items[self.index]
+        assert isinstance(item, str)
+        return item
 
-    def get_selected(self):
+    def get_selected(self) -> bool:
         return self._selected
 
-    def set_selected(self, value):
+    def set_selected(self, value: bool) -> None:
         self._selected = value
 
     selected = property(get_selected, set_selected)
 
-    def get_max_length(self):
+    def get_max_length(self) -> int:
         if self._max_length is None:
             lens = [len(item) for item in self.items]
             logger.debug("lens: '%s'", lens)
@@ -112,13 +117,13 @@ class ListRenderer:
         logger.debug("got max_length '%s'", max_length)
         return max_length
 
-    def set_max_length(self, value):
+    def set_max_length(self, value: int) -> None:
         self._max_length = value
 
     max_length = property(get_max_length, set_max_length)
 
     @property
-    def actual_width(self):
+    def actual_width(self) -> int:
         text = " " * self.max_length
         width = len(self.get_item_margins(text))
         if self.indent_selected:
@@ -126,7 +131,7 @@ class ListRenderer:
         logger.debug("got actual_width: '%s'", width)
         return width
 
-    def draw(self):
+    def draw(self) -> None:
         # draw the list
         for index, item in enumerate(self.items):
             item = self.get_item_margins(item)
@@ -136,7 +141,7 @@ class ListRenderer:
 
         self.highlight_selected()
 
-    def get_item_margins(self, item):
+    def get_item_margins(self, item: str) -> str:
         if self.select_max_length:
             item += " " * (self.max_length - len(item))
             logger.debug("item: '%s'", item)
@@ -145,7 +150,7 @@ class ListRenderer:
         item = " " * self.margin + item + " " * self.margin
         return item
 
-    def highlight_selected(self):
+    def highlight_selected(self) -> None:
         item = self.get_item_margins(self.selected_item)
 
         selected_x_pos = self.x_pos
@@ -171,20 +176,3 @@ class ListRenderer:
                 curses.A_DIM | curses.A_REVERSE,
             )
 
-    def set_selected(self, selected: bool = True):
-        self.selected = selected
-
-
-"""
-j = create_list(["Test1","Test2","Test3"], vertical=true, offx = 5, offy = 5, x = 5, y = 2)
-j.create_border()
-j.set_title("Save File", 1)
-
-j.draw()
-
-j.check_key_pressed(key)
-
-if j.check_selected():
-    j.set_active(False)
-    h.set_active(True)
-"""
