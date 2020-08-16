@@ -89,3 +89,9 @@ class GameState:
         :return: None
         """
         self.data.update(data)
+
+    def __str__(self) -> str:
+        return self.data["name"]
+
+    def __len__(self) -> int:
+        return len(self.data["name"])

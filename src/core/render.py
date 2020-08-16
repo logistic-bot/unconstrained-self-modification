@@ -24,6 +24,7 @@ This is where the rendering happens.
 import curses
 import logging
 from curses import textpad
+from time import sleep
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,8 @@ class CursesRenderer:
     def __init__(self) -> None:
         logger.debug("Crate CursesRenderer and init curses")
         self.stdscr: Any = curses.initscr()  # pylint: disable=E1101
+
+        self.debug = False
 
         curses.noecho()
         curses.cbreak()
@@ -197,6 +200,10 @@ class CursesRenderer:
         assert y_pos > -1, f"y_pos: {y_pos}"
         self._move_cursoryx(y_pos, x_pos)
         self.stdscr.addstr(text, color_pair)
+
+        if self.debug:
+            self.refresh()
+            sleep(0.03)
 
     def addinto(self, x_pos: int, y_pos: int, text: str) -> None:
         """

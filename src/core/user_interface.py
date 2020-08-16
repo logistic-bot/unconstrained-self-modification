@@ -55,7 +55,9 @@ class ListRenderer:
         self._margin = margin
         self.select_max_length = select_max_length
 
-        logger.info("Created new ListRenderer at ({}, {})")
+        logger.info(
+            "Created new ListRenderer at (%s, %s) with items '%s'", x_pos, y_pos, items
+        )
 
     def set_margin(self, value: int) -> None:
         self._margin = value
@@ -95,8 +97,10 @@ class ListRenderer:
     @property
     def selected_item(self) -> str:
         item = self.items[self.index]
-        assert isinstance(item, str)
         return item
+
+    def get_selected_index(self) -> int:
+        return self.index
 
     def get_selected(self) -> bool:
         return self._selected
@@ -136,7 +140,10 @@ class ListRenderer:
         for index, item in enumerate(self.items):
             item = self.get_item_margins(item)
 
-            self.renderer.addtext(self.x_pos, self.y_pos + index, " " * (len(item) + 1))
+            if self.indent_selected:
+                self.renderer.addtext(
+                    self.x_pos, self.y_pos + index, " " * (len(item) + 1)
+                )
             self.renderer.addtext(self.x_pos, self.y_pos + index, item)
 
         self.highlight_selected()
@@ -147,7 +154,7 @@ class ListRenderer:
             logger.debug("item: '%s'", item)
             logger.debug("item len: '%s'", len(item))
 
-        item = " " * self.margin + item + " " * self.margin
+        item = " " * self.margin + str(item) + " " * self.margin
         return item
 
     def highlight_selected(self) -> None:
@@ -178,11 +185,11 @@ class ListRenderer:
 
 
 class TreeListRenderer:
+    # TODO: Add a way to represent file systems with nested lists. This onl
+    # allows for a defined set of actions wich are independent of the selected
+    # element.
     def __init__(
-        self,
-        renderer,
-        x_pos: int,
-        y_pos: int, items=None,
+        self, renderer, x_pos: int, y_pos: int, items=None,
     ):
         if items is None:
             items = []
@@ -261,3 +268,7 @@ class TreeListRenderer:
             sum_now += item.actual_width + self.margin
             # self.items[x].x_pos += self.x_pos
             # self.items[x].y_pos += self.y_pos
+
+    def get_list_item(self, index: int):
+        if index < 0 or index >= len(self.items):
+            return self.items[index]
