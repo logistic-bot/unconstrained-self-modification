@@ -97,13 +97,18 @@ class SelectSave(FullScreenScene):
                 infos = [
                     "Username: '{d[user][username]}'",
                     "Password: '{d[user][password]}'",
+                    "Note: {d[note]}",
                 ]
 
                 for index, info in enumerate(infos):
-                    self.addinto(
-                        PROPERTIES_X_POS, INFO_Y_POS + index, info.format(d=save.data)
-                    )
-                    sleep(delay)
+                    try:
+                        self.addinto(
+                            PROPERTIES_X_POS, INFO_Y_POS + index, info.format(d=save.data)
+                        )
+                    except KeyError:
+                        pass
+                    else:
+                        sleep(delay)
 
                 computer_brand = "none"
                 try:
