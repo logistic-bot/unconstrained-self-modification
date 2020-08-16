@@ -23,12 +23,17 @@ be loaded.
 # ------------------------------------------------------------------------------
 import curses
 import logging
+from time import sleep
 from typing import Optional
 
+from src import GAME_ROOT_DIR
 from src.core.render import CursesRenderer
 from src.core.scene import FullScreenScene, Scene
 from src.core.state.game_state import GameState
+from src.core.state.save_manager import SaveManager
 from src.core.user_interface import ListRenderer, TreeListRenderer
+from src.scenes.corrupted_login_new_save import CorruptedLoginNewSave
+from src.scenes.start_computer import StartComputer
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +64,8 @@ class SelectSave(FullScreenScene):
         See above
         """
 
+        self.last_selected_save_index = 0
+
         logger.info("Starting Scene: SelectSave")
 
         save_list = self.create_save_list()
@@ -69,11 +76,19 @@ class SelectSave(FullScreenScene):
 
         PROPERTIES_X_POS = SEPARATOR_2_POS + MARGIN + 1
 
-        save_tree_list = TreeListRenderer(
+        treelist = TreeListRenderer(
             self.renderer, TREE_X_POS, TREE_Y_POS, [save_list, action_list]
         )
 
-        def show_extra_info(save_list):
+        ACTION_LIST_X_POS = TREE_X_POS + (MARGIN * 2) + MAX_LENGTH
+
+        def show_info(save_list):
+            if save_list.index == self.last_selected_save_index:
+                delay = 0
+            else:
+                self.last_selected_save_index = save_list.index
+                delay = 0.02
+
             try:
                 save = self.get_saves()[save_list.index]
             except IndexError:
@@ -88,14 +103,61 @@ class SelectSave(FullScreenScene):
                     self.addinto(
                         PROPERTIES_X_POS, INFO_Y_POS + index, info.format(d=save.data)
                     )
-                    self.sleep_key(0.02)
+                    sleep(delay)
+
+                computer_brand = "none"
+                try:
+                    logger.debug("Trying to get computer brand info from save file")
+                    computer_brand = save.data["progress"]["computer-brand"]
+                except KeyError:
+                    logger.warning("Failed to get computer brand info from save file")
+
+                computer_brand_path = GAME_ROOT_DIR / "assets" / "brand_logo" / computer_brand
+
+                logger.debug("Trying to find asset at '%s'", computer_brand_path)
+                try:
+                    with computer_brand_path.open("r") as file:
+                        computer_brand_logo = file.read()
+                except FileNotFoundError:
+                    computer_brand_logo = "WARNING: Asset missing. Try updating your game."
+
+                lines = computer_brand_logo.splitlines()
+                max_line_length = max([len(line) for line in lines])
+                assert max_line_length < MAX_LENGTH, (
+                    "There is an error with the logo file, the lines are too "
+                    "long to be displayed."
+                )
+                x_pos = ACTION_LIST_X_POS + round(MAX_LENGTH / 2) - round(max_line_length / 2)
+                y_pos = self.renderer.max_y - len(lines) - 1 # minus one for the border
+                for index, line in enumerate(lines):
+                    self.addinto(x_pos, y_pos + index, line)
+                    sleep(delay)
+
+        def update_save_list_names():
+            save_list = self.create_save_list()
+            save_list.selected = False
+            treelist.items[0] = save_list
+            treelist.set_items_position()
+
+        def show_help(save_list, action_list):
+            selected_save = self.get_saves()[save_list.index]
+            helps = [
+                "ENTER: Load save '{}'",
+                "ENTER: Rename save '{}'",
+                "ENTER: Delete save '{}'",
+                "ENTER: Create new save",
+            ]
+            name = selected_save.data["name"]
+            help_text = helps[action_list.index]
+            help_text = help_text.format(name)
+            self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
 
         key = ""
         while key != "q":
             self.clear()
 
             # draw
-            save_tree_list.draw()
+            treelist.draw()
 
             # separator
             self.show_separator(SEPARATOR_1_POS)
@@ -134,25 +196,89 @@ class SelectSave(FullScreenScene):
                 curses.A_DIM | curses.A_REVERSE,
             )
 
-            show_extra_info(save_list)
+            show_help(save_list, action_list)
+            show_info(save_list) # this should be last, because of the delay.
 
             # key
             key = self.get_key()
-            save_tree_list.check_input(key)
+            treelist.check_input(key)
 
             if key == "\n":
                 index = action_list.index
-                if index == 0:
+                if index == 0:  # Load game
                     self.addinto_all_centred("LOADING...")
-                elif index == 1:
-                    self.addinto_all_centred("RENAMING...")
-                elif index == 2:
-                    self.addinto_all_centred("DELETING...")
-                elif index == 3:
-                    self.addinto_all_centred("CREATING...")
-                else:
+                    self.state = self.get_saves()[save_list.index]
+                    self.clear()
+                    self.addinto_all_centred("Done.")
+                    return StartComputer(self.renderer, self.state)
+                elif index == 1:  # Rename
+                    selected_state = self.get_saves()[save_list.index]
+                    name = selected_state.data["name"]
+
+                    # prompt for name
+                    prompt_text = "New name for save '{}': ".format(name)
+                    new_name = self.prompt(
+                        round(self.renderer.max_x / 2)
+                        - 15
+                        - round(len(prompt_text) / 2),
+                        round(self.renderer.max_y / 2),
+                        prompt_text,
+                    )
+
+                    # actual renameing
+                    save_manager = SaveManager()
+                    save_manager.rename(selected_state, new_name)
+
+                    # update save_list names
+                    update_save_list_names()
+                elif index == 2:  # Delete
+                    selected_state = self.get_saves()[save_list.index]
+                    name = selected_state.data["name"]
+
+                    confirmation_prompt = " Are you sure you want to delete the save '{}'? ".format(
+                        name
+                    )
+
+                    curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
+
+                    self.renderer.add_down_bar_text(
+                        confirmation_prompt,
+                        color_pair=curses.A_REVERSE
+                        | curses.color_pair(1)
+                        | curses.A_BOLD,
+                    )
+                    self.renderer.add_down_bar_text(
+                        " [y/n] ",
+                        2,
+                        color_pair=curses.A_REVERSE | curses.color_pair(1),
+                    )
+
+                    key = ""
+                    while key not in ("y", "n"):
+                        key = self.get_key().lower()
+                        if key not in ("y", "n"):
+                            self.renderer.add_down_bar_text(
+                                " Please press 'y' or 'n' ",
+                                2,
+                                color_pair=curses.A_REVERSE
+                                | curses.A_BLINK
+                                | curses.color_pair(1),
+                            )
+                        self.renderer.add_down_bar_text(
+                            confirmation_prompt,
+                            color_pair=curses.A_REVERSE | curses.color_pair(1),
+                        )
+
+                    if key == "y":
+                        self.addinto_all_centred("Deleting save {}...".format(name))
+                        SaveManager().delete(selected_state)
+
+                    # update save_list names
+                    update_save_list_names()
+                elif index == 3:  # Create new
+                    return CorruptedLoginNewSave(self.renderer, self.state)
+                else:  # This should not be possible
                     self.addinto_all_centred("IMPOSSIBLE...")
-                self.sleep_key(5000)
 
     def create_save_list(self):
         save_list = ListRenderer(
