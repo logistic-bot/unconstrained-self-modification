@@ -37,8 +37,6 @@ class ListRenderer:
         max_length: Optional[int] = None,
         margin: int = 0,
     ) -> None:
-        # TODO: if the user changes self.items, self.max_length is not correct anymore. Use @property and self._max_length
-
         if items is None:
             items = []
 
@@ -60,29 +58,62 @@ class ListRenderer:
         )
 
     def set_margin(self, value: int) -> None:
+        """
+        Set the margin for this ListRenderer.
+
+        The margin dictates how many spaces should be added before and after each
+        element of the list.
+
+        Examples:
+            margin = 0:
+                `element 1`
+                `element 2`
+                `element 3`
+            margin = 1:
+                ` element 1 `
+                ` element 2 `
+                ` element 3 `
+            margin = 5:
+                `     element 1     `
+                `     element 2     `
+                `     element 3     `
+
+        """
         self._margin = value
 
     def get_margin(self) -> int:
+        """
+        Get the current margin for this ListRenderer.
+
+        See set_margin for a description of what a margin is.
+        """
         return self._margin
 
     margin = property(get_margin, set_margin)
 
-    # def set_select_max_length():
-
     def select_next(self) -> None:
+        """
+        Select the next element element in the list.
+        """
         self.select(self.index + 1)
 
     def select_previous(self) -> None:
+        """
+        Select the previous element element in the list.
+        """
         self.select(self.index - 1)
 
-    def check_input(self, key: str) -> None:
-        if self.selected:
-            if key == "KEY_DOWN":
-                self.select_next()
-            elif key == "KEY_UP":
-                self.select_previous()
-
     def select(self, index: int) -> None:
+        """
+        Select a specified element in the list.
+
+        If the given index is out of range, no change is made.
+
+        The selected element is highlighed when the list is drawn. It can also
+        be indented if ListRenderer.indent_selected is set to True.
+
+        :param index: The index of the element to select.
+        """
         try:
             assert index < len(self.items)
             assert index >= 0
@@ -94,23 +125,93 @@ class ListRenderer:
                 self.items,
             )
 
+    def check_input(self, key: str) -> None:
+        """
+        Select the next or previous element in the list if the given key is
+        KEY_DOWN or KEY_UP, respectively.
+
+        This only has an effect when this list is selected.
+
+        (Selected means that  the list can be acted upon. It also serves to give
+        the user feedback  about whether the user can act on the list. When the
+        list is selected,  the currently selected element is highlighted. When
+        the list is not  selected, the currently selected element is not
+        highlighted as much.)
+        """
+        if self.selected:
+            if key == "KEY_DOWN":
+                self.select_next()
+            elif key == "KEY_UP":
+                self.select_previous()
+
     @property
     def selected_item(self) -> str:
+        """
+        Return the currently selected item.
+        """
         item = self.items[self.index]
         return item
 
     def get_selected_index(self) -> int:
+        """
+        Return the index of the currently selected item.
+        """
         return self.index
 
     def get_selected(self) -> bool:
+        """
+        Return True if the list is currently selected, False otherwise.
+        """
         return self._selected
 
     def set_selected(self, value: bool) -> None:
+        """
+        When given True, the list will be selected. When given False, the list
+        will be unselected.
+        """
         self._selected = value
 
     selected = property(get_selected, set_selected)
 
     def get_max_length(self) -> int:
+        """
+        Get the length of the longest element of the list, or the minimum
+        highlight length.
+
+        max_length can be in two modes: Internal or external. The mode is
+        determined by whether the max_length was set or not.
+
+        Internal mode: (default)
+            Internal mode can be obtained by setting max_length to None. It is
+            also the default mode, which is used if max_length is not set at
+            all.
+
+            While in internal mode, get_max_length will return the length of the
+            longes element of the list.
+
+            select_max_length will select the length of the longest element,
+            automatically.
+
+            (dev note: this is because select_max_length uses get_max_length
+            internally)
+
+        External mode:
+            External mode can be obtained by setting max_length to any integer.
+            If the given integer is negative, zero, or smaller that the length
+            of the shortest element of the list, it will behave as if it were in
+            internal mode.
+
+            If highlight_selected and highlight_max_length are both True, then
+            the ListRenderer will highlight up to max_length for element that
+            are shorter than max_length and the whole element for elements that
+            are longer.
+
+            While in external mode, get_max_length will return the length set by
+            set_max_length.
+
+        (dev note: not all of the described behavior is tested, please open an
+        issues if you experience any disrepancies)
+        """
         if self._max_length is None:
             lens = [len(item) for item in self.items]
             logger.debug("lens: '%s'", lens)
@@ -122,12 +223,28 @@ class ListRenderer:
         return max_length
 
     def set_max_length(self, value: int) -> None:
+        """
+        If value is None, set the max_length mode to Internal. If value is not
+        None, set the max_length mode to External and set the max_length to the
+        given value.
+
+        See get_max_length for an extended explanation of what External and
+        Internal modes are.
+        """
         self._max_length = value
 
     max_length = property(get_max_length, set_max_length)
 
     @property
     def actual_width(self) -> int:
+        """
+        Returns the width taken by drawing the list.
+
+        It's a measure of how much vertical space will be altered when calling
+        the draw() method.
+
+        It takes into account margins, indent_selected and get_max_length.
+        """
         text = " " * self.max_length
         width = len(self.get_item_margins(text))
         if self.indent_selected:
@@ -136,7 +253,17 @@ class ListRenderer:
         return width
 
     def draw(self) -> None:
-        # draw the list
+        # TODO: indent_selected should be customizable, how much should it be
+        # indented
+        """
+        Draw the list.
+
+        Possible options:
+         - margin: sets how many spaces should be inserted before and after each
+           item. See also get_item_margins()
+
+        See also highlight_selected() for option to highlight the selected item.
+        """
         for index, item in enumerate(self.items):
             item = self.get_item_margins(item)
 
@@ -149,6 +276,16 @@ class ListRenderer:
         self.highlight_selected()
 
     def get_item_margins(self, item: str) -> str:
+        """
+        Given an item string, return the item with the needed margins applied.
+
+        If select_max_length is True, we need to add a corresponding number of
+        spaces to the end of the item string, to make sure that if the item is
+        selected, the needed length will be highlighted. See also
+        get_max_length() (Internal mode) for more details.
+
+        See also set_margin()
+        """
         if self.select_max_length:
             item += " " * (self.max_length - len(item))
             logger.debug("item: '%s'", item)
@@ -158,6 +295,16 @@ class ListRenderer:
         return item
 
     def highlight_selected(self) -> None:
+        """
+        Highlight the selected item so that the user can see which item is
+        selected.
+
+        Options:
+            indent_selected: If True, the selected item will be indented to the
+                right by one character.
+            selected: If the list is selected, the selected item will be
+                highlighted brightly. If not, it will be highlighted greyly.
+        """
         item = self.get_item_margins(self.selected_item)
 
         selected_x_pos = self.x_pos
@@ -205,19 +352,25 @@ class TreeListRenderer:
         try:
             if isinstance(items[0], ListRenderer):
                 logger.debug("Creating TreeListRenderer with List[ListRenderer]")
-                passed_items= items
+                passed_items = items
             elif isinstance(items[0], str):
                 logger.debug("Creating TreeListRenderer with List[List[str]]")
-                passed_items= self.convert_list_str_to_listrenderer(renderer, cast(List[List[str]], items))
+                passed_items = self.convert_list_str_to_listrenderer(
+                    renderer, cast(List[List[str]], items)
+                )
             else:
-                logger.warning("Unexceped type %s. Assuming List[List[str]].", type(items))
-                passed_items = self.convert_list_str_to_listrenderer(renderer, cast(List[List[str]], items))
+                logger.warning(
+                    "Unexceped type %s. Assuming List[List[str]].", type(items)
+                )
+                passed_items = self.convert_list_str_to_listrenderer(
+                    renderer, cast(List[List[str]], items)
+                )
         except IndexError:
             logger.warning(
                 "Could not determine type of items. Type: %s. Assuming List[ListRenderer].",
                 type(items),
             )
-            passed_items= items
+            passed_items = items
 
         self.items: List[ListRenderer] = cast(List[ListRenderer], passed_items)
         self.set_items_position()

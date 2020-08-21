@@ -344,4 +344,6 @@ class SelectSave(FullScreenScene):
         Show a separator at the given x_pos
         :param x_pos: the x_pos of the separator
         """
-        self.renderer.stdscr.vline(1, x_pos, curses.ACS_VLINE, self.renderer.max_y - 2)  # type: ignore
+        self.renderer.stdscr.vline(
+            1, x_pos, curses.ACS_VLINE, self.renderer.max_y - 2  # type: ignore
+        )
