@@ -24,7 +24,7 @@ This file contains the GameState class, which is responsible for saving the curr
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +91,7 @@ class GameState:
         self.data.update(data)
 
     def __str__(self) -> str:
-        return self.data["name"]
+        return cast(str, self.data["name"])
 
     def __len__(self) -> int:
         return len(self.data["name"])

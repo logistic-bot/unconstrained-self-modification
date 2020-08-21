@@ -19,7 +19,7 @@
 
 import curses
 import logging
-from typing import Optional, List
+from typing import Optional, List, Union, cast
 
 from src.core.render import CursesRenderer
 
@@ -189,10 +189,12 @@ class TreeListRenderer:
     # allows for a defined set of actions wich are independent of the selected
     # element.
     def __init__(
-        self, renderer, x_pos: int, y_pos: int, items=None,
+        self,
+        renderer: CursesRenderer,
+        x_pos: int,
+        y_pos: int,
+        items: Union[List[List[str]], List[ListRenderer]],
     ):
-        if items is None:
-            items = []
         self.renderer = renderer
         self.x_pos = x_pos
         self.y_pos = y_pos
@@ -203,25 +205,27 @@ class TreeListRenderer:
         try:
             if isinstance(items[0], ListRenderer):
                 logger.debug("Creating TreeListRenderer with List[ListRenderer]")
-                passed_items = items
+                passed_items= items
             elif isinstance(items[0], str):
-                logger.debug("Creating TreeListRenderer with List[str]")
-                passed_items = self.convert_list_str_to_listrenderer(renderer, items)
+                logger.debug("Creating TreeListRenderer with List[List[str]]")
+                passed_items= self.convert_list_str_to_listrenderer(renderer, cast(List[List[str]], items))
             else:
-                logger.warning("Unexceped type %s. Assuming List[str].", type(items))
-                passed_items = self.convert_list_str_to_listrenderer(renderer, items)
+                logger.warning("Unexceped type %s. Assuming List[List[str]].", type(items))
+                passed_items = self.convert_list_str_to_listrenderer(renderer, cast(List[List[str]], items))
         except IndexError:
             logger.warning(
                 "Could not determine type of items. Type: %s. Assuming List[ListRenderer].",
                 type(items),
             )
-            passed_items = items
+            passed_items= items
 
-        self.items = passed_items
+        self.items: List[ListRenderer] = cast(List[ListRenderer], passed_items)
         self.set_items_position()
         self.select_list(0)
 
-    def convert_list_str_to_listrenderer(self, renderer, items):
+    def convert_list_str_to_listrenderer(
+        self, renderer: CursesRenderer, items: List[List[str]]
+    ) -> List[ListRenderer]:
         passed_items = []
         for item in items:
             lr = ListRenderer(renderer, 0, 0, item)
@@ -229,12 +233,11 @@ class TreeListRenderer:
 
         return passed_items
 
-    def draw(self):
+    def draw(self) -> None:
         for i in self.items:
             i.draw()
-        pass
 
-    def check_input(self, key):
+    def check_input(self, key: str) -> None:
         for item in self.items:
             item.check_input(key)
 
@@ -243,13 +246,13 @@ class TreeListRenderer:
         elif key == "KEY_LEFT":
             self.select_previous_list()
 
-    def select_next_list(self):
+    def select_next_list(self) -> None:
         self.select_list(self.selected_list + 1)
 
-    def select_previous_list(self):
+    def select_previous_list(self) -> None:
         self.select_list(self.selected_list - 1)
 
-    def select_list(self, index):
+    def select_list(self, index: int) -> None:
         if index < 0 or index >= len(self.items):
             return
 
@@ -260,15 +263,14 @@ class TreeListRenderer:
             else:
                 item.selected = False
 
-    def set_items_position(self):
+    def set_items_position(self) -> None:
         sum_now = self.x_pos
         for item in self.items:
             item.x_pos = sum_now
             item.y_pos = self.y_pos
             sum_now += item.actual_width + self.margin
-            # self.items[x].x_pos += self.x_pos
-            # self.items[x].y_pos += self.y_pos
 
-    def get_list_item(self, index: int):
+    def get_list_item(self, index: int) -> Optional[ListRenderer]:
         if index < 0 or index >= len(self.items):
-            return self.items[index]
+            return None
+        return self.items[index]

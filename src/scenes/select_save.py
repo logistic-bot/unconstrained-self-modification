@@ -3,6 +3,8 @@ This files contains the SelectSave scene, which allows the user to select a save
 be loaded.
 """
 
+# TODO: make action_list and save_list adn treelist members of the class
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
@@ -24,7 +26,7 @@ be loaded.
 import curses
 import logging
 from time import sleep
-from typing import Optional
+from typing import Optional, List
 
 from src import GAME_ROOT_DIR
 from src.core.render import CursesRenderer
@@ -82,7 +84,8 @@ class SelectSave(FullScreenScene):
 
         ACTION_LIST_X_POS = TREE_X_POS + (MARGIN * 2) + MAX_LENGTH
 
-        def show_info(save_list):
+        def show_info(save_list: ListRenderer) -> None:
+            delay: float = 0  # solves mypy
             if save_list.index == self.last_selected_save_index:
                 delay = 0
             else:
@@ -103,7 +106,9 @@ class SelectSave(FullScreenScene):
                 for index, info in enumerate(infos):
                     try:
                         self.addinto(
-                            PROPERTIES_X_POS, INFO_Y_POS + index, info.format(d=save.data)
+                            PROPERTIES_X_POS,
+                            INFO_Y_POS + index,
+                            info.format(d=save.data),
                         )
                     except KeyError:
                         pass
@@ -117,14 +122,18 @@ class SelectSave(FullScreenScene):
                 except KeyError:
                     logger.warning("Failed to get computer brand info from save file")
 
-                computer_brand_path = GAME_ROOT_DIR / "assets" / "brand_logo" / computer_brand
+                computer_brand_path = (
+                    GAME_ROOT_DIR / "assets" / "brand_logo" / computer_brand
+                )
 
                 logger.debug("Trying to find asset at '%s'", computer_brand_path)
                 try:
                     with computer_brand_path.open("r") as file:
                         computer_brand_logo = file.read()
                 except FileNotFoundError:
-                    computer_brand_logo = "WARNING: Asset missing. Try updating your game."
+                    computer_brand_logo = (
+                        "WARNING: Asset missing. Try updating your game."
+                    )
 
                 lines = computer_brand_logo.splitlines()
                 max_line_length = max([len(line) for line in lines])
@@ -132,19 +141,23 @@ class SelectSave(FullScreenScene):
                     "There is an error with the logo file, the lines are too "
                     "long to be displayed."
                 )
-                x_pos = ACTION_LIST_X_POS + round(MAX_LENGTH / 2) - round(max_line_length / 2)
-                y_pos = self.renderer.max_y - len(lines) - 1 # minus one for the border
+                x_pos = (
+                    ACTION_LIST_X_POS
+                    + round(MAX_LENGTH / 2)
+                    - round(max_line_length / 2)
+                )
+                y_pos = self.renderer.max_y - len(lines) - 1  # minus one for the border
                 for index, line in enumerate(lines):
                     self.addinto(x_pos, y_pos + index, line)
                     sleep(delay)
 
-        def update_save_list_names():
+        def update_save_list_names() -> None:
             save_list = self.create_save_list()
             save_list.selected = False
             treelist.items[0] = save_list
             treelist.set_items_position()
 
-        def show_help(save_list, action_list):
+        def show_help(save_list: ListRenderer, action_list: ListRenderer) -> None:
             selected_save = self.get_saves()[save_list.index]
             helps = [
                 "ENTER: Load save '{}'",
@@ -171,13 +184,13 @@ class SelectSave(FullScreenScene):
             # title
             if save_list.selected:
                 save_title_color = curses.A_BOLD | curses.A_REVERSE
-                action_title_color = None
+                action_title_color = 0
             elif action_list.selected:
-                save_title_color = None
+                save_title_color = 0
                 action_title_color = curses.A_BOLD | curses.A_REVERSE
             else:
-                save_title_color = None
-                action_title_color = None
+                save_title_color = 0
+                action_title_color = 0
 
             self.draw_centred(
                 SAVE_LIST_TITLE,
@@ -202,7 +215,7 @@ class SelectSave(FullScreenScene):
             )
 
             show_help(save_list, action_list)
-            show_info(save_list) # this should be last, because of the delay.
+            show_info(save_list)  # this should be last, because of the delay.
 
             # key
             key = self.get_key()
@@ -284,14 +297,15 @@ class SelectSave(FullScreenScene):
                     return CorruptedLoginNewSave(self.renderer, self.state)
                 else:  # This should not be possible
                     self.addinto_all_centred("IMPOSSIBLE...")
+        return None  # if quit
 
-    def create_save_list(self):
+    def create_save_list(self) -> ListRenderer:
         save_list = ListRenderer(
             self.renderer, 0, 0, self.get_save_names(), True, MAX_LENGTH, MARGIN,
         )
         return save_list
 
-    def create_action_list(self):
+    def create_action_list(self) -> ListRenderer:
         action_list = ListRenderer(
             self.renderer,
             0,
@@ -303,7 +317,9 @@ class SelectSave(FullScreenScene):
         )
         return action_list
 
-    def draw_centred(self, text, left, right, y_pos, color_pair=None):
+    def draw_centred(
+        self, text: str, left: int, right: int, y_pos: int, color_pair: int = 0
+    ) -> None:
         logger.debug(
             "Drawing centred text '%s' with left %s right %s y_pos %s.",
             text,
@@ -317,7 +333,7 @@ class SelectSave(FullScreenScene):
         logger.debug("Drawing centred text '%s' at (%s, %s)", text, x_pos, y_pos)
         self.addinto(x_pos, y_pos, text, color_pair)
 
-    def get_save_names(self):
+    def get_save_names(self) -> List[str]:
         names = []
         for save in self.get_saves():
             names.append(save.data["name"])
@@ -328,4 +344,4 @@ class SelectSave(FullScreenScene):
         Show a separator at the given x_pos
         :param x_pos: the x_pos of the separator
         """
-        self.renderer.stdscr.vline(1, x_pos, curses.ACS_VLINE, self.renderer.max_y - 2)
+        self.renderer.stdscr.vline(1, x_pos, curses.ACS_VLINE, self.renderer.max_y - 2)  # type: ignore
