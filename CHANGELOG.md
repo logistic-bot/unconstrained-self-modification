@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+ - Documentation for user_interface.py and TreeListRenderer
+
 ## [0.1.1-alpha]
 
 ### Changed

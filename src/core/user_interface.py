@@ -1,3 +1,8 @@
+"""
+Thie module contains user_interface facilities. Various class to simplify
+building user interfaces.
+"""
+
 # ------------------------------------------------------------------------------
 #  This file is part of Unconstrained self-modification.
 #
@@ -27,6 +32,10 @@ logger = logging.getLogger(__name__)
 
 
 class ListRenderer:
+    """
+    Allows to render a list of strings. This can also be used to select one of
+    the strings from the list.
+    """
     def __init__(
         self,
         renderer: CursesRenderer,
@@ -332,6 +341,28 @@ class ListRenderer:
 
 
 class TreeListRenderer:
+    """
+    Allows to show two or more ListRenderer one after the other, with Automatic
+    navigation between the lists.
+
+    The lists can only be shown horizontally, with list 0 being on the left.
+
+    The lists are completely independent of each other, so dynamically changing
+    one list depending on which element is selected in another is not supported
+    by this class. It can however be done manually, and this functionallity is
+    planned.
+
+    Note: whenever we talk about the 'next' or 'previous' ListRenderer, we talk
+    about the ListRenderer directly to the right and left of the currently
+    selected one, respectively.
+
+    Layout: (the number indicates the index of the list)
+    +-----+ +-----+ +-----+
+    |     | |     | |     |
+    |  0  | |  1  | |  2  |
+    |     | |     | |     |
+    +-----+ +-----+ +-----+
+    """
     # TODO: Add a way to represent file systems with nested lists. This onl
     # allows for a defined set of actions wich are independent of the selected
     # element.
@@ -379,6 +410,10 @@ class TreeListRenderer:
     def convert_list_str_to_listrenderer(
         self, renderer: CursesRenderer, items: List[List[str]]
     ) -> List[ListRenderer]:
+        """
+        Convert a list of lists of strings into a corresponding list of
+        ListRenderers. Used internally.
+        """
         passed_items = []
         for item in items:
             lr = ListRenderer(renderer, 0, 0, item)
@@ -387,10 +422,27 @@ class TreeListRenderer:
         return passed_items
 
     def draw(self) -> None:
+        """
+        Draw the TreeListRenderer.
+
+        (draws each of the ListRenderers in sequence.)
+        """
         for i in self.items:
             i.draw()
 
     def check_input(self, key: str) -> None:
+        """
+        Check if the given key is one of the handled keys, and execute the
+        appropriate action.
+
+        Handled keys include all the keys handled by ListRenderers, since the
+        key is first handled by each of the ListRenderers. (at the time of
+        writing, the ListRenderers can handle KEY_UP and KEY_DOWN to select the
+        next and previous item in the list if the list is selected)
+
+        KEY_RIGHT select the ListRenderer to the right of the current one, and
+        KEY_LEFT select the ListRenderer to the left of the current one
+        """
         for item in self.items:
             item.check_input(key)
 
@@ -400,12 +452,27 @@ class TreeListRenderer:
             self.select_previous_list()
 
     def select_next_list(self) -> None:
+        """
+        Select the ListRenderer to the right of the current one.
+        """
         self.select_list(self.selected_list + 1)
 
     def select_previous_list(self) -> None:
+        """
+        Select the ListRenderer to the left of the current one.
+        """
         self.select_list(self.selected_list - 1)
 
     def select_list(self, index: int) -> None:
+        """
+        Select the ListRenderer at the given index. See the documentation for
+        the whole class to understand how indexes work.
+
+        If the index is out of range, nothing happens.
+
+        This method will alos ensure that only one ListRenderer is currently
+        selected.
+        """
         if index < 0 or index >= len(self.items):
             return
 
@@ -417,6 +484,14 @@ class TreeListRenderer:
                 item.selected = False
 
     def set_items_position(self) -> None:
+        """
+        Automatically adjust the positionning of the ListRenderers so that they
+        conform to the layout described in the documentation for the whole
+        class.
+
+        This is called at initialization, and will need to be called manually if
+        one of the ListRenderer's actual_width chages.
+        """
         sum_now = self.x_pos
         for item in self.items:
             item.x_pos = sum_now
@@ -424,6 +499,10 @@ class TreeListRenderer:
             sum_now += item.actual_width + self.margin
 
     def get_list_item(self, index: int) -> Optional[ListRenderer]:
+        """
+        Return the ListRenderer at the given index. If the index is out of
+        range, returns None.
+        """
         if index < 0 or index >= len(self.items):
             return None
         return self.items[index]
