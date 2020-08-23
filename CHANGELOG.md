@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
  - Documentation for user_interface.py and TreeListRenderer
+ - Documentation for select_save.py
+
+### Fixed
+ - Linting in user_interface.py
+
+### Changed
+ - Ignore pylint C0103: Variable name doesn't conform to snake_case naming style
+   (invalid-name)
 
 ## [0.1.1-alpha]
 

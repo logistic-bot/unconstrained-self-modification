@@ -36,6 +36,7 @@ class ListRenderer:
     Allows to render a list of strings. This can also be used to select one of
     the strings from the list.
     """
+
     def __init__(
         self,
         renderer: CursesRenderer,
@@ -363,6 +364,7 @@ class TreeListRenderer:
     |     | |     | |     |
     +-----+ +-----+ +-----+
     """
+
     # TODO: Add a way to represent file systems with nested lists. This onl
     # allows for a defined set of actions wich are independent of the selected
     # element.
@@ -416,8 +418,8 @@ class TreeListRenderer:
         """
         passed_items = []
         for item in items:
-            lr = ListRenderer(renderer, 0, 0, item)
-            passed_items.append(lr)
+            list_renderer = ListRenderer(renderer, 0, 0, item)
+            passed_items.append(list_renderer)
 
         return passed_items
 

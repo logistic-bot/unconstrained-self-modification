@@ -55,15 +55,16 @@ TITLE_Y_POS = 1
 
 class SelectSave(FullScreenScene):
     """
-    Ask the user to select a save, then load it.
+    Present the user with a list of saves, and allows him to manage them.
     """
 
     def __init__(self, renderer: CursesRenderer, state: GameState) -> None:
+        self.last_selected_save_index = 0
         super().__init__(renderer, state)
 
     def start(self) -> Optional[Scene]:
         """
-        See above
+        Present the user with a list of saves, and allows him to manage them.
         """
 
         self.last_selected_save_index = 0
@@ -300,12 +301,19 @@ class SelectSave(FullScreenScene):
         return None  # if quit
 
     def create_save_list(self) -> ListRenderer:
+        """
+        Return a ListRenderer with the names of the saved games, sorted
+        alphabetically.
+        """
         save_list = ListRenderer(
             self.renderer, 0, 0, self.get_save_names(), True, MAX_LENGTH, MARGIN,
         )
         return save_list
 
     def create_action_list(self) -> ListRenderer:
+        """
+        Return a ListRenderer with the actions possible for a save.
+        """
         action_list = ListRenderer(
             self.renderer,
             0,
@@ -320,6 +328,10 @@ class SelectSave(FullScreenScene):
     def draw_centred(
         self, text: str, left: int, right: int, y_pos: int, color_pair: int = 0
     ) -> None:
+        """
+        Draw <text> centered between <left> and <right> at <y_pos> with
+        color_pair <color_pair>.
+        """
         logger.debug(
             "Drawing centred text '%s' with left %s right %s y_pos %s.",
             text,
@@ -334,6 +346,9 @@ class SelectSave(FullScreenScene):
         self.addinto(x_pos, y_pos, text, color_pair)
 
     def get_save_names(self) -> List[str]:
+        """
+        Get a list of save names, sorted alphabetically.
+        """
         names = []
         for save in self.get_saves():
             names.append(save.data["name"])
