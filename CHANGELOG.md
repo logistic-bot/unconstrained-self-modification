@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - Ignore pylint C0103: Variable name doesn't conform to snake_case naming style
    (invalid-name)
+ - Refactoring of select_save.py
+   - action_list, save_list and treelist are now members of SelectSave
+   - Delete action now uses get_confirmation to confirm
 
 ## [0.1.1-alpha]
 

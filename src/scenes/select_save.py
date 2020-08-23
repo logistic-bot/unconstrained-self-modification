@@ -3,8 +3,6 @@ This files contains the SelectSave scene, which allows the user to select a save
 be loaded.
 """
 
-# TODO: make action_list and save_list adn treelist members of the class
-
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #
@@ -59,8 +57,16 @@ class SelectSave(FullScreenScene):
     """
 
     def __init__(self, renderer: CursesRenderer, state: GameState) -> None:
-        self.last_selected_save_index = 0
         super().__init__(renderer, state)
+        logger.info("Initialising save manager")
+
+        self.last_selected_save_index = 0
+
+        self.save_list = self.create_save_list()
+        self.action_list = self.create_action_list()
+        self.treelist = TreeListRenderer(
+            self.renderer, TREE_X_POS, TREE_Y_POS, [self.save_list, self.action_list]
+        )
 
     def start(self) -> Optional[Scene]:
         """
@@ -71,30 +77,23 @@ class SelectSave(FullScreenScene):
 
         logger.info("Starting Scene: SelectSave")
 
-        save_list = self.create_save_list()
-        action_list = self.create_action_list()
-
-        SEPARATOR_1_POS = save_list.actual_width + 1
-        SEPARATOR_2_POS = action_list.actual_width + save_list.actual_width + 2
+        SEPARATOR_1_POS = self.save_list.actual_width + 1
+        SEPARATOR_2_POS = self.action_list.actual_width + self.save_list.actual_width + 2
 
         PROPERTIES_X_POS = SEPARATOR_2_POS + MARGIN + 1
 
-        treelist = TreeListRenderer(
-            self.renderer, TREE_X_POS, TREE_Y_POS, [save_list, action_list]
-        )
-
         ACTION_LIST_X_POS = TREE_X_POS + (MARGIN * 2) + MAX_LENGTH
 
-        def show_info(save_list: ListRenderer) -> None:
+        def show_info() -> None:
             delay: float = 0  # solves mypy
-            if save_list.index == self.last_selected_save_index:
+            if self.save_list.index == self.last_selected_save_index:
                 delay = 0
             else:
-                self.last_selected_save_index = save_list.index
+                self.last_selected_save_index = self.save_list.index
                 delay = 0.02
 
             try:
-                save = self.get_saves()[save_list.index]
+                save = self.get_saves()[self.save_list.index]
             except IndexError:
                 pass
             else:
@@ -153,13 +152,13 @@ class SelectSave(FullScreenScene):
                     sleep(delay)
 
         def update_save_list_names() -> None:
-            save_list = self.create_save_list()
-            save_list.selected = False
-            treelist.items[0] = save_list
-            treelist.set_items_position()
+            self.save_list = self.create_save_list()
+            self.save_list.selected = False
+            self.treelist.items[0] = self.save_list
+            self.treelist.set_items_position()
 
-        def show_help(save_list: ListRenderer, action_list: ListRenderer) -> None:
-            selected_save = self.get_saves()[save_list.index]
+        def show_help() -> None:
+            selected_save = self.get_saves()[self.save_list.index]
             helps = [
                 "ENTER: Load save '{}'",
                 "ENTER: Rename save '{}'",
@@ -167,7 +166,7 @@ class SelectSave(FullScreenScene):
                 "ENTER: Create new save",
             ]
             name = selected_save.data["name"]
-            help_text = helps[action_list.index]
+            help_text = helps[self.action_list.index]
             help_text = help_text.format(name)
             self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
 
@@ -176,17 +175,17 @@ class SelectSave(FullScreenScene):
             self.clear()
 
             # draw
-            treelist.draw()
+            self.treelist.draw()
 
             # separator
             self.show_separator(SEPARATOR_1_POS)
             self.show_separator(SEPARATOR_2_POS)
 
             # title
-            if save_list.selected:
+            if self.save_list.selected:
                 save_title_color = curses.A_BOLD | curses.A_REVERSE
                 action_title_color = 0
-            elif action_list.selected:
+            elif self.action_list.selected:
                 save_title_color = 0
                 action_title_color = curses.A_BOLD | curses.A_REVERSE
             else:
@@ -215,23 +214,23 @@ class SelectSave(FullScreenScene):
                 curses.A_DIM | curses.A_REVERSE,
             )
 
-            show_help(save_list, action_list)
-            show_info(save_list)  # this should be last, because of the delay.
+            show_help()
+            show_info()  # this should be last, because of the delay.
 
             # key
             key = self.get_key()
-            treelist.check_input(key)
+            self.treelist.check_input(key)
 
             if key == "\n":
-                index = action_list.index
+                index = self.action_list.index
                 if index == 0:  # Load game
                     self.addinto_all_centred("LOADING...")
-                    self.state = self.get_saves()[save_list.index]
+                    self.state = self.get_saves()[self.save_list.index]
                     self.clear()
                     self.addinto_all_centred("Done.")
                     return StartComputer(self.renderer, self.state)
-                elif index == 1:  # Rename
-                    selected_state = self.get_saves()[save_list.index]
+                if index == 1:  # Rename
+                    selected_state = self.get_saves()[self.save_list.index]
                     name = selected_state.data["name"]
 
                     # prompt for name
@@ -251,44 +250,16 @@ class SelectSave(FullScreenScene):
                     # update save_list names
                     update_save_list_names()
                 elif index == 2:  # Delete
-                    selected_state = self.get_saves()[save_list.index]
+                    selected_state = self.get_saves()[self.save_list.index]
                     name = selected_state.data["name"]
 
                     confirmation_prompt = " Are you sure you want to delete the save '{}'? ".format(
                         name
                     )
 
-                    curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
+                    do_delete = self.get_confirmation(confirmation_prompt)
 
-                    self.renderer.add_down_bar_text(
-                        confirmation_prompt,
-                        color_pair=curses.A_REVERSE
-                        | curses.color_pair(1)
-                        | curses.A_BOLD,
-                    )
-                    self.renderer.add_down_bar_text(
-                        " [y/n] ",
-                        2,
-                        color_pair=curses.A_REVERSE | curses.color_pair(1),
-                    )
-
-                    key = ""
-                    while key not in ("y", "n"):
-                        key = self.get_key().lower()
-                        if key not in ("y", "n"):
-                            self.renderer.add_down_bar_text(
-                                " Please press 'y' or 'n' ",
-                                2,
-                                color_pair=curses.A_REVERSE
-                                | curses.A_BLINK
-                                | curses.color_pair(1),
-                            )
-                        self.renderer.add_down_bar_text(
-                            confirmation_prompt,
-                            color_pair=curses.A_REVERSE | curses.color_pair(1),
-                        )
-
-                    if key == "y":
+                    if do_delete:
                         self.addinto_all_centred("Deleting save {}...".format(name))
                         SaveManager().delete(selected_state)
 
@@ -362,3 +333,35 @@ class SelectSave(FullScreenScene):
         self.renderer.stdscr.vline(
             1, x_pos, curses.ACS_VLINE, self.renderer.max_y - 2  # type: ignore
         )
+
+    def get_confirmation(self, confirmation_prompt: str) -> bool:
+        """
+        Asks the user to confirm <confirmation_prompt> with yes or no. Return
+        True for yes, False for no.
+        """
+        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
+
+        self.renderer.add_down_bar_text(
+            confirmation_prompt,
+            color_pair=curses.A_REVERSE | curses.color_pair(1) | curses.A_BOLD,
+        )
+        self.renderer.add_down_bar_text(
+            " [y/n] ", 2, color_pair=curses.A_REVERSE | curses.color_pair(1),
+        )
+
+        key = ""
+        while key not in ("y", "n"):
+            key = self.get_key().lower()
+            if key not in ("y", "n"):
+                self.renderer.add_down_bar_text(
+                    " Please press 'y' or 'n' ",
+                    2,
+                    color_pair=curses.A_REVERSE | curses.A_BLINK | curses.color_pair(1),
+                )
+            self.renderer.add_down_bar_text(
+                confirmation_prompt, color_pair=curses.A_REVERSE | curses.color_pair(1),
+            )
+
+        if key == "y":
+            return True
+        return False
