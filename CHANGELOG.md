@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2-alpha] 2020-08-25
+
 ### Removed
  - Messages that were never shown: "DELETING SAVE", "IMPOSSIBLE", ...
 
@@ -16,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Colors when asking for confirmation are more readable.
  - Ignore pylint C0103: Variable name doesn't conform to snake_case naming style
    (invalid-name)
+ - Ignore pylint W0707: Consider explicitly re-raising using the 'from' keyword
 
 ## [0.1.1-alpha]
 
