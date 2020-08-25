@@ -6,20 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+ - Messages that were never shown.
+
 ### Added
  - Documentation for user_interface.py and TreeListRenderer
  - Documentation for select_save.py
 
 ### Fixed
  - Linting in user_interface.py
+ - Selected save would reset to the first when renaming.
 
 ### Changed
+ - Colors when asking for confirmation are more readable.
  - Ignore pylint C0103: Variable name doesn't conform to snake_case naming style
    (invalid-name)
  - Refactoring of select_save.py
    - action_list, save_list and treelist are now members of SelectSave
    - Delete action now uses get_confirmation to confirm
    - Moved show_info() function outside of the start() method
+   - Moved update_save_list_names() function outside of the start() method
+   - Moved show_help() function outside of the start() method
    - Renamed show_info() method to show_properties()
 
 ## [0.1.1-alpha]

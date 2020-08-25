@@ -86,25 +86,6 @@ class SelectSave(FullScreenScene):
 
         ACTION_LIST_X_POS = TREE_X_POS + (MARGIN * 2) + MAX_LENGTH
 
-        def update_save_list_names() -> None:
-            self.save_list = self.create_save_list()
-            self.save_list.selected = False
-            self.treelist.items[0] = self.save_list
-            self.treelist.set_items_position()
-
-        def show_help() -> None:
-            selected_save = self.get_saves()[self.save_list.index]
-            helps = [
-                "ENTER: Load save '{}'",
-                "ENTER: Rename save '{}'",
-                "ENTER: Delete save '{}'",
-                "ENTER: Create new save",
-            ]
-            name = selected_save.data["name"]
-            help_text = helps[self.action_list.index]
-            help_text = help_text.format(name)
-            self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
-
         key = ""
         while key != "q":
             self.clear()
@@ -149,8 +130,10 @@ class SelectSave(FullScreenScene):
                 curses.A_DIM | curses.A_REVERSE,
             )
 
-            show_help()
-            self.show_properties(PROPERTIES_X_POS, INFO_Y_POS, ACTION_LIST_X_POS, MAX_LENGTH)  # this should be last, because of the delay.
+            self.show_help()
+            self.show_properties(
+                PROPERTIES_X_POS, INFO_Y_POS, ACTION_LIST_X_POS, MAX_LENGTH
+            )  # this should be last, because of the delay.
 
             # key
             key = self.get_key()
@@ -159,10 +142,7 @@ class SelectSave(FullScreenScene):
             if key == "\n":
                 index = self.action_list.index
                 if index == 0:  # Load game
-                    self.addinto_all_centred("LOADING...")
                     self.state = self.get_saves()[self.save_list.index]
-                    self.clear()
-                    self.addinto_all_centred("Done.")
                     return StartComputer(self.renderer, self.state)
                 if index == 1:  # Rename
                     selected_state = self.get_saves()[self.save_list.index]
@@ -183,7 +163,7 @@ class SelectSave(FullScreenScene):
                     save_manager.rename(selected_state, new_name)
 
                     # update save_list names
-                    update_save_list_names()
+                    self.update_save_list_names()
                 elif index == 2:  # Delete
                     selected_state = self.get_saves()[self.save_list.index]
                     name = selected_state.data["name"]
@@ -195,15 +175,12 @@ class SelectSave(FullScreenScene):
                     do_delete = self.get_confirmation(confirmation_prompt)
 
                     if do_delete:
-                        self.addinto_all_centred("Deleting save {}...".format(name))
                         SaveManager().delete(selected_state)
 
-                    # update save_list names
-                    update_save_list_names()
+                        # update save_list names
+                        self.update_save_list_names()
                 elif index == 3:  # Create new
                     return CorruptedLoginNewSave(self.renderer, self.state)
-                else:  # This should not be possible
-                    self.addinto_all_centred("IMPOSSIBLE...")
         return None  # if quit
 
     def create_save_list(self) -> ListRenderer:
@@ -274,11 +251,10 @@ class SelectSave(FullScreenScene):
         Asks the user to confirm <confirmation_prompt> with yes or no. Return
         True for yes, False for no.
         """
-        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
+        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
 
         self.renderer.add_down_bar_text(
-            confirmation_prompt,
-            color_pair=curses.A_REVERSE | curses.color_pair(1) | curses.A_BOLD,
+            confirmation_prompt, color_pair=curses.A_REVERSE | curses.color_pair(1),
         )
         self.renderer.add_down_bar_text(
             " [y/n] ", 2, color_pair=curses.A_REVERSE | curses.color_pair(1),
@@ -304,6 +280,14 @@ class SelectSave(FullScreenScene):
     def show_properties(
         self, x_pos: int, y_pos: int, logo_x_pos: int, logo_max_length: int
     ) -> None:
+        """
+        Show the properties of the currently selected save.
+
+        Actually does two thinkgs: display the infos, and display the brand
+        logo.
+        """
+        # TODO: split brand logo display and info display into separate methods.
+
         infos = [
             "Note: {d[note]}",
             "Debug: {d[debug]}",
@@ -370,3 +354,33 @@ class SelectSave(FullScreenScene):
         for index, line in enumerate(lines):
             self.addinto(x_pos, y_pos + index, line)
             sleep(delay)
+
+    def update_save_list_names(self) -> None:
+        """
+        Update the names in the save list.
+        """
+        index = self.save_list.index
+
+        self.save_list = self.create_save_list()
+
+        self.save_list.index = index
+
+        self.save_list.selected = False
+        self.treelist.items[0] = self.save_list
+        self.treelist.set_items_position()
+
+    def show_help(self) -> None:
+        """
+        Show a helpful message at the bottom of the screen.
+        """
+        selected_save = self.get_saves()[self.save_list.index]
+        helps = [
+            "ENTER: Load save '{}'",
+            "ENTER: Rename save '{}'",
+            "ENTER: Delete save '{}'",
+            "ENTER: Create new save",
+        ]
+        name = selected_save.data["name"]
+        help_text = helps[self.action_list.index]
+        help_text = help_text.format(name)
+        self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)
