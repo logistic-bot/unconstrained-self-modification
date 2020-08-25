@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-
 """
-Run this file to start the game
+This FullScreenScene is responsible for showing the game's title and startup messages.
 """
 
 # ------------------------------------------------------------------------------
@@ -23,25 +21,28 @@ Run this file to start the game
 # ------------------------------------------------------------------------------
 
 
-import logging
+from typing import Any
 
-from src.core.engine import Engine
+from src.core.scene import FullScreenScene
+from src.core.user_interface import TreeListRenderer
 
-logger = logging.getLogger(__name__)
 
+class TestScene(FullScreenScene):
 
-def main() -> None:
     """
-    main
+    This scene is called at the start of the game, in engine.py
     """
-    engine = Engine()
-    engine.start()
 
-    logger.info(
-        "This should be the last log line. If it is not, please contact the developers"
-    )
+    def start(self) -> Any:  # pylint: disable=R1711
 
+        # treelist = TreeListRenderer(self.renderer, 5, 5 ,[[list,list2,list3,["",""]])
+        treelist = TreeListRenderer(
+            self.renderer, 5, 5, [["Test", "Tryce"], ["Action1", "Action2"]]
+        )
 
-if __name__ == "__main__":
-    logger.info("Starting game")
-    main()
+        key = ""
+        while key != "q":
+            treelist.draw()
+            key = self.get_key()
+
+            treelist.check_input(key)

@@ -52,6 +52,7 @@ class Engine:  # pylint: disable=R0903
         logger.info("Starting game")
 
         try:
+            # current_scene: Optional[Scene] = TestScene(self.renderer, self.game_state)
             current_scene: Optional[Scene] = StartupScene(
                 self.renderer, self.game_state
             )
