@@ -78,78 +78,13 @@ class SelectSave(FullScreenScene):
         logger.info("Starting Scene: SelectSave")
 
         SEPARATOR_1_POS = self.save_list.actual_width + 1
-        SEPARATOR_2_POS = self.action_list.actual_width + self.save_list.actual_width + 2
+        SEPARATOR_2_POS = (
+            self.action_list.actual_width + self.save_list.actual_width + 2
+        )
 
         PROPERTIES_X_POS = SEPARATOR_2_POS + MARGIN + 1
 
         ACTION_LIST_X_POS = TREE_X_POS + (MARGIN * 2) + MAX_LENGTH
-
-        def show_info() -> None:
-            delay: float = 0  # solves mypy
-            if self.save_list.index == self.last_selected_save_index:
-                delay = 0
-            else:
-                self.last_selected_save_index = self.save_list.index
-                delay = 0.02
-
-            try:
-                save = self.get_saves()[self.save_list.index]
-            except IndexError:
-                pass
-            else:
-                infos = [
-                    "Username: '{d[user][username]}'",
-                    "Password: '{d[user][password]}'",
-                    "Note: {d[note]}",
-                ]
-
-                for index, info in enumerate(infos):
-                    try:
-                        self.addinto(
-                            PROPERTIES_X_POS,
-                            INFO_Y_POS + index,
-                            info.format(d=save.data),
-                        )
-                    except KeyError:
-                        pass
-                    else:
-                        sleep(delay)
-
-                computer_brand = "none"
-                try:
-                    logger.debug("Trying to get computer brand info from save file")
-                    computer_brand = save.data["progress"]["computer-brand"]
-                except KeyError:
-                    logger.warning("Failed to get computer brand info from save file")
-
-                computer_brand_path = (
-                    GAME_ROOT_DIR / "assets" / "brand_logo" / computer_brand
-                )
-
-                logger.debug("Trying to find asset at '%s'", computer_brand_path)
-                try:
-                    with computer_brand_path.open("r") as file:
-                        computer_brand_logo = file.read()
-                except FileNotFoundError:
-                    computer_brand_logo = (
-                        "WARNING: Asset missing. Try updating your game."
-                    )
-
-                lines = computer_brand_logo.splitlines()
-                max_line_length = max([len(line) for line in lines])
-                assert max_line_length < MAX_LENGTH, (
-                    "There is an error with the logo file, the lines are too "
-                    "long to be displayed."
-                )
-                x_pos = (
-                    ACTION_LIST_X_POS
-                    + round(MAX_LENGTH / 2)
-                    - round(max_line_length / 2)
-                )
-                y_pos = self.renderer.max_y - len(lines) - 1  # minus one for the border
-                for index, line in enumerate(lines):
-                    self.addinto(x_pos, y_pos + index, line)
-                    sleep(delay)
 
         def update_save_list_names() -> None:
             self.save_list = self.create_save_list()
@@ -215,7 +150,7 @@ class SelectSave(FullScreenScene):
             )
 
             show_help()
-            show_info()  # this should be last, because of the delay.
+            self.show_properties(PROPERTIES_X_POS, INFO_Y_POS, ACTION_LIST_X_POS, MAX_LENGTH)  # this should be last, because of the delay.
 
             # key
             key = self.get_key()
@@ -365,3 +300,73 @@ class SelectSave(FullScreenScene):
         if key == "y":
             return True
         return False
+
+    def show_properties(
+        self, x_pos: int, y_pos: int, logo_x_pos: int, logo_max_length: int
+    ) -> None:
+        infos = [
+            "Note: {d[note]}",
+            "Debug: {d[debug]}",
+            "Username: '{d[user][username]}'",
+            "Password: '{d[user][password]}'",
+        ]
+
+        # the delay will be 0.02 if a different save is selected, but 0 if the
+        # same save is selected. This ensures that no redraw animation is
+        # displayed when selecting an action.
+        delay: float = 0  # solves mypy
+        if self.save_list.index == self.last_selected_save_index:
+            delay = 0
+        else:
+            self.last_selected_save_index = self.save_list.index
+            delay = 0.02
+
+        try:
+            save = self.get_saves()[self.save_list.index]
+        except IndexError:
+            # if there are no saves, or an invalid save, do nothing and don't
+            # draw anything.
+            return
+
+        skipped_info_counter = 0
+        for index, info in enumerate(infos):
+            try:
+                self.addinto(
+                    x_pos,
+                    y_pos + index - skipped_info_counter,
+                    info.format(d=save.data),
+                )
+            except KeyError:
+                # if the save does not contain the given key, simply skip it.
+                # we increment this counter to make sure that there are no blank
+                # lines
+                skipped_info_counter += 1
+            else:
+                sleep(delay)
+
+        computer_brand = "none"
+        computer_brand_path = GAME_ROOT_DIR / "assets" / "brand_logo" / computer_brand
+        try:
+            logger.debug("Trying to get computer brand info from save file")
+            computer_brand = save.data["progress"]["computer-brand"]
+        except KeyError:
+            logger.warning("Failed to get computer brand info from save file")
+
+        try:
+            with computer_brand_path.open("r") as file:
+                computer_brand_logo = file.read()
+        except FileNotFoundError:
+            computer_brand_logo = "Asset missing"
+
+        lines = computer_brand_logo.splitlines()
+        max_line_length = max([len(line) for line in lines])
+        assert (
+            max_line_length < logo_max_length
+        ), "The logo is to large to be displayed! The maximum width is {} characters".format(
+            logo_max_length
+        )
+        x_pos = logo_x_pos + round(logo_max_length / 2) - round(max_line_length / 2)
+        y_pos = self.renderer.max_y - len(lines) - 1  # -1 for the border
+        for index, line in enumerate(lines):
+            self.addinto(x_pos, y_pos + index, line)
+            sleep(delay)

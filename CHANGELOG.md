@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Refactoring of select_save.py
    - action_list, save_list and treelist are now members of SelectSave
    - Delete action now uses get_confirmation to confirm
+   - Moved show_info() function outside of the start() method
+   - Renamed show_info() method to show_properties()
 
 ## [0.1.1-alpha]
 
