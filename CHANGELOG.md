@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+ - Alphabetic save ordering is now case-insensitive
+ - Save filepaths are no longer determined by the name
+ - All have an unique uuid as the filename
+
+### Fixed
+ - Renaming a save to the same name as another save overwrites the other save
+
 ## [0.1.2-alpha.1] 2020-08-26
 
 ### Fixed

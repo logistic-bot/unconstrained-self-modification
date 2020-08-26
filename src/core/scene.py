@@ -135,7 +135,7 @@ class Scene:
         """
         save_manager = SaveManager()
         saves = save_manager.saves
-        saves.sort(key=lambda x: x.data["name"])
+        saves.sort(key=lambda x: x.data["name"].lower())
         return saves
 
 

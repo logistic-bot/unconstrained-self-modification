@@ -23,6 +23,7 @@ This file contains the SaveManager class, which manages a group of Saves
 import logging
 from pathlib import Path
 from typing import List
+from uuid import uuid4 as uuid
 
 from src import GAME_ROOT_DIR
 from src.core.state.game_state import GameState
@@ -67,9 +68,8 @@ class SaveManager:
 
     def save_state(self, state: GameState) -> None:
         """
-        Save a given state into a file. The filename is determined by the 'name' attribute of the
-        state data.
-
+        Save a given state into a file. The filename is determined by the
+        'filepath' attribute of the state.
         :param state: The state to save
         :return: None
         """
@@ -80,11 +80,21 @@ class SaveManager:
 
     def get_path(self, state: GameState) -> Path:
         """
-        get the path of a state
+        Get the path of a state. The path is determined by the filepath
+        attribute of the sate.
+
+        If the filepath attribute is None, an unique UUID is generated and
+        stored as the filepath.
+
         :param state: the state to get the path
         :return: the path where the state is saved
         """
-        path = self.save_dir / f"{state.data['name']}.json"
+        path = state.filepath
+        if path is None:
+            logger.warning("filepath for state '%s' was not set, creating uuid", state)
+            path = self.save_dir / (str(uuid()) + ".json")
+            state.filepath = path
+            logger.warning("uuid filepath for state '%s': '%s'", state, path)
         return path
 
     def rename(self, state: GameState, new_name: str) -> None:
@@ -96,15 +106,8 @@ class SaveManager:
         logger.info(
             "Rename state '%s' from '%s' to '%s'", state, state.data["name"], new_name
         )
-
-        path = self.get_path(state)
         state.data["name"] = new_name
-
-        new_path = self.get_path(state)
-        state.save(new_path)
-
-        logger.warning("Deleting file: '%s'", path)
-        path.unlink()
+        state.save()
 
     def delete(self, state: GameState) -> None:
         """

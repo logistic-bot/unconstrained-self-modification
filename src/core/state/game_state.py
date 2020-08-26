@@ -24,7 +24,7 @@ This file contains the GameState class, which is responsible for saving the curr
 import json
 import logging
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, cast, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -34,17 +34,30 @@ JSON = Any
 class GameState:
     """
     This class is responsible for saving the current game state.
+
+    It has two properties: data and filepath. data contains the actual JSON data
+    loaded from the save file. filepath contains the path where the save is
+    stored.
+
+    At init time, filepath is set to None.
+
+    See the documentation for load() and save() for information on how filepath
+    behaves.
     """
 
     def __init__(self) -> None:
         self.data: JSON = {}
+        self.filepath: Optional[Path] = None
 
         logger.debug("Creating new empty GameState")
 
     def load(self, path: Path) -> None:
         """
-        Load a save file at a specified path into this save object.
+        Load a save file at a specified path into this save object. The internal
+        path is then set to the given <path>.
         """
+        self.filepath = path
+
         logger.info("Loading save file: '%s'", path)
 
         with path.open("r") as file:
@@ -55,8 +68,8 @@ class GameState:
     @property
     def lastsave(self) -> str:
         """
-        Return a string describing the last time this state was saved. If it was not saved,
-        return "Never".
+        Return a string describing the last time this state was saved. If it was
+        not saved, return "Never".
         """
         last_save = self.data["metadata"]["save_date"]
         assert isinstance(last_save, str)
@@ -64,12 +77,19 @@ class GameState:
         logger.debug("Lastsave: '%s'", last_save)
         return last_save
 
-    def save(self, path: Path) -> None:
+    def save(self, path: Optional[Path] = None) -> None:
         """
-        Save this game state to a given file, in JSON format.
+        Save this game state to a given file, in JSON format. Does not update
+        the internal path.
 
         :param path: the path to the file.
         """
+        if path is None:
+            assert (
+                self.filepath is not None
+            ), "You need to provide load() or set the filepath manually at least once."
+            path = self.filepath
+            logger.info("Using last loaded filepath '%s'", path)
         logger.info("Saving state to file '%s'", path)
         logger.info('Current data: "%s"', self.data)
 
