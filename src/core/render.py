@@ -301,7 +301,7 @@ class CursesRenderer:
         self,
         text: str,
         mode: int = 0,
-        color_pair: Optional[int] = None,
+        color_pair: Optional[int] = curses.A_NORMAL,
         x_pos: Optional[int] = None,
     ) -> None:
         """
@@ -314,18 +314,16 @@ class CursesRenderer:
         3 = Custom}
         :return:
         """
-        color = curses.A_NORMAL
-        if color_pair is not None:
-            color = color_pair
-        self.refresh()
         if mode == 0:  # Left
-            self.addtext(1, self.max_y - 1, text, color)
+            self.addtext(1, self.max_y - 1, text, color_pair)
         elif mode == 1:  # Middle
             x_pos = int((self.max_x / 2) - (len(text) / 2))
-            self.addtext(x_pos, self.max_y - 1, text, color)
+            self.addtext(x_pos, self.max_y - 1, text, color_pair)
         elif mode == 2:  # Right
-            self.addtext(self.max_x - 1 - len(text), self.max_y - 1, text, color)
+            self.addtext(self.max_x - 1 - len(text), self.max_y - 1, text, color_pair)
         elif mode == 3:  # Custom
-            assert x_pos is not None
-            self.addtext(x_pos, self.max_y - 1, text, color)
+            assert (
+                x_pos is not None
+            ), "When using mode 3 (custom), you must specify the x_pos"
+            self.addtext(x_pos, self.max_y - 1, text, color_pair)
         self.refresh()

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
  - Refactored select_save.py... Again
+ - Refactored render.add_down_bar_text()
 
 ## [0.1.3-alpha] 2020-08-26
 
