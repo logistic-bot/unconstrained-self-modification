@@ -137,51 +137,79 @@ class SelectSave(FullScreenScene):
 
             # key
             key = self.get_key()
-            self.treelist.check_input(key)
+            next_scene = self.handle_key(key)
+            if next_scene is not None:
+                return next_scene
 
-            if key == "\n":
-                index = self.action_list.index
-                if index == 0:  # Load game
-                    self.state = self.get_saves()[self.save_list.index]
-                    return StartComputer(self.renderer, self.state)
-                if index == 1:  # Rename
-                    selected_state = self.get_saves()[self.save_list.index]
-                    name = selected_state.data["name"]
-
-                    # prompt for name
-                    prompt_text = "New name for save '{}': ".format(name)
-                    new_name = self.prompt(
-                        round(self.renderer.max_x / 2)
-                        - 15
-                        - round(len(prompt_text) / 2),
-                        round(self.renderer.max_y / 2),
-                        prompt_text,
-                    )
-
-                    # actual renameing
-                    save_manager = SaveManager()
-                    save_manager.rename(selected_state, new_name)
-
-                    # update save_list names
-                    self.update_save_list_names()
-                elif index == 2:  # Delete
-                    selected_state = self.get_saves()[self.save_list.index]
-                    name = selected_state.data["name"]
-
-                    confirmation_prompt = " Are you sure you want to delete the save '{}'? ".format(
-                        name
-                    )
-
-                    do_delete = self.get_confirmation(confirmation_prompt)
-
-                    if do_delete:
-                        SaveManager().delete(selected_state)
-
-                        # update save_list names
-                        self.update_save_list_names()
-                elif index == 3:  # Create new
-                    return CorruptedLoginNewSave(self.renderer, self.state)
         return None  # if quit
+
+    def load_game(self) -> StartComputer:
+        """
+        Load the selected save. Returns the next scene.
+        """
+        self.state = self.get_saves()[self.save_list.index]
+        return StartComputer(self.renderer, self.state)
+
+    def rename_save(self) -> None:
+        """
+        Prompt the user for a new name for the selected save, and rename this
+        save.
+        """
+        selected_state = self.get_saves()[self.save_list.index]
+        name = selected_state.data["name"]
+
+        # prompt for name
+        prompt_text = "New name for save '{}': ".format(name)
+        new_name = self.prompt(
+            round(self.renderer.max_x / 2) - 15 - round(len(prompt_text) / 2),
+            round(self.renderer.max_y / 2),
+            prompt_text,
+        )
+
+        # actual renameing
+        save_manager = SaveManager()
+        save_manager.rename(selected_state, new_name)
+
+        # update save_list names
+        self.update_save_list_names()
+
+    def delete_save(self) -> None:
+        """
+        Prompt the user for confirmation, and if the user confirms, delete the
+        selected save.
+        """
+        selected_state = self.get_saves()[self.save_list.index]
+        name = selected_state.data["name"]
+
+        confirmation_prompt = " Are you sure you want to delete the save '{}'? ".format(
+            name
+        )
+
+        do_delete = self.get_confirmation(confirmation_prompt)
+
+        if do_delete:
+            SaveManager().delete(selected_state)
+
+            # update save_list names
+            self.update_save_list_names()
+
+    def handle_key(self, key: str) -> Optional[Scene]:
+        """
+        Handle a key event.
+        """
+        self.treelist.check_input(key)
+
+        if key == "\n":  # action
+            index = self.action_list.index
+            if index == 0:  # Load game
+                return self.load_game()
+            if index == 1:  # Rename
+                self.rename_save()
+            elif index == 2:  # Delete
+                self.delete_save()
+            elif index == 3:  # Create new
+                return CorruptedLoginNewSave(self.renderer, self.state)
+        return None
 
     def create_save_list(self) -> ListRenderer:
         """
@@ -263,12 +291,14 @@ class SelectSave(FullScreenScene):
         key = ""
         while key not in ("y", "n"):
             key = self.get_key().lower()
+
             if key not in ("y", "n"):
                 self.renderer.add_down_bar_text(
                     " Please press 'y' or 'n' ",
                     2,
                     color_pair=curses.A_REVERSE | curses.A_BLINK | curses.color_pair(1),
                 )
+
             self.renderer.add_down_bar_text(
                 confirmation_prompt, color_pair=curses.A_REVERSE | curses.color_pair(1),
             )
@@ -276,6 +306,33 @@ class SelectSave(FullScreenScene):
         if key == "y":
             return True
         return False
+
+    def show_infos(self, x_pos: int, y_pos: int, delay: float, save: GameState) -> None:
+        """
+        Show the infos.
+        """
+        infos = [
+            "Note: {d[note]}",
+            "Debug: {d[debug]}",
+            "Username: '{d[user][username]}'",
+            "Password: '{d[user][password]}'",
+        ]
+
+        skipped_info_counter = 0
+        for index, info in enumerate(infos):
+            try:
+                self.addinto(
+                    x_pos,
+                    y_pos + index - skipped_info_counter,
+                    info.format(d=save.data),
+                )
+            except KeyError:
+                # if the save does not contain the given key, simply skip it.
+                # we increment this counter to make sure that there are no blank
+                # lines
+                skipped_info_counter += 1
+            else:
+                sleep(delay)
 
     def show_properties(
         self, x_pos: int, y_pos: int, logo_x_pos: int, logo_max_length: int
@@ -287,13 +344,6 @@ class SelectSave(FullScreenScene):
         logo.
         """
         # TODO: split brand logo display and info display into separate methods.
-
-        infos = [
-            "Note: {d[note]}",
-            "Debug: {d[debug]}",
-            "Username: '{d[user][username]}'",
-            "Password: '{d[user][password]}'",
-        ]
 
         # the delay will be 0.02 if a different save is selected, but 0 if the
         # same save is selected. This ensures that no redraw animation is
@@ -312,22 +362,15 @@ class SelectSave(FullScreenScene):
             # draw anything.
             return
 
-        skipped_info_counter = 0
-        for index, info in enumerate(infos):
-            try:
-                self.addinto(
-                    x_pos,
-                    y_pos + index - skipped_info_counter,
-                    info.format(d=save.data),
-                )
-            except KeyError:
-                # if the save does not contain the given key, simply skip it.
-                # we increment this counter to make sure that there are no blank
-                # lines
-                skipped_info_counter += 1
-            else:
-                sleep(delay)
+        self.show_infos(x_pos, y_pos, delay, save)
+        self.show_computer_brand(logo_x_pos, logo_max_length, delay, save)
 
+    def show_computer_brand(
+        self, logo_x_pos: int, logo_max_length: int, delay: float, save: GameState
+    ) -> None:
+        """
+        Show the brand logo for the provided save at the given x_pos.
+        """
         computer_brand = "none"
         try:
             logger.debug("Trying to get computer brand info from save file")
