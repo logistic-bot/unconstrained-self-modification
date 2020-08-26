@@ -329,12 +329,12 @@ class SelectSave(FullScreenScene):
                 sleep(delay)
 
         computer_brand = "none"
-        computer_brand_path = GAME_ROOT_DIR / "assets" / "brand_logo" / computer_brand
         try:
             logger.debug("Trying to get computer brand info from save file")
             computer_brand = save.data["progress"]["computer-brand"]
         except KeyError:
             logger.warning("Failed to get computer brand info from save file")
+        computer_brand_path = GAME_ROOT_DIR / "assets" / "brand_logo" / computer_brand
 
         try:
             with computer_brand_path.open("r") as file:
