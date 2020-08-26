@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Deprecated
+ - select_save_old.py
+
 ## [0.1.3-alpha] 2020-08-26
 
 ### Changed
