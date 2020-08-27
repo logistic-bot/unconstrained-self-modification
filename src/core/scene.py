@@ -149,6 +149,14 @@ class FullScreenScene(Scene, ABC):
     def _addinto_centred_paged(
         self, y_pos: int, text: str, delay: float, pager_delay: float, color_pair: int
     ) -> bool:
+        logger.info(
+            "_addinto_centred_paged: y_pos: '%s' text: '%s' delay: '%s' pager_delay: '%s' color_pair: '%s'",
+            y_pos,
+            text,
+            delay,
+            pager_delay,
+            color_pair,
+        )
         all_lines = text.splitlines()
         max_lines = self.renderer.max_y - 2
 
@@ -202,6 +210,15 @@ class FullScreenScene(Scene, ABC):
         :param pager_delay: Delay between each page
         :return: True if the text was skipped, False otherwise
         """
+        logger.info(
+            "addinto_centred: y_pos: '%s' text: '%s' delay: '%s' pager_delay: '%s' color_pair: '%s'",
+            y_pos,
+            text,
+            delay,
+            pager_delay,
+            color_pair,
+        )
+
         # We can not set color pairs before curses is initialized, so we have to do it here.
         if color_pair is None:
             color_pair = curses.color_pair(0)
@@ -230,6 +247,15 @@ class FullScreenScene(Scene, ABC):
     def _add_line_centred(
         self, color_pair: int, delay: float, idx: int, line: str, y_pos: int
     ) -> float:
+        logger.info(
+            "_add_line_centred: color_pair: '%s' delay: '%s' idx: '%s' line: '%s' y_pos: '%s'",
+            color_pair,
+            delay,
+            idx,
+            line,
+            y_pos,
+        )
+
         middle_of_screen = self.renderer.max_x / 2
         middle_of_text = len(line) / 2
         # we need to round this to avoid passing a float to self.renderer.add_text
@@ -261,6 +287,14 @@ class FullScreenScene(Scene, ABC):
         :param delay: How many seconds to wait between each line
         :param pager_delay: How many seconds to wait between each page.
         """
+        logger.info(
+            "addinto_all_centred: text: '%s' delay: '%s' pager_delay: '%s' color_pair: '%s'",
+            text,
+            delay,
+            pager_delay,
+            color_pair,
+        )
+
         line_count = len(text.splitlines())
         return self.addinto_centred(
             round(self.renderer.max_y / 2) - round(line_count / 2),
@@ -269,12 +303,3 @@ class FullScreenScene(Scene, ABC):
             pager_delay,
             color_pair,
         )
-
-
-class PartialScreenScene(FullScreenScene, ABC):
-    """
-    This is the base class for all Scenes that do not use the full screen.
-    """
-
-    # TODO: Add logging for this class
-    # TODO: Make this class inherit from Scene, not FullScreenScene

@@ -6,12 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Deprecated
+### Removed
  - select_save_old.py
+ - PartialScreenScene
 
 ### Changed
  - Refactored select_save.py... Again
  - Refactored render.add_down_bar_text()
+ - Added logging to FullScreenScene
+ - Linter max line length set to 120
+
 
 ## [0.1.3-alpha] 2020-08-26
 
