@@ -62,6 +62,7 @@ class ListRenderer:
         self.indent_selected = False
         self._margin = margin
         self.select_max_length = select_max_length
+        self.highlight_selected = True
 
         logger.info(
             "Created new ListRenderer at (%s, %s) with items '%s'", x_pos, y_pos, items
@@ -155,11 +156,20 @@ class ListRenderer:
                 self.select_previous()
 
     @property
-    def selected_item(self) -> str:
+    def selected_item(self) -> Optional[str]:
         """
-        Return the currently selected item.
+        Return the currently selected item. If the cureent index is not usable,
+        return the first item (items[0]). If the items list is empty, return
+        None.
         """
-        item = self.items[self.index]
+        item: Optional[str]
+        try:
+            item = self.items[self.index]
+        except IndexError:  # if the item at the index does not exist..
+            try:
+                item = self.items[0]  # we try getting the first
+            except IndexError:  # if the list is empty
+                item = None  # we return none
         return item
 
     def get_selected_index(self) -> int:
@@ -211,10 +221,9 @@ class ListRenderer:
             of the shortest element of the list, it will behave as if it were in
             internal mode.
 
-            If highlight_selected and highlight_max_length are both True, then
-            the ListRenderer will highlight up to max_length for element that
-            are shorter than max_length and the whole element for elements that
-            are longer.
+            If highlight_max_length is True, then the ListRenderer will
+            highlight up to max_length for element that are shorter than
+            max_length and the whole element for elements that are longer.
 
             While in external mode, get_max_length will return the length set by
             set_max_length.
@@ -272,7 +281,7 @@ class ListRenderer:
          - margin: sets how many spaces should be inserted before and after each
            item. See also get_item_margins()
 
-        See also highlight_selected() for option to highlight the selected item.
+        See also draw_highlight_selected() for option to highlight the selected item.
         """
         for index, item in enumerate(self.items):
             item = self.get_item_margins(item)
@@ -283,9 +292,9 @@ class ListRenderer:
                 )
             self.renderer.addtext(self.x_pos, self.y_pos + index, item)
 
-        self.highlight_selected()
+        self.draw_highlight_selected()
 
-    def get_item_margins(self, item: str) -> str:
+    def get_item_margins(self, item: Optional[str]) -> str:
         """
         Given an item string, return the item with the needed margins applied.
 
@@ -294,20 +303,27 @@ class ListRenderer:
         selected, the needed length will be highlighted. See also
         get_max_length() (Internal mode) for more details.
 
+        If the given item is None, return an empty string.
+
         See also set_margin()
         """
+        if item is None:
+            item = ""
+
         if self.select_max_length:
             item += " " * (self.max_length - len(item))
             logger.debug("item: '%s'", item)
+            assert isinstance(item, str)  # mypy
             logger.debug("item len: '%s'", len(item))
 
         item = " " * self.margin + str(item) + " " * self.margin
+        assert isinstance(item, str)  # mypy
         return item
 
-    def highlight_selected(self) -> None:
+    def draw_highlight_selected(self) -> None:
         """
         Highlight the selected item so that the user can see which item is
-        selected.
+        selected, but only if highlight_selected is True.
 
         Options:
             indent_selected: If True, the selected item will be indented to the
@@ -315,30 +331,31 @@ class ListRenderer:
             selected: If the list is selected, the selected item will be
                 highlighted brightly. If not, it will be highlighted greyly.
         """
-        item = self.get_item_margins(self.selected_item)
+        if self.highlight_selected:
+            item = self.get_item_margins(self.selected_item)
 
-        selected_x_pos = self.x_pos
-        if self.indent_selected:
-            selected_x_pos += 1
+            selected_x_pos = self.x_pos
+            if self.indent_selected:
+                selected_x_pos += 1
 
-        if self.selected:  # if selected
-            self.renderer.addtext(
-                self.x_pos, self.y_pos + self.index, " " * self.max_length
-            )
+            if self.selected:  # if selected
+                self.renderer.addtext(
+                    self.x_pos, self.y_pos + self.index, " " * self.max_length
+                )
 
-            self.renderer.addtext(
-                selected_x_pos,
-                self.y_pos + self.index,
-                item,
-                curses.A_BOLD | curses.A_REVERSE,
-            )
-        else:  # if not selected
-            self.renderer.addtext(
-                self.x_pos,
-                self.y_pos + self.index,
-                item,
-                curses.A_DIM | curses.A_REVERSE,
-            )
+                self.renderer.addtext(
+                    selected_x_pos,
+                    self.y_pos + self.index,
+                    item,
+                    curses.A_BOLD | curses.A_REVERSE,
+                )
+            else:  # if not selected
+                self.renderer.addtext(
+                    self.x_pos,
+                    self.y_pos + self.index,
+                    item,
+                    curses.A_DIM | curses.A_REVERSE,
+                )
 
 
 class TreeListRenderer:

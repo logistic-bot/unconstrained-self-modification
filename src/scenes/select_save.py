@@ -88,6 +88,14 @@ class SelectSave(FullScreenScene):
 
         key = ""
         while key != "q":
+            if self.save_list.items == []:
+                self.save_list.selected = False
+                self.action_list.selected = True
+
+                self.save_list.highlight_selected = False
+            else:
+                self.save_list.highlight_selected = True
+
             self.clear()
 
             # draw
@@ -201,14 +209,15 @@ class SelectSave(FullScreenScene):
 
         if key == "\n":  # action
             index = self.action_list.index
-            if index == 0:  # Load game
-                return self.load_game()
-            if index == 1:  # Rename
-                self.rename_save()
-            elif index == 2:  # Delete
-                self.delete_save()
-            elif index == 3:  # Create new
+            if index == 3:  # create new
                 return CorruptedLoginNewSave(self.renderer, self.state)
+            if self.save_list.items != []:
+                if index == 0:  # Load game
+                    return self.load_game()
+                if index == 1:  # Rename
+                    self.rename_save()
+                elif index == 2:  # Delete
+                    self.delete_save()
         return None
 
     def create_save_list(self) -> ListRenderer:
@@ -416,14 +425,24 @@ class SelectSave(FullScreenScene):
         """
         Show a helpful message at the bottom of the screen.
         """
-        selected_save = self.get_saves()[self.save_list.index]
-        helps = [
-            "ENTER: Load save '{}'",
-            "ENTER: Rename save '{}'",
-            "ENTER: Delete save '{}'",
-            "ENTER: Create new save",
-        ]
-        name = selected_save.data["name"]
-        help_text = helps[self.action_list.index]
-        help_text = help_text.format(name)
+        if self.save_list.items == []:
+            helps = [
+                "No save to load",
+                "No save to rename",
+                "No save to delete",
+                "ENTER: Create new save",
+            ]
+            help_text = helps[self.action_list.index]
+        else:
+            selected_save = self.get_saves()[self.save_list.index]
+            helps = [
+                "ENTER: Load save '{}'",
+                "ENTER: Rename save '{}'",
+                "ENTER: Delete save '{}'",
+                "ENTER: Create new save",
+            ]
+            name = selected_save.data["name"]
+            help_text = helps[self.action_list.index]
+            help_text = help_text.format(name)
+
         self.renderer.add_down_bar_text(help_text, 0, curses.A_REVERSE)

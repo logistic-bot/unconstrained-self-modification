@@ -144,8 +144,6 @@ class FullScreenScene(Scene, ABC):
     The base class for all full-screen Scenes, contains convenience methods.
     """
 
-    # TODO: Add logging for this class
-
     def _addinto_centred_paged(
         self, y_pos: int, text: str, delay: float, pager_delay: float, color_pair: int
     ) -> bool:
