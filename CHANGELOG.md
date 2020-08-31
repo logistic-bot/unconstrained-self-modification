@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4-alpha] 2020-08-31
+
 ### Added
  - select_save.py now supports not having any save files at all
 
@@ -18,7 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Refactored render.add_down_bar_text()
  - Added logging to FullScreenScene
  - Linter max line length set to 120
-
 
 ## [0.1.3-alpha] 2020-08-26
 
