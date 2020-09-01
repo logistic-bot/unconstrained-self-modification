@@ -10,3 +10,6 @@ mind_control.code-workspace
 /saves/
 /saves/ignored
 /log/
+/doc/_build
+/doc/_static
+/doc/_templates
