@@ -1,6 +1,11 @@
 """
-Define Game-wide Constants
+src
+===
+
+This module contains all the source code for the game engine, and the different
+Scenes.
 """
+# Define Game-wide Constants
 
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.

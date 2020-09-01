@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 """
+main.py
+=======
+
 Run this file to start the game
 """
 

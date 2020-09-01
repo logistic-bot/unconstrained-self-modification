@@ -1,3 +1,13 @@
+"""
+src.core
+--------
+
+This module contains all the code that should not be game-specific.
+
+That is, any code in this module should be usable in a completely different
+game.
+"""
+
 # ------------------------------------------------------------------------------
 #  This file is part of Universal Sandbox.
 #

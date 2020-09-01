@@ -21,18 +21,7 @@ cheat-sheet.
 
    api
 
-   api/core
-   api/core/engine
-   api/core/render
-   api/core/scene
-   api/core/user_interface
-
    game
-   game/scenes
-   game/animations
-
-
-
 
 Indices and tables
 ==================
